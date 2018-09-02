@@ -18,6 +18,7 @@ import java.util.List;
 public class Lendment extends AuditModel{
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)

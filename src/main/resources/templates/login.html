@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.springframework.org/schema/data/jaxb">
+<head>
+	<title>Login Pages</title>
+	<link rel="stylesheet" type="text/css" th:href="@{css/login.css}">
+</head>
+<body>
+	<div class="container">
+		<div class="icon"></div>
+		<div class="title">INVENGER</div>
+		<div align="center">
+			<form class="form" th:action="@{/login}" th:object="${user}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <div>
+					<input class="input" type="text" th:field="*{username}"  placeholder="Username">
+				</div>
+				<div>
+					<input class="input" type="password" th:field="*{password}"  placeholder="Password">
+				</div>
+				<div>
+					<input type="checkbox" name="verif" value=""> Login as Admin
+				</div>
+				<div>
+					<button class="btn">LOG IN</button>
+				</div>
+			</form>
+		</div>
+		<div align="center">
+			<a href="">Contact Admin?</a>
+		</div>
+	</div>
+</body>
+</html>
