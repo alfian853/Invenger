@@ -19,6 +19,7 @@ import javax.persistence.*;
 public class Category {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     Integer id;
 
     String name;
