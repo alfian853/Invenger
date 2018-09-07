@@ -50,7 +50,7 @@ public class DataSeeder {
             admin = new User();
             admin.setUsername("root");
             admin.setRole(roleRepository.findByName("ROLE_ADMIN"));
-            admin.setPassword(new BCryptPasswordEncoder().encode("admin-root-123"));
+            admin.setPassword(new BCryptPasswordEncoder().encode("root"));
             userRepository.save(admin);
         }
     }

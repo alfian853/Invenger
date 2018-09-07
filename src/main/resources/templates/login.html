@@ -6,6 +6,15 @@
 </head>
 <body>
 	<div class="container">
+		<div th:if="${#request.getParameter('error') == 'true'}"
+			 style="color:red;margin:10px 0px;">
+			Login Failed!!!<br />
+			Reason :
+			<span th:if="${#session!= null and #session.getAttribute('SPRING_SECURITY_LAST_EXCEPTION') != null}"
+				  th:utext="${#session.getAttribute('SPRING_SECURITY_LAST_EXCEPTION').message}">
+                Static summary
+         </span>
+		</div>
 		<div class="icon"></div>
 		<div class="title">INVENGER</div>
 		<div align="center">
@@ -18,7 +27,7 @@
 					<input class="input" type="password" th:field="*{password}"  placeholder="Password">
 				</div>
 				<div>
-					<input type="checkbox" name="verif" value=""> Login as Admin
+					<input type="checkbox" name="remember-me"> Remember me
 				</div>
 				<div>
 					<button class="btn">LOG IN</button>

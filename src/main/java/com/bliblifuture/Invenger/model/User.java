@@ -1,5 +1,6 @@
 package com.bliblifuture.Invenger.model;
 
+import com.bliblifuture.Invenger.InvengerApplication;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -7,8 +8,10 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.util.*;
@@ -54,6 +57,7 @@ public class User extends AuditModel implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
         grantedAuthorities.add(new SimpleGrantedAuthority(role.getName()));
+        InvengerApplication.log.info("rolenya: "+role.getName());
         return grantedAuthorities;
     }
 
@@ -76,4 +80,10 @@ public class User extends AuditModel implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+
+
+
+
+
 }

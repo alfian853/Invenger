@@ -1,19 +1,27 @@
 package com.bliblifuture.Invenger.config;
 
 
+import com.bliblifuture.Invenger.InvengerApplication;
 import com.bliblifuture.Invenger.repository.UserRepository;
+import com.bliblifuture.Invenger.service.Imp.UserServiceImp;
 import com.bliblifuture.Invenger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+
+import javax.sql.DataSource;
 
 @Configuration
 @EnableWebSecurity
@@ -23,43 +31,60 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     UserRepository userRepository;
 
     @Autowired
-    UserService userService;
+    UserServiceImp userServiceImp;
+
+    @Autowired
+    DataSource dataSource;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userService).passwordEncoder(new BCryptPasswordEncoder());
+        auth.userDetailsService(userServiceImp).passwordEncoder(new BCryptPasswordEncoder());
     }
+
 
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers("/css/**");
     }
 
+    @Bean
+    public PersistentTokenRepository persistentTokenRepository() {
+        JdbcTokenRepositoryImpl db = new JdbcTokenRepositoryImpl();
+        db.setDataSource(this.dataSource);
+        return db;
+    }
+
+
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
 //                .anyRequest().hasAnyRole("ROLE_ADMIN","ROLE_USER")
+                .antMatchers("/login","/logout","/logedout").permitAll()
                 .and()
                 .formLogin()
-                .loginPage("/login").permitAll()
-                .successHandler(loginSuccessHandler())
+                .loginPage("/login")
+                .defaultSuccessUrl("/form")
                 .failureHandler(loginFailureHandler())
                 .and()
                 .logout().permitAll()
                 .logoutSuccessUrl("/login")
                 .and()
+                .rememberMe().tokenRepository(this.persistentTokenRepository()).tokenValiditySeconds(2)
+                .and()
+                .logout().logoutUrl("/logout").logoutSuccessUrl("/login")
+                .and()
                 .csrf();
-    }
 
-    public AuthenticationSuccessHandler loginSuccessHandler() {
-        return (request, response, authentication) -> response.sendRedirect("/sukses");
+//        http.authorizeRequests().and()
+
     }
 
     public AuthenticationFailureHandler loginFailureHandler() {
         return (request, response, exception) -> {
 //            request.getSession().setAttribute("flash", new FlashMessage("Incorrect username and/or password. Please try again.", FlashMessage.Status.FAILURE));
-            response.sendRedirect("/gagal");
+            response.sendRedirect("/login?error=true");
         };
     }
 

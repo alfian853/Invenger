@@ -1,35 +1,43 @@
-package com.bliblifuture.Invenger.service;
+package com.bliblifuture.Invenger.service.Imp;
 
 import com.bliblifuture.Invenger.InvengerApplication;
 import com.bliblifuture.Invenger.model.User;
+import com.bliblifuture.Invenger.repository.RoleRepository;
 import com.bliblifuture.Invenger.repository.UserRepository;
+import com.bliblifuture.Invenger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import sun.rmi.runtime.Log;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
+import org.springframework.util.StringUtils;
+
+import java.util.Collection;
 
 @Service
-public class UserServiceImp implements UserService{
+public class UserServiceImp implements UserService {
 
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    RoleRepository roleRepository;
+
     @Override
     public User findByUsername(String username) {
-        InvengerApplication.log.info("masuk sayang");
         return userRepository.findByUsername(username);
     }
 
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
         User user = findByUsername(s);
-        InvengerApplication.log.info("masuk sayang2 "+ Boolean.toString(user == null));
         if(user == null) {
             throw new UsernameNotFoundException("User not found");
         }
         return user;
     }
+
+
+
+
 }
