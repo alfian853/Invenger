@@ -1,6 +1,14 @@
 body{
-	background-color: black;
+	background-color: #2879ae;
 	font-family: Roboto;
+}
+a{
+	text-decoration: none;
+	font-weight: normal;
+	color: #24abf2;
+}
+a:hover{
+	color: #59bff5;
 }
 .card{
 	border-color: rgba(24, 28, 33, 0.06);
