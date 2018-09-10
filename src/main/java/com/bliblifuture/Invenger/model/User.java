@@ -37,7 +37,9 @@ public class User extends AuditModel implements UserDetails {
     @Column(length = 72,nullable = false)
     private String password;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "position_id")
     @OnDelete(action = OnDeleteAction.NO_ACTION)
     private Position position;

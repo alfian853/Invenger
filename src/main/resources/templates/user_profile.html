@@ -15,7 +15,7 @@
 							<div class="titleInput">
 								Name
 							</div>
-							<input class="input" type="text" name="" th:field="${user.position}">
+							<input class="input" type="text" name="" th:field="*{username}">
 						</div>
 						<div align="center">
 							<div class="titleInput">
@@ -33,7 +33,7 @@
 							<div class="titleInput">
 								Position
 							</div>
-							<input class="input" type="text" name="" th:field="${position}">
+							<input class="input" type="text" name="" th:field="*{position.name}">
 						</div>
 						<div align="center">
 							<button class="btn">Update profile</button>
