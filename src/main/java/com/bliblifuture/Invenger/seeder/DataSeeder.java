@@ -31,7 +31,7 @@ public class DataSeeder {
 
     @EventListener
     public void initSeeder(ContextRefreshedEvent event){
-//        postionSeeder();
+        postionSeeder();
         roleSeeder();
         adminSeeder();
     }

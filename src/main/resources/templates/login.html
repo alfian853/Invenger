@@ -21,7 +21,7 @@
 			<form class="form" th:action="@{/login}" th:object="${user}" method="post">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <div>
-					<input class="input" type="text" th:field="*{username}"  placeholder="example@future.com">
+					<input class="input" type="text" th:field="*{username}"  placeholder="username or email">
 				</div>
 				<div>
 					<input class="input" type="password" th:field="*{password}"  placeholder="Password">

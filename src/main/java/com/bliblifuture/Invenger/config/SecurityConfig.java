@@ -2,7 +2,7 @@ package com.bliblifuture.Invenger.config;
 
 
 import com.bliblifuture.Invenger.repository.UserRepository;
-import com.bliblifuture.Invenger.service.Imp.UserServiceImp;
+import com.bliblifuture.Invenger.service.Imp.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,14 +26,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     UserRepository userRepository;
 
     @Autowired
-    UserServiceImp userServiceImp;
+    UserService userService;
 
     @Autowired
     DataSource dataSource;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userServiceImp).passwordEncoder(new BCryptPasswordEncoder());
+        auth.userDetailsService(userService).passwordEncoder(new BCryptPasswordEncoder());
     }
 
 
@@ -66,7 +66,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logout().permitAll()
                 .logoutSuccessUrl("/login")
                 .and()
-                .rememberMe().tokenRepository(this.persistentTokenRepository())
+                .rememberMe().tokenRepository(this.persistentTokenRepository()).userDetailsService(userService)
                 .and()
                 .logout().logoutUrl("/logout").logoutSuccessUrl("/login")
                 .and()

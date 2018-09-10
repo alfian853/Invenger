@@ -4,13 +4,13 @@ import com.bliblifuture.Invenger.InvengerApplication;
 import com.bliblifuture.Invenger.model.User;
 import com.bliblifuture.Invenger.repository.RoleRepository;
 import com.bliblifuture.Invenger.repository.UserRepository;
-import com.bliblifuture.Invenger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserServiceImp implements UserService {
+public class UserService implements UserDetailsService {
 
     @Autowired
     UserRepository userRepository;
@@ -18,16 +18,16 @@ public class UserServiceImp implements UserService {
     @Autowired
     RoleRepository roleRepository;
 
-    @Override
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username);
-    }
-
-
-    //username for login is email
+    /*
+    * load by username or email for login and auto login purpose
+    * */
     @Override
     public User loadUserByUsername(String s) throws UsernameNotFoundException {
-        User user =userRepository.findByEmail(s);
+        InvengerApplication.log.info("iam called "+s);
+        User user =userRepository.findByUsername(s);
+        if(user == null){
+            return userRepository.findByEmail(s);
+        }
         return user;
     }
 
