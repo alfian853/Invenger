@@ -3,7 +3,7 @@ body{
 	background-color: #f8f8f8;
 	font-family: Roboto;
 }
-.sidebar{
+#sidebar{
     height: 100%;
     width: 250px;
     position: fixed;
@@ -13,7 +13,7 @@ body{
     background-color: #2f3337;
     overflow-x: hidden;
 }
-.top{
+#top{
 	display: flex;
 	justify-content: space-between;
 	padding: 18px 32px;
@@ -21,27 +21,30 @@ body{
 	font-size: 20px;
     color: #f1f1f1;
     border-bottom: 1px solid rgb(57, 65, 74);
-    margin-bottom: 20px;
 }
-.sidebar a{
-    padding: 12px 32px 12px 32px;
+#element{
+	text-align: left;
+	margin: 12px 32px;
+	font-size: 11px; 
+	color: rgb(157, 159, 161); 
+}
+.icon{
+    padding: 12px 32px;
     text-decoration: none;
     font-size: 15px;
     color: rgb(157, 159, 161);
-    display: block;
+    display: flex;
+    justify-content: flex-start;
 }
-.sidebar a:hover{
+.icon:hover{
     color: #f1f1f1;
 }
-.content{
+#content{
     margin-left: 250px;
 }
 #selected{
 	color: rgb(255, 255, 255);
 	background-color: #393d41;
-}
-a i{
-	padding-right: 15px;
 }
 .navbar{
 	background-color: #ffffff;
@@ -55,4 +58,7 @@ a i{
 }
 #bars:hover{
 	color: #f1f1f1;
+}
+.text{
+	padding-left: 15px;
 }
