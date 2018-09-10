@@ -5,35 +5,35 @@
 	<link rel="stylesheet" type="text/css" th:href="@{css/user_profile.css}">
 </head>
 <body>
-	<div class="container">
+	<div class="container" >
 		<div class="text">User Profile</div>
 		<div style="height: 448px;">
 			<div class="left">
 				<div>
-					<form class="form">
+					<form class="form" th:object="${user}" >
 						<div align="center">
 							<div class="titleInput">
 								Name
 							</div>
-							<input class="input" type="text" name="" value="">
+							<input class="input" type="text" name="" th:field="${user.position}">
 						</div>
 						<div align="center">
 							<div class="titleInput">
 								Email
 							</div>
-							<input class="input" type="text" name="" value="">
+							<input class="input" type="text" name="" th:field="*{email}">
 						</div>
 						<div align="center">
 							<div class="titleInput">
 								Telp
 							</div>
-							<input class="input" type="text" name="" value="">
+							<input class="input" type="text" name="" th:field="*{telp}">
 						</div>
 						<div align="center">
 							<div class="titleInput">
 								Position
 							</div>
-							<input class="input" type="text" name="" value="">
+							<input class="input" type="text" name="" th:field="${position}">
 						</div>
 						<div align="center">
 							<button class="btn">Update profile</button>

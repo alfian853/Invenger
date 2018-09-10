@@ -1,7 +1,9 @@
 package com.bliblifuture.Invenger.seeder;
 
+import com.bliblifuture.Invenger.model.Position;
 import com.bliblifuture.Invenger.model.Role;
 import com.bliblifuture.Invenger.model.User;
+import com.bliblifuture.Invenger.repository.PositionRepository;
 import com.bliblifuture.Invenger.repository.RoleRepository;
 import com.bliblifuture.Invenger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +26,28 @@ public class DataSeeder {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    PositionRepository positionRepository;
+
     @EventListener
     public void initSeeder(ContextRefreshedEvent event){
+//        postionSeeder();
         roleSeeder();
         adminSeeder();
     }
 
+
+    void postionSeeder(){
+
+        Position position = positionRepository.findByName("inventory system admin");
+        if(position == null){
+            position = new Position();
+            position.setDescription("manage invenger");
+            position.setName("inventory system admin");
+        }
+
+        positionRepository.save(position);
+    }
 
     void roleSeeder(){
         List<Role> roleList = roleRepository.findAll();
@@ -49,8 +67,10 @@ public class DataSeeder {
         if(admin == null){
             admin = new User();
             admin.setUsername("root");
+            admin.setEmail("root@future.com");
             admin.setRole(roleRepository.findByName("ROLE_ADMIN"));
             admin.setPassword(new BCryptPasswordEncoder().encode("root"));
+            admin.setPosition(positionRepository.findByName("inventory system admin"));
             userRepository.save(admin);
         }
     }

@@ -6,13 +6,8 @@ import com.bliblifuture.Invenger.repository.RoleRepository;
 import com.bliblifuture.Invenger.repository.UserRepository;
 import com.bliblifuture.Invenger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-
-import java.util.Collection;
 
 @Service
 public class UserServiceImp implements UserService {
@@ -28,15 +23,13 @@ public class UserServiceImp implements UserService {
         return userRepository.findByUsername(username);
     }
 
+
+    //username for login is email
     @Override
-    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        User user = findByUsername(s);
-        if(user == null) {
-            throw new UsernameNotFoundException("User not found");
-        }
+    public User loadUserByUsername(String s) throws UsernameNotFoundException {
+        User user =userRepository.findByEmail(s);
         return user;
     }
-
 
 
 

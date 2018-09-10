@@ -1,10 +1,8 @@
 package com.bliblifuture.Invenger.config;
 
 
-import com.bliblifuture.Invenger.InvengerApplication;
 import com.bliblifuture.Invenger.repository.UserRepository;
 import com.bliblifuture.Invenger.service.Imp.UserServiceImp;
-import com.bliblifuture.Invenger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,9 +13,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
-import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
@@ -65,13 +60,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .formLogin()
                 .loginPage("/login")
-                .defaultSuccessUrl("/form")
+                .defaultSuccessUrl("/profile")
                 .failureHandler(loginFailureHandler())
                 .and()
                 .logout().permitAll()
                 .logoutSuccessUrl("/login")
                 .and()
-                .rememberMe().tokenRepository(this.persistentTokenRepository()).tokenValiditySeconds(2)
+                .rememberMe().tokenRepository(this.persistentTokenRepository())
                 .and()
                 .logout().logoutUrl("/logout").logoutSuccessUrl("/login")
                 .and()
