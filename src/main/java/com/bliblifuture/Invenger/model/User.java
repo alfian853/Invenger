@@ -1,5 +1,6 @@
 package com.bliblifuture.Invenger.model;
 
+import com.bliblifuture.Invenger.annotation.PhoneConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,11 +33,11 @@ public class User extends AuditModel implements UserDetails {
     @Column(unique = true)
     private String email;
 
+    @PhoneConstraint
     private String telp;
 
     @Column(length = 72,nullable = false)
     private String password;
-
 
 
     @ManyToOne(fetch = FetchType.LAZY)
