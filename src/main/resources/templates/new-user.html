@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
+	<link rel="stylesheet" type="text/css" href="new-user.css">
+	<title>User Profile</title>
+</head>
+<body>
+	<div id="sidebar">
+		<div id="top">
+			<div id="invenger-text">INVENGER</div><i onclick="myFunction()" id="bars" class="fa fa-bars"></i>
+		</div>
+		<div id="element">MENUS</div>
+		<a class="icon" href="">
+			<i class="fa fa-cloud"></i><div class="text">Options</div>
+		</a>
+		<a class="icon" id="selected" href="">
+			<i class="fa fa-cloud"></i><div class="text">Options</div>
+		</a>
+		<a class="icon" href="">
+			<i class="fa fa-cloud"></i><div class="text">Options</div>
+		</a>
+		<a class="icon" href="">
+			<i class="fa fa-cloud"></i><div class="text">Options</div>
+		</a>
+		<a class="icon" href="">
+			<i class="fa fa-cloud"></i><div class="text">Options</div>
+		</a>
+	</div>
+	<div id="content">
+		<div class="navbar"></div>
+		<div class="user-text">User Profile</div>
+		<div class="profile">
+			<div class="pic">
+				<div class="image"></div>
+				<div class="change">
+					<div class="ava">Avatar</div>
+					<button class="btn">Change</button>
+				</div>
+			</div>
+			<div class="field">
+				<form>
+					<div class="form-group">
+						<label class="form-label">Name</label><br>
+						<input class="form-input" type="" name="">
+					</div>
+					<div class="form-group">
+						<label class="form-label">Email</label>
+						<input class="form-input" type="" name="">
+					</div>
+					<div class="form-group">
+						<label class="form-label">Password</label>
+						<input class="form-input" type="" name="">
+					</div>
+					<div class="form-group">
+						<label class="form-label">Telp</label>
+						<input class="form-input" type="" name="">
+					</div>
+					<div class="form-group">
+						<label class="form-label">Position</label>
+						<input class="form-input" type="" name="" disabled="">
+					</div>
+					<div class="form-action">
+						<button class="submit">Update Profile</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div> 
+	<script>
+		function myFunction(){
+			var z = document.getElementsByClassName("text");
+			var a = document.getElementsByClassName("icon");
+			var y = document.getElementById("top");
+		    var x = document.getElementById("invenger-text");
+		    if (x.style.display === "none"){
+		    	document.getElementById("sidebar").style.width = "250px";
+		    	document.getElementById("content").style.marginLeft = "250px";
+		        x.style.display = "flex";
+		        y.style.padding = "18px 32px";
+		        document.getElementById("element").style.textAlign = "left";
+		        document.getElementById("element").style.margin = "12px 32px";
+		        for (var i = z.length - 1; i >= 0; i--) {
+		        	z[i].style.display = "flex";
+		        }
+		        for (var i = a.length - 1; i >= 0; i--) {
+		        	a[i].style.padding = "12px 32px";
+		        }
+		    }
+		    else{
+		    	document.getElementById("sidebar").style.width = "auto";
+		    	document.getElementById("content").style.marginLeft = "57.15px";
+		        x.style.display = "none";
+		        y.style.padding = "20px 20px";
+		        document.getElementById("element").style.textAlign = "center";
+		        document.getElementById("element").style.margin = "12px 0px";
+		        for (var i = z.length - 1; i >= 0; i--) {
+		        	z[i].style.display = "none";
+		        }
+		        for (var i = a.length - 1; i >= 0; i--) {
+		        	a[i].style.padding = "12px 20px 15px 20px";
+		        }
+		    }
+		}
+	</script>
+</body>
+</html> 
