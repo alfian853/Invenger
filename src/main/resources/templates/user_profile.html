@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.springframework.org/schema/data/jaxb">
 <head>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" th:href="@{css/user_profile.css}">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 	<title>User Profile</title>
 </head>
 <body>
@@ -33,7 +34,7 @@
 	<div id="content">
 		<div class="navbar">
 			<div id="dropdown" onclick="dropDown()">
-				<div style="padding-left: 32px; padding-right: 8px; border-left: 1px solid rgba(24, 28, 33, 0.04);">Nama Panjang</div>
+				<div style="padding-left: 32px; padding-right: 8px; border-left: 1px solid rgba(24, 28, 33, 0.04);" th:object="${user}" th:text="*{username}"></div>
 				<div class="circle"></div>
 				<i style="padding-left: 8px; padding-right: 8px;" class="fa fa-angle-down"></i>
 			</div>
