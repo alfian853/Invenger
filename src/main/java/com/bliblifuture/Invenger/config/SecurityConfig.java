@@ -2,7 +2,7 @@ package com.bliblifuture.Invenger.config;
 
 
 import com.bliblifuture.Invenger.repository.UserRepository;
-import com.bliblifuture.Invenger.service.Imp.UserService;
+import com.bliblifuture.Invenger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,6 +40,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers("/css/**");
+        web.ignoring().antMatchers("/profile/pict/**");
     }
 
     @Bean
@@ -55,9 +56,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-//                .anyRequest().hasAnyRole("ROLE_ADMIN","ROLE_USER")
-                .antMatchers("/login","/logout","/logedout").permitAll()
-                .antMatchers("/profile").hasAnyRole("ADMIN","USER")
+                .antMatchers("/login").permitAll()
+                .antMatchers(
+                        "/profile",
+                        "/profile/upload-pict").hasAnyRole("ADMIN","USER")
                 .and()
                 .formLogin()
                 .loginPage("/login")
@@ -67,17 +69,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logout().permitAll()
                 .logoutSuccessUrl("/login")
                 .and()
-                .rememberMe().tokenRepository(this.persistentTokenRepository()).userDetailsService(userService)
+                .rememberMe().tokenRepository(this.persistentTokenRepository())
                 .and()
                 .logout().logoutUrl("/logout").logoutSuccessUrl("/login")
                 .and()
                 .csrf();
 
-//        http.authorizeRequests().and()
-
     }
 
-    public AuthenticationFailureHandler loginFailureHandler() {
+    private AuthenticationFailureHandler loginFailureHandler() {
         return (request, response, exception) -> {
 //            request.getSession().setAttribute("flash", new FlashMessage("Incorrect username and/or password. Please try again.", FlashMessage.Status.FAILURE));
             response.sendRedirect("/login?error=true");
