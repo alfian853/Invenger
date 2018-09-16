@@ -9,10 +9,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @SpringBootApplication
 @EnableJpaAuditing
 public class InvengerApplication {
-    public static final Logger log = LoggerFactory.getLogger(InvengerApplication.class);
-
 	public static void main(String[] args) {
 		SpringApplication.run(InvengerApplication.class, args);
 	}
-
 }
