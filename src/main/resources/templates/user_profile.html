@@ -42,6 +42,23 @@
 		</a>
 	</div>
 	<div id="content">
+		<div class="navbar">
+			<div id="dropdown" onclick="dropDown()">
+				<div style="padding-left: 32px; padding-right: 8px; border-left: 1px solid rgba(24, 28, 33, 0.04);" th:object="${user}" th:text="*{username}"></div>
+				<div class="circle"></div>
+				<i style="padding-left: 8px; padding-right: 8px;" class="fa fa-angle-down"></i>
+			</div>
+		</div>
+		<div id="link">
+			<a th:href="@{/profile}" style="border-bottom: 1px solid rgba(24,28,33,0.04);">
+				<i style="padding-right: 8px;" class="fa fa-user"></i>
+				<div>My Profile</div>
+			</a>
+			<a href="">
+				<i style="padding-right: 8px;" class="fa fa-sign-out"></i>
+				<div>Log Out</div>
+			</a>
+		</div>
 		<div class="user-text">User Profile</div>
 		<div class="profile">
 			<div class="pic">
@@ -204,6 +221,17 @@
 		        	a[i].style.padding = "12px 20px 15px 20px";
 		        }
 		    }
+		}
+		function dropDown(){
+			var link = document.getElementById("link");
+			var drop = document.getElementById("dropdown");
+			if(link.style.display==="none"){
+				link.style.display="block";
+				// drop.style.color="rgb(78, 81, 85)";
+			}
+			else{
+				link.style.display="none";
+			}
 		}
 	</script>
 </body>
