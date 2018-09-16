@@ -1,10 +1,12 @@
-package com.bliblifuture.Invenger.service.Imp;
+package com.bliblifuture.Invenger.service;
 
 import com.bliblifuture.Invenger.InvengerApplication;
+import com.bliblifuture.Invenger.Utils.MyUtils;
 import com.bliblifuture.Invenger.model.User;
 import com.bliblifuture.Invenger.repository.RoleRepository;
 import com.bliblifuture.Invenger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -23,7 +25,6 @@ public class UserService implements UserDetailsService {
     * */
     @Override
     public User loadUserByUsername(String s) throws UsernameNotFoundException {
-        InvengerApplication.log.info("iam called "+s);
         User user =userRepository.findByUsername(s);
         if(user == null){
             return userRepository.findByEmail(s);
@@ -31,6 +32,15 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
+    public static User getThisUser(){
+        if(SecurityContextHolder.getContext().getAuthentication() == null){
+            return null;
+        }
+        else if(SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof User){
+            return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        }
+        return null;
+    }
 
 
 }
