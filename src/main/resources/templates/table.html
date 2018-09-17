@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.springframework.org/schema/data/jaxb">
+<head>
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+	<meta content="utf-8" http-equiv="encoding">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.1.0/material.min.css">
+	<link rel="stylesheet" href="http://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+	<script src="http://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.js"></script>
+	<link rel="stylesheet" type="text/css" href="@{css/table.css}">
+	<script>
+		$(document).ready(function(){
+			$('#myTable').DataTable( {
+        columnDefs: [
+            {
+                targets: [ 0, 1, 2 ],
+                className: 'mdl-data-table__cell--non-numeric'
+            }
+        ]
+    } );
+		});
+	</script>
+ 	<title>User Profile</title>
+</head>
+<body>
+    <!--for ajax request    -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+    <div id="sidebar">
+		<div id="top">
+			<div id="invenger-text">INVENGER</div><i onclick="myFunction()" id="bars" class="fa fa-bars"></i>
+		</div>
+		<div id="element">MENUS</div>
+		<a class="icon" href="">
+			<i class="fa fa-cloud"></i><div class="text">Options</div>
+		</a>
+		<a class="icon" id="selected" href="">
+			<i class="fa fa-cloud"></i><div class="text">Options</div>
+		</a>
+		<a class="icon" href="">
+			<i class="fa fa-cloud"></i><div class="text">Options</div>
+		</a>
+		<a class="icon" href="">
+			<i class="fa fa-cloud"></i><div class="text">Options</div>
+		</a>
+		<a class="icon" href="">
+			<i class="fa fa-cloud"></i><div class="text">Options</div>
+		</a>
+	</div>
+	<div id="content">
+		<div class="navbar">
+			<div id="dropdown" onclick="dropDown()">
+				<div style="padding-left: 32px; padding-right: 8px; border-left: 1px solid rgba(24, 28, 33, 0.04);" th:object="${user}" th:text="*{username}"></div>
+				<div class="circle"></div>
+				<i style="padding-left: 8px; padding-right: 8px;" class="fa fa-angle-down"></i>
+			</div>
+		</div>
+		<div id="link">
+			<a th:href="@{/profile}" style="border-bottom: 1px solid rgba(24,28,33,0.04);">
+				<i style="padding-right: 8px;" class="fa fa-user"></i>
+				<div>My Profile</div>
+			</a>
+			<a href="">
+				<i style="padding-right: 8px;" class="fa fa-sign-out"></i>
+				<div>Log Out</div>
+			</a>
+		</div>
+		<div class="user-text">User Profile</div>
+		<div style="padding: 30px;">
+			<table id="myTable" class="display" style="width:100%;">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Position</th>
+						<th>Office</th>
+						<th>Age</th>
+						<th>Start date</th>
+						<th>Salary</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>Tiger Nixon</td>
+						<td>System Architect</td>
+						<td>Edinburgh</td>
+						<td>61</td>
+						<td>2011/04/25</td>
+						<td>$320,800</td>
+					</tr>
+					<tr>
+						<td>Garrett Winters</td>
+						<td>Accountant</td>
+						<td>Tokyo</td>
+						<td>63</td>
+						<td>2011/07/25</td>
+						<td>$170,750</td>
+					</tr>
+					<tr>
+						<td>Ashton Cox</td>
+						<td>Junior Technical Author</td>
+						<td>San Francisco</td>
+						<td>66</td>
+						<td>2009/01/12</td>
+						<td>$86,000</td>
+					</tr>
+					<tr>
+						<td>Cedric Kelly</td>
+						<td>Senior Javascript Developer</td>
+						<td>Edinburgh</td>
+						<td>22</td>
+						<td>2012/03/29</td>
+						<td>$433,060</td>
+					</tr>
+					<tr>
+						<td>Donna Snider</td>
+						<td>Customer Support</td>
+						<td>New York</td>
+						<td>27</td>
+						<td>2011/01/25</td>
+						<td>$112,000</td>
+					</tr>
+				</tbody>
+				<tfoot>
+					<tr>
+						<th>Name</th>
+						<th>Position</th>
+						<th>Office</th>
+						<th>Age</th>
+						<th>Start date</th>
+						<th>Salary</th>
+					</tr>
+				</tfoot>
+			</table>
+		</div>
+	</div>
+    <!--Change Picture Modal-->
+	<script>
+        function myFunction(){
+			var z = document.getElementsByClassName("text");
+			var a = document.getElementsByClassName("icon");
+			var y = document.getElementById("top");
+		    var x = document.getElementById("invenger-text");
+		    if (x.style.display === "none"){
+		    	document.getElementById("sidebar").style.width = "250px";
+		    	document.getElementById("content").style.marginLeft = "250px";
+		        x.style.display = "flex";
+		        y.style.padding = "18px 32px";
+		        document.getElementById("element").style.textAlign = "left";
+		        document.getElementById("element").style.margin = "12px 32px";
+		        for (var i = z.length - 1; i >= 0; i--) {
+		        	z[i].style.display = "flex";
+		        }
+		        for (var i = a.length - 1; i >= 0; i--) {
+		        	a[i].style.padding = "12px 32px";
+		        }
+		    }
+		    else{
+		    	document.getElementById("sidebar").style.width = "auto";
+		    	document.getElementById("content").style.marginLeft = "57.15px";
+		        x.style.display = "none";
+		        y.style.padding = "20px 20px";
+		        document.getElementById("element").style.textAlign = "center";
+		        document.getElementById("element").style.margin = "12px 0px";
+		        for (var i = z.length - 1; i >= 0; i--) {
+		        	z[i].style.display = "none";
+		        }
+		        for (var i = a.length - 1; i >= 0; i--) {
+		        	a[i].style.padding = "12px 20px 15px 20px";
+		        }
+		    }
+		}
+		function dropDown(){
+			var link = document.getElementById("link");
+			var drop = document.getElementById("dropdown");
+			if(link.style.display==="none"){
+				link.style.display="block";
+				// drop.style.color="rgb(78, 81, 85)";
+			}
+			else{
+				link.style.display="none";
+			}
+		}
+	</script>
+</body>
+</html> 

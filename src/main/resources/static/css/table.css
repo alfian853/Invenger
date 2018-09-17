@@ -1,0 +1,113 @@
+body{
+    margin: 0;
+    background-color: #f8f8f8;
+    font-family: Roboto;
+}
+#sidebar{
+    height: 100%;
+    width: 250px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #2f3337;
+    overflow-x: hidden;
+}
+#top{
+    display: flex;
+    justify-content: space-between;
+    padding: 18px 32px;
+    font-weight: bold;
+    font-size: 20px;
+    color: #f1f1f1;
+    border-bottom: 1px solid rgb(57, 65, 74);
+}
+#element{
+    text-align: left;
+    margin: 12px 32px;
+    font-size: 11px; 
+    color: rgb(157, 159, 161); 
+}
+.icon{
+    padding: 12px 32px;
+    text-decoration: none;
+    font-size: 15px;
+    color: rgb(157, 159, 161);
+    display: flex;
+    justify-content: flex-start;
+}
+.icon:hover{
+    color: #f1f1f1;
+}
+#content{
+    margin-left: 250px;
+}
+#selected{
+    color: rgb(255, 255, 255);
+    background-color: #393d41;
+}
+.navbar{
+    background-color: #ffffff;
+    left: 0px;
+    height: 60px;
+    border-bottom: 1px solid rgba(24,28,33,0.04);
+    padding-right: 32px;
+}
+#bars{
+    color: rgb(157, 159, 161);
+    cursor: pointer;
+}
+#bars:hover{
+    color: #f1f1f1;
+}
+.text{
+    padding-left: 15px;
+}
+.user-text{
+    font-size: 21px;
+    font-weight: bolder;
+    color: rgb(78, 81, 85);
+    margin: 30px 30px;
+}
+#dropdown{
+    position: absolute;
+    right: 40px;
+    font-size: 14.3px;
+    color: rgb(148, 154, 162);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+#dropdown:hover{
+    color: rgb(78, 81, 85);
+}
+.circle{
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid rgba(24,28,33,0.06);
+    background-color: rgba(24,28,33,0.06);
+}
+#link{
+    display: none;
+    font-size: 14.3px;
+    color: rgb(78, 81, 85);
+    right: 40px;
+    position: absolute;
+    background-color: #ffffff;
+    border: 1px solid rgba(24, 28, 33, 0.05);
+    border-radius: 4px;
+    box-shadow: rgba(0, 0, 0, 0.09) 0px 1px 6px;
+    box-sizing: border-box;
+}
+#link a{
+    padding: 15px 40px 15px 20px;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: rgb(78, 81, 85);
+}
+#link a:hover{
+    background-color: #f5f5f5;
+}
