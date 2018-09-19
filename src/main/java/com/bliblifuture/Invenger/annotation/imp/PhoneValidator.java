@@ -1,5 +1,6 @@
 package com.bliblifuture.Invenger.annotation.imp;
 
+import com.bliblifuture.Invenger.Utils.MyUtils;
 import com.bliblifuture.Invenger.annotation.PhoneConstraint;
 
 import javax.validation.ConstraintValidator;
@@ -11,12 +12,17 @@ public class PhoneValidator implements ConstraintValidator<PhoneConstraint,Strin
 
     @Override
     public void initialize(PhoneConstraint constraintAnnotation) {
-
     }
 
     public static boolean isValid(String s){
         return s.matches(PATTERN);
     }
+
+
+    public static String getErrorMessage(){
+        return "Invalid phone number";
+    }
+
 
     @Override
     public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {

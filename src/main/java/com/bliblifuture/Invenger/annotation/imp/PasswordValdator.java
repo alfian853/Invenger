@@ -14,6 +14,10 @@ public class PasswordValdator implements ConstraintValidator<PasswordConstraint,
 
     }
 
+    public static String getErrorMessage(){
+        return "Weak password, your password must contain atleast 1 Uppercase, 1 lowercase and 1 number";
+    }
+
     public static boolean isValid(String s) {
         return s.matches(PATTERN);
     }
