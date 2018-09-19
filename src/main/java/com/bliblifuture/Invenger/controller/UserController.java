@@ -1,30 +1,26 @@
 package com.bliblifuture.Invenger.controller;
 
-import com.bliblifuture.Invenger.InvengerApplication;
 import com.bliblifuture.Invenger.Utils.MyUtils;
 import com.bliblifuture.Invenger.annotation.imp.PasswordValdator;
 import com.bliblifuture.Invenger.annotation.imp.PhoneValidator;
 import com.bliblifuture.Invenger.model.User;
 import com.bliblifuture.Invenger.repository.PositionRepository;
 import com.bliblifuture.Invenger.repository.UserRepository;
+import com.bliblifuture.Invenger.response.FormFieldResponse;
 import com.bliblifuture.Invenger.response.UploadProfilePictResponse;
 import com.bliblifuture.Invenger.service.FileStorageService;
 import com.bliblifuture.Invenger.service.UserService;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.UUID;
+import java.util.*;
 
 
 @Controller
@@ -45,7 +41,7 @@ public class UserController {
         if(UserService.getThisUser() != null){
             return "redirect:/profile";
         }
-        return "login";
+        return "user/login";
     }
 
     @GetMapping("/profile")
@@ -57,9 +53,7 @@ public class UserController {
         user.setPosition(positionRepository.findUserPosition(user.getId()));
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         model.addAttribute("user",user);
-        MyUtils.log(request.getLocalName());
-        MyUtils.log(Integer.toString(request.getLocalPort()));
-        return "user_profile";
+        return "user/profile";
     }
 
     /*
@@ -67,49 +61,107 @@ public class UserController {
      * sementara diprint log dulu
      * */
     @PostMapping("/profile")
-    public String postProfile(Model model,HttpServletRequest request){
+    @ResponseBody
+    public Map<String,FormFieldResponse> postProfile(@RequestBody Map<String,String> request){
 
-        User user = null;
-        if(!"".equals(request.getParameter("new-telp")) ){
-            if(PhoneValidator.isValid(request.getParameter("new-telp"))){
-                user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-                user.setTelp(request.getParameter("telp"));
-                userRepository.save(user);
-            }
-            else{
-                MyUtils.log("phone number is not valid");
-            }
+        if(request.get("new-telp") == null || request.get("old-pwd") == null
+                || request.get("new-pwd1") == null || request.get("new-pwd2") == null){
+            throw new IllegalArgumentException();
         }
 
-        if(!"".equals(request.getParameter("old-pwd")) ){
-            String newPassword = request.getParameter("new-pwd1");
-            if(!newPassword.equals(request.getParameter("new-pwd2")) ){
-                MyUtils.log("password doesn't match");
-                return "redirect:/profile?result=password_doesnot_match";
+        User user = null;
+        Map<String,FormFieldResponse> formResponses = new HashMap<>();
+        FormFieldResponse formResponse = null;
+
+        MyUtils.log(request.toString());
+        MyUtils.log(request.get("new-telp"));
+        String new_telp = request.get("new-telp");
+        MyUtils.log(new_telp);
+
+        if(!request.get("new-telp").equals("") ){
+
+            formResponse = new FormFieldResponse("new-telp");
+
+            if(PhoneValidator.isValid(new_telp)){
+                user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+                if(!new_telp.equals(user.getTelp())){
+                    user.setTelp(new_telp);
+                    userRepository.save(user);
+                    formResponse.setStatusToSuccess();
+                    formResponse.setMessage("Phone number updated successfuly");
+                }
             }
+            else{
+                formResponse.setStatusToFailed();
+                formResponse.setMessage(PhoneValidator.getErrorMessage());
+            }
+            formResponses.put("new-telp",formResponse);
+        }
+
+        while(!request.get("old-pwd").equals("") ){
+
+            String newPassword = request.get("new-pwd1");
+            formResponse = new FormFieldResponse();
+
+            if(newPassword.equals(request.get("old-pwd"))){
+                break;
+            }
+
+            if(request.get("new-pwd1").equals("")){
+                formResponse.setField_name("new-pwd1");
+                formResponse.setStatusToFailed();
+                formResponse.setMessage("password field can't be empty");
+                formResponses.put("password",formResponse);
+                break;
+            }
+            if(request.get("new-pwd2").equals("")){
+                formResponse.setField_name("new-pwd2");
+                formResponse.setStatusToFailed();
+                formResponse.setMessage("password field can't be empty");
+                formResponses.put("password",formResponse);
+                break;
+            }
+
+            if(!newPassword.equals(request.get("new-pwd2")) ) {
+                formResponse.setField_name("new-pwd2");
+                formResponse.setStatusToFailed();
+                formResponse.setMessage("new password doesn't match");
+                formResponses.put("password",formResponse);
+                break;
+            }
+
             if(!PasswordValdator.isValid(newPassword)){
-                MyUtils.log("weak password");
-                return "redirect:/profile?result=weak_password";
+                formResponse.setField_name("new-pwd1");
+                formResponse.setStatusToFailed();
+                formResponse.setMessage("Weak password");
+                formResponses.put("password",formResponse);
+                break;
             }
 
             if(user == null){
                 user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             }
-            if(!MyUtils.matches(request.getParameter("old-pwd"),user.getPassword() )){
-                MyUtils.log("wrong password");
-                return "redirect:/profile?result=wrong_password";
+            if(MyUtils.matches(request.get("old-pwd"),user.getPassword() )){
+                user.setPassword(MyUtils.getBcryptHash(newPassword));
+                userRepository.save(user);
+                formResponse.setField_name("old-pwd");
+                formResponse.setStatusToSuccess();
+                formResponse.setMessage("Change password success");
+
+            }
+            else{
+                formResponse.setField_name("old-pwd");
+                formResponse.setStatusToFailed();
+                formResponse.setMessage("wrong password");
             }
 
-            user.setPassword(MyUtils.getBcryptHash(newPassword));
-            userRepository.save(user);
+            formResponses.put("password",formResponse);
+
+            break;
         }
-        if(user == null){
-            model.addAttribute("user",UserService.getThisUser());
-        }
-        else{
-            model.addAttribute("user",user);
-        }
-        return "redirect:/profile?result=success";
+
+
+        return formResponses;
     }
 
     @PostMapping("/profile/upload-pict")
@@ -138,6 +190,8 @@ public class UserController {
 
         return response;
     }
+
+
 
 
 
