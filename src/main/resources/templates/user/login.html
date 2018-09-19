@@ -1,11 +1,14 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.springframework.org/schema/data/jaxb">
+<html xmlns:th="http://www.springframework.org/schema/data/jaxb"
+      th:replace="~{masterLayout :: layout(~{::title}, ~{::content}, ~{::headContent})}">
 <head>
-	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
 	<title>Login</title>
+    <headContent>
 	<link rel="stylesheet" type="text/css" th:href="@{css/login.css}">
+    </headContent>
 </head>
 <body>
+<content>
 	<div class="card">
 		<div class="field">
 			<div class="logo">INVENGER</div>
@@ -32,7 +35,8 @@
 		</div>
 		<div class="footer">
 			Don't have an account yet? <a href="">Contact Admin</a>
-		</div>		
+		</div>
 	</div>
+</content>
 </body>
 </html>

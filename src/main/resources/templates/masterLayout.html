@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html th:fragment="layout (title, content,headContent)" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/notify/0.4.2/notify.min.js"></script>
+
+    <title th:replace="${title}">Layout Title</title>
+
+    <th:block th:include="${headContent}"></th:block>
+
+</head>
+<body>
+<th:block th:include="${content}">
+    <p>Layout content</p>
+</th:block>
+
+<footer>
+    <!--Layout footer-->
+</footer>
+<!--/*
+    alert.status : {success,info,warn,error}
+*/-->
+<script th:if="${alert} != null">
+    $.notify("[[${alert}]]", "[[${ #vars.getVariable('alert.status') }]]");
+</script>
+</body>
+</html>
