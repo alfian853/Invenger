@@ -16,10 +16,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 
@@ -36,16 +38,29 @@ public class UserController {
     FileStorageService fileStorageService;
 
     @GetMapping("/login")
-    public String getLogin(Model model){
-        model.addAttribute("user",new User());
+    public String getLogin(Model model, HttpServletRequest request){
         if(UserService.getThisUser() != null){
             return "redirect:/profile";
         }
+        User user = new User();
+        String requestStatus = (String) request.getSession().getAttribute("status");
+        MyUtils.log("reqg: "+requestStatus);
+        if(requestStatus != null
+            && requestStatus.equals("failed") ){
+            model.addAttribute("alert","Wrong username/email or password");
+            model.addAttribute("alert.status","error");
+            model.addAttribute("alert.title","Login Failed");
+            user.setUsername(request.getSession().getAttribute("username").toString());
+            request.removeAttribute("status");
+            request.removeAttribute("username");
+        }
+        model.addAttribute("user",user);
+
         return "user/login";
     }
 
     @GetMapping("/profile")
-    public String getProfile(Model model, HttpServletRequest request){
+    public String getProfile(Model model){
         User user = UserService.getThisUser();
         if(user == null){
             return "redirect:/login";

@@ -1,6 +1,7 @@
 package com.bliblifuture.Invenger.config;
 
 
+import com.bliblifuture.Invenger.Utils.MyUtils;
 import com.bliblifuture.Invenger.repository.UserRepository;
 import com.bliblifuture.Invenger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,8 +84,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private AuthenticationFailureHandler loginFailureHandler() {
         return (request, response, exception) -> {
-//            request.getSession().setAttribute("flash", new FlashMessage("Incorrect username and/or password. Please try again.", FlashMessage.Status.FAILURE));
-            response.sendRedirect("/login?error=true");
+            request.getSession().setAttribute("status","failed");
+            request.getSession().setAttribute("username",request.getParameter("username"));
+            response.sendRedirect("/login");
         };
     }
 
