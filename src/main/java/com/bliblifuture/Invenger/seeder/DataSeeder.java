@@ -68,6 +68,7 @@ public class DataSeeder {
             admin = new User();
             admin.setUsername("root");
             admin.setEmail("root@future.com");
+            admin.setTelp("+123456789");
             admin.setRole(roleRepository.findByName("ROLE_ADMIN"));
             admin.setPassword(new BCryptPasswordEncoder().encode("root"));
             admin.setPosition(positionRepository.findByName("inventory system admin"));
