@@ -5,15 +5,40 @@
     <meta content="utf-8" http-equiv="encoding">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/notify/0.4.2/notify.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js"></script>
 
     <title th:replace="${title}">Layout Title</title>
 
     <th:block th:include="${headContent}"></th:block>
+    <!--/*
+        alert.status :{info,success,warning,error}
+        Read more at http://izitoast.marcelodolce.com/
 
+    */-->
+    <th:block th:if="${alert} != null">
+        <script>
+            $(document).ready(function() {
+                var colorsOfStatus = {'success':'green','info':'blue','warning':'yellow','error':'red'};
+            function toastMessage(status,title,message){
+                iziToast.show({
+                    title: title,
+                    message: message,
+                    position : 'topCenter',
+                    color : colorsOfStatus[status]
+                });
+            }
+
+            toastMessage("[[${ #vars.getVariable('alert.status') }]]",
+                "[[${ #vars.getVariable('alert.title') }]]",
+                "[[${ #vars.getVariable('alert') }]]");
+            });
+        </script>
+    </th:block>
 </head>
 <body>
 <th:block th:include="${content}">
@@ -23,11 +48,6 @@
 <footer>
     <!--Layout footer-->
 </footer>
-<!--/*
-    alert.status : {success,info,warn,error}
-*/-->
-<script th:if="${alert} != null">
-    $.notify("[[${alert}]]", "[[${ #vars.getVariable('alert.status') }]]");
-</script>
+
 </body>
 </html>
