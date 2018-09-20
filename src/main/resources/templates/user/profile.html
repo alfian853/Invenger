@@ -180,7 +180,7 @@
             }
             else{
                 $('#pwd-field').slideUp();
-                $('input[name="old-new"]').val("");
+                $('input[name="old-pwd"]').val("");
                 $('input[name="new-pwd1"]').val("");
                 $('input[name="new-pwd2"]').val("");
             }
@@ -189,8 +189,6 @@
         var old_telp = "[[${user.telp}]]";
 		var new_telp = '';
         $('#bt-submit').click(function () {
-			$('#change-pwd').toggle();
-			return;
             if (old_telp == $('input[name="telp"]').val()) {
                 new_telp = '';
             }
@@ -232,9 +230,7 @@
                     console.log(response);
 
                     if(response['new-telp'] != null){
-                        $.notify("good",'info');
                         if(response['new-telp']['status'] == 'success'){
-                            $.notify("good",'success');
                             $('input[name="telp"]').notify(
                                 response['new-telp']['message'],
                                 'success',
@@ -255,7 +251,7 @@
 					if(response['password'] != null){
 					    if(response['password']['status'] == 'success'){
                             $('#pwd-field').slideUp();
-                            $('input[name="old-new"]').val("");
+                            $('input[name="old-pwd"]').val("");
                             $('input[name="new-pwd1"]').val("");
                             $('input[name="new-pwd2"]').val("");
 
@@ -275,8 +271,6 @@
             }).fail(function (xhr, error, thrownError) {
                 alert('something wrong :(');
             });
-
-
 
         });
 
