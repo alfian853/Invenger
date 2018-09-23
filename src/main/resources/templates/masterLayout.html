@@ -20,25 +20,18 @@
         Read more at http://izitoast.marcelodolce.com/
 
     */-->
-    <th:block th:if="${alert} != null">
-        <script>
-            $(document).ready(function() {
-                var colorsOfStatus = {'success':'green','info':'blue','warning':'yellow','error':'red'};
-            function toastMessage(status,title,message){
-                iziToast.show({
-                    title: title,
-                    message: message,
-                    position : 'topCenter',
-                    color : colorsOfStatus[status]
-                });
-            }
+    <script>
+        var colorsOfStatus = {'success': 'green', 'info': 'blue', 'warning': 'yellow', 'error': 'red'};
 
-            toastMessage("[[${ #vars.getVariable('alert.status') }]]",
-                "[[${ #vars.getVariable('alert.title') }]]",
-                "[[${ #vars.getVariable('alert') }]]");
+        function toastMessage(status, title, message) {
+            iziToast.show({
+                title: title,
+                message: message,
+                position: 'topCenter',
+                color: colorsOfStatus[status]
             });
-        </script>
-    </th:block>
+        }
+    </script>
 </head>
 <body>
 <th:block th:include="${content}">
@@ -48,6 +41,15 @@
 <footer>
     <!--Layout footer-->
 </footer>
+<th:block th:if="${alert} != null">
+    <script>
+        $(document).ready(function() {
+            toastMessage("[[${ #vars.getVariable('alert.status') }]]",
+                "[[${ #vars.getVariable('alert.title') }]]",
+                "[[${ #vars.getVariable('alert') }]]");
+        });
+    </script>
+</th:block>
 
 </body>
 </html>
