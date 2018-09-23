@@ -26,5 +26,5 @@ public class Lendment extends AuditModel{
     User user;
     
     @OneToMany(mappedBy = "lendment", cascade = CascadeType.ALL)
-    List<Lendment_detail> lendment_details;
+    List<LendmentDetails> lendment_details;
 }
