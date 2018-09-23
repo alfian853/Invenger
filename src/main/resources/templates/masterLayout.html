@@ -44,9 +44,9 @@
 <th:block th:if="${alert} != null">
     <script>
         $(document).ready(function() {
-            toastMessage("[[${ #vars.getVariable('alert.status') }]]",
-                "[[${ #vars.getVariable('alert.title') }]]",
-                "[[${ #vars.getVariable('alert') }]]");
+            toastMessage('[[${ alert.status }]]',
+                '[[${ alert.title }]]',
+                '[[${ alert.message }]]');
         });
     </script>
 </th:block>
