@@ -1,15 +1,27 @@
 package com.bliblifuture.Invenger.service;
 
-import com.bliblifuture.Invenger.InvengerApplication;
 import com.bliblifuture.Invenger.Utils.MyUtils;
+import com.bliblifuture.Invenger.annotation.imp.PasswordValdator;
+import com.bliblifuture.Invenger.annotation.imp.PhoneValidator;
+import com.bliblifuture.Invenger.model.Position;
 import com.bliblifuture.Invenger.model.User;
+import com.bliblifuture.Invenger.repository.PositionRepository;
 import com.bliblifuture.Invenger.repository.RoleRepository;
 import com.bliblifuture.Invenger.repository.UserRepository;
+import com.bliblifuture.Invenger.request.ProfileRequest;
+import com.bliblifuture.Invenger.response.FormFieldResponse;
+import com.bliblifuture.Invenger.response.UploadProfilePictResponse;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -20,6 +32,11 @@ public class UserService implements UserDetailsService {
     @Autowired
     RoleRepository roleRepository;
 
+    @Autowired
+    FileStorageService fileStorageService;
+
+    @Autowired
+    PositionRepository positionRepository;
     /*
     * load by username or email for login and auto login purpose
     * */
@@ -32,7 +49,7 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
-    public static User getThisUser(){
+    public User getThisUser(){
         if(SecurityContextHolder.getContext().getAuthentication() == null){
             return null;
         }
@@ -41,6 +58,123 @@ public class UserService implements UserDetailsService {
         }
         return null;
     }
+
+
+    public Map<String,FormFieldResponse> editProfile(ProfileRequest request){
+        User user = null;
+        Map<String,FormFieldResponse> formResponses = new HashMap<>();
+        FormFieldResponse formResponse = null;
+
+        if(!request.getNewTelp().equals("") ){
+
+            formResponse = new FormFieldResponse("new-telp");
+
+            if(PhoneValidator.isValid(request.getNewTelp())){
+                user = (User) this.getThisUser();
+                if(!request.getNewTelp().equals(user.getTelp())){
+                    user.setTelp(request.getNewTelp());
+                    userRepository.save(user);
+                    formResponse.setStatusToSuccess();
+                    formResponse.setMessage("Phone number updated successfuly");
+                }
+            }
+            else{
+                formResponse.setStatusToFailed();
+                formResponse.setMessage(PhoneValidator.getErrorMessage());
+            }
+            formResponses.put("new-telp",formResponse);
+        }
+//
+        while(!request.getOldPwd().equals("") ){
+
+            String newPassword = request.getNewPwd1();
+            formResponse = new FormFieldResponse();
+
+            if(newPassword.equals(request.getOldPwd())){
+                break;
+            }
+
+            if(request.getNewPwd1().equals("")){
+                formResponse.setField_name("new-pwd1");
+                formResponse.setStatusToFailed();
+                formResponse.setMessage("password field can't be empty");
+                formResponses.put("password",formResponse);
+                break;
+            }
+            if(request.getNewPwd2().equals("")){
+                formResponse.setField_name("new-pwd2");
+                formResponse.setStatusToFailed();
+                formResponse.setMessage("password field can't be empty");
+                formResponses.put("password",formResponse);
+                break;
+            }
+
+            if(!newPassword.equals(request.getNewPwd2()) ) {
+                formResponse.setField_name("new-pwd2");
+                formResponse.setStatusToFailed();
+                formResponse.setMessage("new password doesn't match");
+                formResponses.put("password",formResponse);
+                break;
+            }
+
+            if(!PasswordValdator.isValid(newPassword)){
+                formResponse.setField_name("new-pwd1");
+                formResponse.setStatusToFailed();
+                formResponse.setMessage("Weak password");
+                formResponses.put("password",formResponse);
+                break;
+            }
+
+            if(user == null){
+                user = (User) this.getThisUser();
+            }
+            if(MyUtils.matches(request.getOldPwd(),user.getPassword() )){
+                user.setPassword(MyUtils.getBcryptHash(newPassword));
+                userRepository.save(user);
+                formResponse.setField_name("old-pwd");
+                formResponse.setStatusToSuccess();
+                formResponse.setMessage("Change password success");
+
+            }
+            else{
+                formResponse.setField_name("old-pwd");
+                formResponse.setStatusToFailed();
+                formResponse.setMessage("wrong password");
+            }
+
+            formResponses.put("password",formResponse);
+
+            break;
+        }
+        return formResponses;
+    }
+
+    public UploadProfilePictResponse changeProfilePict(MultipartFile file){
+        UploadProfilePictResponse response = new UploadProfilePictResponse();
+        if(file == null){
+            response.setStatusToSuccess();
+            return response;
+        }
+        String fileName = UUID.randomUUID().toString().replace("-","")+
+                "."+ FilenameUtils.getExtension(file.getOriginalFilename());
+
+        if(fileStorageService.storeFile(file,fileName, FileStorageService.PathCategory.PROFILE_PICT) ){
+            User user = this.getThisUser();
+            user.setPictureName(fileName);
+            userRepository.save(user);
+            response.setNew_pict_src("/profile/pict/"+fileName);
+            response.setStatusToSuccess();
+        }
+        else{
+            response.setStatusToFailed();
+        }
+        return response;
+    }
+
+    public Position getUserPositionById(Integer id){
+        return positionRepository.findUserPosition(id);
+    }
+
 
 
 }
