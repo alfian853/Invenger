@@ -23,7 +23,6 @@ public class Category implements Serializable {
 
     @JsonBackReference
     @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
     @JoinColumn(name="parent_id", nullable = true)
     @ManyToOne(fetch = FetchType.LAZY)
     Category parent;
