@@ -16,7 +16,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Entity
 @Table(name = "lendments_detail")
-public class Lendment_detail implements Serializable {
+public class LendmentDetails implements Serializable {
     int quantity;
 
     boolean isReturn;
