@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" type="text/css" href="../static/css/modal.css">
+    <link rel="stylesheet" type="text/css" th:href="@{css/modal.css}">
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <title>Modal</title>
 </head>
 <body>
@@ -11,7 +12,7 @@
     <div id="categoryModal" class="modal">
       <div class="modal-content">
         <div class="modal-header">
-          <span class="close">&times;</span>
+          <span id="close0" class="close">&times;</span>
           <h2>New Category</h2>
         </div>
         <div class="modal-body">
@@ -38,7 +39,7 @@
     <div id="itemModal" class="modal">
       <div class="modal-content">
         <div class="modal-header">
-          <span class="close">&times;</span>
+          <span id="close1" class="close">&times;</span>
           <h2>New Item</h2>
         </div>
         <div class="modal-body">
@@ -75,32 +76,28 @@
       </div>
     </div>
     <script>
-        var modal = document.getElementById('categoryModal');
-        var modal2 = document.getElementById('itemModal');
-        var btn = document.getElementById("categoryBtn");
-        var btn2 = document.getElementById("itemBtn");
-        var span = document.getElementsByClassName("close")[0];
-        var span2 = document.getElementsByClassName("close")[1];
-        btn.onclick = function() {
-            modal.style.display = "block";
-        }
-        span.onclick = function() {
-            modal.style.display = "none";
-        }
-        btn2.onclick = function() {
-            modal2.style.display = "block";
-        }
-        span2.onclick = function() {
-            modal2.style.display = "none";
-        }
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
-            if (event.target == modal2) {
-                modal2.style.display = "none";
-            }
-        }
+        $(document).ready(function(){
+            $("#categoryBtn").click(function(){
+                $("#categoryModal").show();
+            });
+            $("#close0").click(function(){
+                $("#categoryModal").hide();
+            });
+            $("#itemBtn").click(function(){
+                $("#itemModal").show();
+            });
+            $("#close1").click(function(){
+                $("#itemModal").hide();
+            });
+            $(window).click(function(e){
+                if(e.target.id=="categoryModal"){
+                    $("#categoryModal").hide();
+                }
+                if(e.target.id=="itemModal"){
+                    $("#itemModal").hide();
+                }
+            });
+        });
     </script>
 </body>
 </html>
