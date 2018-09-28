@@ -1,11 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.springframework.org/schema/data/jaxb"
+      th:replace="~{masterLayout :: layout(~{::title}, ~{::content}, ~{::headContent})}">
 <head>
-    <link rel="stylesheet" type="text/css" href="../static/css/modal.css">
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
-    <title>Modal</title>
+    <headContent>
+        <title>Modal</title>
+        <link rel="stylesheet" type="text/css" th:href="@{/css/modal.css}">
+        <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    </headContent>
 </head>
 <body>
+<content>
+    <!--for ajax request    -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
     <button class="btn" id="categoryBtn">Category</button>
     <button class="btn" id="itemBtn">Item</button>
     <div id="categoryModal" class="modal">
@@ -18,18 +26,18 @@
             <form>
                 <div class="form-group">
                     <label class="form-label">Category Name</label><br>
-                    <input class="form-input" type="" name="">
+                    <input id="ctg-new-name" class="form-input" type="" name="">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Category Parent</label><br>
-                    <select class="form-input" style="width: 100%;">
-                        <option>Option 1</option>
-                        <option>Option 1</option>
-                        <option>Option 1</option>
+                    <select id="select-parent-ctg" class="form-input" style="width: 100%;">
+                    <th:block th:each="category : ${categories}">
+                        <option th:value="${category.id}" th:text="${category.name}">Option i</option>
+                    </th:block>
                     </select>
                 </div>
                 <div class="form-action">
-                    <button class="submit">Add Category</button>
+                    <div id="submit-new-ctg" class="submit">Add Category</div>
                 </div>
             </form>
         </div>
@@ -42,7 +50,7 @@
           <h2>New Item</h2>
         </div>
         <div class="modal-body">
-            <form>
+            <div>
                 <div class="form-group">
                     <label class="form-label">Item Name</label><br>
                     <input class="form-input" type="" name="">
@@ -70,11 +78,38 @@
                 <div class="form-action">
                     <button class="submit">Add Item</button>
                 </div>
-            </form>
+            </div>
         </div>
       </div>
     </div>
     <script>
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content')
+            }
+        });
+
+        $('#submit-new-ctg').click(function () {
+            $.ajax({
+                url: "[[@{/items/category/create}]]",
+                type: 'POST',
+                contentType : "application/json; charset=utf-8",
+                data : JSON.stringify({
+                    "name": $('#ctg-new-name').val(),
+                    "parent_id": $('#select-parent-ctg').val()
+                }),
+                success: function (response) {
+                    console.log(response);
+                }
+            }).fail(function (xhr, error, thrownError) {
+                alert('something wrong :(');
+            });
+
+        });
+
+
+
         var modal = document.getElementById('categoryModal');
         var modal2 = document.getElementById('itemModal');
         var btn = document.getElementById("categoryBtn");
@@ -102,5 +137,6 @@
             }
         }
     </script>
+</content>
 </body>
 </html>
