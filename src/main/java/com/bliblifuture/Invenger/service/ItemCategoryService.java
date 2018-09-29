@@ -3,10 +3,15 @@ package com.bliblifuture.Invenger.service;
 
 import com.bliblifuture.Invenger.model.Category;
 import com.bliblifuture.Invenger.repository.CategoryRepository;
+import com.bliblifuture.Invenger.request.jsonRequest.CategoryCreateRequest;
+import com.bliblifuture.Invenger.request.jsonRequest.CategoryEditRequest;
+import com.bliblifuture.Invenger.response.CategorCreateyResponse;
+import com.bliblifuture.Invenger.response.CategoryEditResponse;
 import com.bliblifuture.Invenger.response.RequestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -17,6 +22,8 @@ public class ItemCategoryService {
     protected CategoryRepository categoryRepository;
 
     private List<Category> categories;
+
+    // Get category index in categories by category id using Binary Search algorithm
     private int getCategoryIndex(int id){
         int lower_bound = 0;
         int upper_bound = categories.size()-1;
@@ -49,29 +56,30 @@ public class ItemCategoryService {
         }
     }
 
-
-    public RequestResponse updateCategory(int id, String newName){
-        RequestResponse response = new RequestResponse();
+    public CategoryEditResponse updateCategory(CategoryEditRequest request){
+        CategoryEditResponse response = new CategoryEditResponse();
        try{
            categories = categoryRepository.findAllOrderById();
-        int c_idx = getCategoryIndex(id);
+        int c_idx = getCategoryIndex(request.getId());
         Category current = categories.get(c_idx);
         int oldNameLength = current.getName().length();
         for(int i = oldNameLength-1; i >= 0; --i){
             if( current.getName().charAt(i) == '/' ){
-                current.setName( current.getName().substring(0,i+1) + newName );
+                current.setName( current.getName().substring(0,i+1) + request.getNewName() );
                 break;
             }
         }
         System.out.println(categories.get(c_idx).getName());
 
 
-        for(Category child: categoryRepository.findAllByParentId(id)){
+        for(Category child: categoryRepository.findAllByParentId(request.getId())){
             updateCategoryUtil(child.getId(),current.getName(),oldNameLength);
         }
 
         categoryRepository.saveAll(categories);
         response.setStatusToSuccess();
+        response.setCategories(categories);
+        categories.clear();
         return response;
        }
        catch (Exception e){
@@ -80,23 +88,24 @@ public class ItemCategoryService {
        }
     }
 
-    public RequestResponse createCategory(int parentId,String name){
-        RequestResponse response = new RequestResponse();
-        if(name.contains("/")){
+    public CategorCreateyResponse createCategory(CategoryCreateRequest request){
+        CategorCreateyResponse response = new CategorCreateyResponse();
+        if(request.getName().contains("/") || request.getName().length() == 0){
             response.setStatusToFailed();
             return response;
         }
-        Category parent = categoryRepository.findCategoryById(parentId);
+        Category parent = categoryRepository.findCategoryById(request.getParentId());
         if(parent == null){
             response.setStatusToFailed();
             return response;
         }
         Category newCategory = new Category();
         newCategory.setParent(parent);
-        newCategory.setName(parent.getName()+"/"+name);
+        newCategory.setName(parent.getName()+"/"+request.getName());
 
         categoryRepository.save(newCategory);
         response.setStatusToSuccess();
+        response.setCategory(newCategory);
         return response;
     }
 
@@ -114,4 +123,7 @@ public class ItemCategoryService {
         }
     }
 
+    public List<Category> getAllItemCategory(){
+        return categoryRepository.findAll();
+    }
 }

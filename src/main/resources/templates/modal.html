@@ -5,6 +5,9 @@
     <headContent>
         <title>Modal</title>
         <link rel="stylesheet" type="text/css" th:href="@{/css/modal.css}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.js"></script>
+
         <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     </headContent>
     <title>Modal</title>
@@ -45,53 +48,53 @@
       </div>
     </div>
     <div id="itemModal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <span id="close1" class="close">&times;</span>
-          <h2>New Item</h2>
-        </div>
-        <div class="modal-body">
-            <form id="create-item-form" action="#" method="POST" enctype="multipart/form-data" th:object="${createItemForm}">
-                <div class="form-group">
-                    <label class="form-label">Item Name *</label><br>
-                    <input class="form-input" th:field="*{name}">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Photo</label>
-                    <div class="dropzone needsclick mx-4" id="uploadFile">
-                        <div class="dz-message needsclick" name="user-pict"> Please Upload jpg, jpeg or png file only
-                            <br> Drop the file here or click here for select file
-                            <i class="fa fa-paper-plane-o ml-1"></i>
-                            <br/>
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close">&times;</span>
+                <h2>New Item</h2>
+            </div>
+            <div class="modal-body">
+                <form id="create-item-form" action="#" method="POST" enctype="multipart/form-data" th:object="${createItemForm}">
+                    <div class="form-group">
+                        <label class="form-label">Item Name *</label><br>
+                        <input class="form-input" th:field="*{name}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Photo</label>
+                        <div class="dropzone needsclick mx-4" id="uploadFile">
+                            <div class="dz-message needsclick" name="user-pict"> Please Upload jpg, jpeg or png file only
+                                <br> Drop the file here or click here for select file
+                                <i class="fa fa-paper-plane-o ml-1"></i>
+                                <br/>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Item Quantity *</label><br>
-                    <input class="form-input" th:field="*{quantity}">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Item Price</label><br>
-                    <input class="form-input" th:field="*{price}">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Item Category</label><br>
-                    <select class="form-input" style="width: 100%;" th:field="category_id">
-                        <th:block th:each="category : ${categories}">
-                            <option th:value="${category.id}" th:text="${category.name}">Option i</option>
-                        </th:block>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Description</label><br>
-                    <input class="form-input" th:field="*{description}">
-                </div>
-                <div class="form-action">
-                    <button class="submit" id="add-item-submit">Add Item</button>
-                </div>
-            </form>
+                    <div class="form-group">
+                        <label class="form-label">Item Quantity *</label><br>
+                        <input class="form-input" th:field="*{quantity}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Item Price</label><br>
+                        <input class="form-input" th:field="*{price}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Item Category</label><br>
+                        <select class="form-input" style="width: 100%;" th:field="category_id">
+                            <th:block th:each="category : ${categories}">
+                                <option th:value="${category.id}" th:text="${category.name}">Option i</option>
+                            </th:block>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Description</label><br>
+                        <input class="form-input" th:field="*{description}">
+                    </div>
+                    <div class="form-action">
+                        <button class="submit" id="add-item-submit">Add Item</button>
+                    </div>
+                </form>
+            </div>
         </div>
-      </div>
     </div>
 
     <script>
@@ -104,25 +107,6 @@
                     'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content')
                 }
             });
-
-            $('#submit-new-ctg').click(function () {
-                $.ajax({
-                    url: "[[@{/items/category/create}]]",
-                    type: 'POST',
-                    contentType : "application/json; charset=utf-8",
-                    data : JSON.stringify({
-                        "name": $('#ctg-new-name').val(),
-                        "parent_id": $('#select-parent-ctg').val()
-                    }),
-                    success: function (response) {
-                        console.log(response);
-                    }
-                }).fail(function (xhr, error, thrownError) {
-                    alert('something wrong :(');
-                });
-
-            });
-
 
             Dropzone.options.uploadFile = {
                 headers : { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } ,
@@ -143,6 +127,24 @@
                 }
             };
 
+
+            $('form#create-item-form').submit(function(e){
+                e.preventDefault();
+                var form = new FormData(this);
+                form.append("photo_file",file_upload);
+                $.ajax({
+                    type: "POST",
+                    url: "[[@{/inventory/create}]]",
+                    data: form,
+                    success: function(data){
+                        console.log(data);
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false
+                });
+
+            });
 
             $("#categoryBtn").click(function(){
                 $("#categoryModal").show();
