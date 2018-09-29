@@ -14,7 +14,7 @@
 
     <title th:replace="${title}">Layout Title</title>
 
-    <th:block th:include="${headContent}"></th:block>
+    <th:block th:if="${headContent} != null" th:include="${headContent}"></th:block>
     <!--/*
         alert.status :{info,success,warning,error}
         Read more at http://izitoast.marcelodolce.com/
