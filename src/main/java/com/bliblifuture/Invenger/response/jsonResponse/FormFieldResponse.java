@@ -1,4 +1,4 @@
-package com.bliblifuture.Invenger.response;
+package com.bliblifuture.Invenger.response.jsonResponse;
 
 public class FormFieldResponse extends RequestResponse {
     String field_name;

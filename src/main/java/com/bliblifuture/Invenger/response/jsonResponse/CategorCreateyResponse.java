@@ -1,4 +1,4 @@
-package com.bliblifuture.Invenger.response;
+package com.bliblifuture.Invenger.response.jsonResponse;
 
 import com.bliblifuture.Invenger.model.Category;
 import com.fasterxml.jackson.annotation.JsonProperty;

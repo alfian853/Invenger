@@ -1,4 +1,4 @@
-package com.bliblifuture.Invenger.response;
+package com.bliblifuture.Invenger.response.jsonResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

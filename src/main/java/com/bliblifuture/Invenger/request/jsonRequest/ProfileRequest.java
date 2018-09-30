@@ -1,4 +1,4 @@
-package com.bliblifuture.Invenger.request;
+package com.bliblifuture.Invenger.request.jsonRequest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
