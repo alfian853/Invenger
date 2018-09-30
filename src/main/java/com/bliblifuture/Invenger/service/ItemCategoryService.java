@@ -2,16 +2,16 @@ package com.bliblifuture.Invenger.service;
 
 
 import com.bliblifuture.Invenger.model.Category;
+import com.bliblifuture.Invenger.model.User;
 import com.bliblifuture.Invenger.repository.CategoryRepository;
 import com.bliblifuture.Invenger.request.jsonRequest.CategoryCreateRequest;
 import com.bliblifuture.Invenger.request.jsonRequest.CategoryEditRequest;
-import com.bliblifuture.Invenger.response.CategorCreateyResponse;
-import com.bliblifuture.Invenger.response.CategoryEditResponse;
-import com.bliblifuture.Invenger.response.RequestResponse;
+import com.bliblifuture.Invenger.response.jsonResponse.CategorCreateyResponse;
+import com.bliblifuture.Invenger.response.jsonResponse.CategoryEditResponse;
+import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -126,4 +126,5 @@ public class ItemCategoryService {
     public List<Category> getAllItemCategory(){
         return categoryRepository.findAll();
     }
+
 }

@@ -3,8 +3,8 @@ package com.bliblifuture.Invenger.controller;
 
 import com.bliblifuture.Invenger.request.jsonRequest.CategoryCreateRequest;
 import com.bliblifuture.Invenger.request.jsonRequest.CategoryEditRequest;
-import com.bliblifuture.Invenger.response.CategoryEditResponse;
-import com.bliblifuture.Invenger.response.RequestResponse;
+import com.bliblifuture.Invenger.response.jsonResponse.CategoryEditResponse;
+import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.Invenger.service.ItemCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
