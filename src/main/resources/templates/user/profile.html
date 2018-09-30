@@ -41,7 +41,7 @@
 	<div id="content">
 		<div class="navbar">
 			<div id="dropdown" onclick="dropDown()">
-				<div style="padding-left: 32px; padding-right: 8px; border-left: 1px solid rgba(24, 28, 33, 0.04);" th:object="${user}" th:text="*{username}"></div>
+				<div style="padding-left: 32px; padding-right: 8px; border-left: 1px solid rgba(24, 28, 33, 0.04);" th:object="${user}" th:text="*{name}"></div>
 				<div class="circle"></div>
 				<i style="padding-left: 8px; padding-right: 8px;" class="fa fa-angle-down"></i>
 			</div>
@@ -63,7 +63,7 @@
 			<div class="pic">
                 <img id="user-pict" class="image" th:src="@{/profile/pict/{link}(link=${user.pictureName})}"/>
 				<div class="change">
-					<div class="ava"><span th:text="${user.username}" th:remove="tag"></span></div>
+					<div class="ava"><span th:text="${user.name}" th:remove="tag"></span></div>
                     <div class="btn" data-toggle="modal" data-target="#modal-edit-pict">Change</div>
 				</div>
 			</div>
@@ -72,7 +72,7 @@
 					<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                     <div class="form-group">
                         <label class="form-label">Position</label>
-                        <input disabled class="form-input" type="text" th:field="*{position.name}">
+                        <input disabled class="form-input" type="text" th:field="*{position}">
                     </div>
 					<div class="form-group">
 						<label class="form-label">Email</label>

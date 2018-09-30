@@ -8,11 +8,13 @@ import com.bliblifuture.Invenger.model.User;
 import com.bliblifuture.Invenger.repository.PositionRepository;
 import com.bliblifuture.Invenger.repository.RoleRepository;
 import com.bliblifuture.Invenger.repository.UserRepository;
-import com.bliblifuture.Invenger.request.ProfileRequest;
-import com.bliblifuture.Invenger.response.FormFieldResponse;
-import com.bliblifuture.Invenger.response.UploadProfilePictResponse;
+import com.bliblifuture.Invenger.request.jsonRequest.ProfileRequest;
+import com.bliblifuture.Invenger.response.jsonResponse.FormFieldResponse;
+import com.bliblifuture.Invenger.response.jsonResponse.UploadProfilePictResponse;
+import com.bliblifuture.Invenger.response.viewDto.ProfileDTO;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
 @Service
 public class UserService implements UserDetailsService {
 
@@ -37,6 +38,21 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     PositionRepository positionRepository;
+
+    @Autowired
+    MyUtils myUtils;
+
+
+    public User getSessionUser(){
+        if(SecurityContextHolder.getContext().getAuthentication() == null){
+            return null;
+        }
+        else if(SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof User){
+            return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        }
+        return null;
+    }
+
     /*
     * load by username or email for login and auto login purpose
     * */
@@ -49,16 +65,27 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
-    public User getThisUser(){
-        if(SecurityContextHolder.getContext().getAuthentication() == null){
-            return null;
-        }
-        else if(SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof User){
-            return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        }
-        return null;
-    }
 
+    public ProfileDTO getProfile(){
+        User user = this.getSessionUser();
+        Position position = user.getPosition();
+        try {
+            position.getName();
+//            myUtils.log("Sudah init");
+        }
+        catch (Exception e){
+//            myUtils.log("Belum init");
+            position = positionRepository.findUserPosition(user.getId());
+            user.setPosition(position);
+        }
+        return ProfileDTO.builder()
+                .name(user.getUsername())
+                .email(user.getEmail())
+                .position(user.getPosition().getName())
+                .pictureName(user.getPictureName())
+                .telp(user.getTelp())
+                .build();
+    }
 
     public Map<String,FormFieldResponse> editProfile(ProfileRequest request){
         User user = null;
@@ -70,7 +97,7 @@ public class UserService implements UserDetailsService {
             formResponse = new FormFieldResponse("new-telp");
 
             if(PhoneValidator.isValid(request.getNewTelp())){
-                user = (User) this.getThisUser();
+                user = this.getSessionUser();
                 if(!request.getNewTelp().equals(user.getTelp())){
                     user.setTelp(request.getNewTelp());
                     userRepository.save(user);
@@ -126,10 +153,10 @@ public class UserService implements UserDetailsService {
             }
 
             if(user == null){
-                user = (User) this.getThisUser();
+                user = (User) this.getSessionUser();
             }
-            if(MyUtils.matches(request.getOldPwd(),user.getPassword() )){
-                user.setPassword(MyUtils.getBcryptHash(newPassword));
+            if(myUtils.matches(request.getOldPwd(),user.getPassword() )){
+                user.setPassword(myUtils.getBcryptHash(newPassword));
                 userRepository.save(user);
                 formResponse.setField_name("old-pwd");
                 formResponse.setStatusToSuccess();
@@ -159,7 +186,7 @@ public class UserService implements UserDetailsService {
                 "."+ FilenameUtils.getExtension(file.getOriginalFilename());
 
         if(fileStorageService.storeFile(file,fileName, FileStorageService.PathCategory.PROFILE_PICT) ){
-            User user = this.getThisUser();
+            User user = this.getSessionUser();
             user.setPictureName(fileName);
             userRepository.save(user);
             response.setNew_pict_src("/profile/pict/"+fileName);
@@ -169,10 +196,6 @@ public class UserService implements UserDetailsService {
             response.setStatusToFailed();
         }
         return response;
-    }
-
-    public Position getUserPositionById(Integer id){
-        return positionRepository.findUserPosition(id);
     }
 
 

@@ -1,13 +1,13 @@
 package com.bliblifuture.Invenger.controller;
 
+import com.bliblifuture.Invenger.Utils.MyUtils;
 import com.bliblifuture.Invenger.model.User;
-import com.bliblifuture.Invenger.request.ProfileRequest;
-import com.bliblifuture.Invenger.response.AlertResponse;
-import com.bliblifuture.Invenger.response.FormFieldResponse;
-import com.bliblifuture.Invenger.response.UploadProfilePictResponse;
+import com.bliblifuture.Invenger.request.jsonRequest.ProfileRequest;
+import com.bliblifuture.Invenger.response.jsonResponse.AlertResponse;
+import com.bliblifuture.Invenger.response.jsonResponse.FormFieldResponse;
+import com.bliblifuture.Invenger.response.jsonResponse.UploadProfilePictResponse;
 import com.bliblifuture.Invenger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -23,14 +23,16 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    @Autowired
+    MyUtils myUtils;
+
     @GetMapping("/login")
     public String getLogin(Model model, HttpServletRequest request){
-        if(userService.getThisUser() != null){
+        if(userService.getSessionUser() != null){
             return "redirect:/profile";
         }
         User user = new User();
         String requestStatus = (String) request.getSession().getAttribute("status");
-
         if(requestStatus != null
                 && requestStatus.equals("failed") ){
             AlertResponse alert = new AlertResponse(
@@ -39,6 +41,7 @@ public class UserController {
                     "Wrong username/email or password"
             );
             model.addAttribute("alert",alert);
+            // persistent login form value
             user.setUsername(request.getSession().getAttribute("username").toString());
             request.removeAttribute("status");
             request.removeAttribute("username");
@@ -50,10 +53,7 @@ public class UserController {
 
     @GetMapping("/profile")
     public String getProfile(Model model){
-        User user = userService.getThisUser();
-        user.setPosition(userService.getUserPositionById(user.getId()));
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        model.addAttribute("user",user);
+        model.addAttribute("user",userService.getProfile());
         return "user/profile";
     }
 
