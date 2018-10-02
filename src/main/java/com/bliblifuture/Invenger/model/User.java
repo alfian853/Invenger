@@ -46,8 +46,8 @@ public class User extends AuditModel implements UserDetails {
     @JoinColumn(name = "position_id",referencedColumnName = "id")
     private Position position;
 
-    @ManyToOne(fetch = FetchType.LAZY,optional = false)
-    @JoinColumn(name="superior_id", nullable = true,referencedColumnName = "id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="superior_id", referencedColumnName = "id")
     private User superior;
 
     @ManyToOne(fetch = FetchType.EAGER)
