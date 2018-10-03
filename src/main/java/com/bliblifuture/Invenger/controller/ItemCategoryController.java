@@ -25,7 +25,13 @@ public class ItemCategoryController {
 
     @PostMapping("/items/category/edit")
     public CategoryEditResponse editCategory(@RequestBody CategoryEditRequest request){
-        return itemCategoryService.updateCategory(request);
+        try {
+            return itemCategoryService.updateCategory(request);
+        } catch (Exception e) {
+            CategoryEditResponse response = new CategoryEditResponse();
+            response.setStatusToFailed();
+            return response;
+        }
     }
 
     @PostMapping("/items/category/delete")

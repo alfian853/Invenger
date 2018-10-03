@@ -2,8 +2,8 @@ package com.bliblifuture.Invenger.service;
 
 
 import com.bliblifuture.Invenger.model.Category;
-import com.bliblifuture.Invenger.model.User;
-import com.bliblifuture.Invenger.repository.CategoryRepository;
+import com.bliblifuture.Invenger.repository.category.CategoryRepository;
+import com.bliblifuture.Invenger.repository.category.CategoryWithChildId;
 import com.bliblifuture.Invenger.request.jsonRequest.CategoryCreateRequest;
 import com.bliblifuture.Invenger.request.jsonRequest.CategoryEditRequest;
 import com.bliblifuture.Invenger.response.jsonResponse.CategorCreateyResponse;
@@ -11,17 +11,20 @@ import com.bliblifuture.Invenger.response.jsonResponse.CategoryEditResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class ItemCategoryService {
 
 
     @Autowired
     protected CategoryRepository categoryRepository;
 
-    private List<Category> categories;
+    private List<CategoryWithChildId> categories;
 
     // Get category index in categories by category id using Binary Search algorithm
     private int getCategoryIndex(int id){
@@ -30,7 +33,6 @@ public class ItemCategoryService {
         int mid;
         while(lower_bound <= upper_bound){
             mid = (lower_bound + upper_bound) >> 1;
-            System.out.println(mid+": "+categories.get(mid).getId());
             if(categories.get(mid).getId() < id){
                 lower_bound = mid + 1;
             }
@@ -45,47 +47,47 @@ public class ItemCategoryService {
     }
 
     private void updateCategoryUtil(int id,String parentNewName,int parentOldNameLength){
-        Category current = categories.get( getCategoryIndex(id) );
+        int currentIndex = getCategoryIndex(id);
+        CategoryWithChildId current = categories.get(currentIndex);
         int oldNameLength = current.getName().length();
 
         current.setName(parentNewName + current.getName().substring(parentOldNameLength));
-//        System.out.println(current.getName());
+        categoryRepository.updateNameById(current.getId(),current.getName());
 
-        for(Category child: categoryRepository.findAllByParentId(id)) {
-            updateCategoryUtil(child.getId(), current.getName(), oldNameLength);
+        for(Integer childId: current.getChildsId()) {
+            updateCategoryUtil(childId, current.getName(), oldNameLength);
         }
     }
 
+
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public CategoryEditResponse updateCategory(CategoryEditRequest request){
-        CategoryEditResponse response = new CategoryEditResponse();
-       try{
-           categories = categoryRepository.findAllOrderById();
-        int c_idx = getCategoryIndex(request.getId());
-        Category current = categories.get(c_idx);
+
+        categories = categoryRepository.getCategoryParentWithChildIdOrderById();
+
+        int currentIndex = getCategoryIndex(request.getId());
+        CategoryWithChildId current = categories.get(currentIndex);
         int oldNameLength = current.getName().length();
         for(int i = oldNameLength-1; i >= 0; --i){
             if( current.getName().charAt(i) == '/' ){
                 current.setName( current.getName().substring(0,i+1) + request.getNewName() );
+                categoryRepository.updateNameById(current.getId(),current.getName());
                 break;
             }
         }
-        System.out.println(categories.get(c_idx).getName());
 
-
-        for(Category child: categoryRepository.findAllByParentId(request.getId())){
-            updateCategoryUtil(child.getId(),current.getName(),oldNameLength);
+        for(Integer childId: current.getChildsId()){
+            updateCategoryUtil(childId,current.getName(),oldNameLength);
         }
 
-        categoryRepository.saveAll(categories);
-        response.setStatusToSuccess();
-        response.setCategories(categories);
-        categories.clear();
+        CategoryEditResponse response = new CategoryEditResponse();
+
+        for(CategoryWithChildId element : categories){
+            response.addCategoryData(element.getId(),element.getName(),element.getParentId());
+        }
+
         return response;
-       }
-       catch (Exception e){
-           response.setStatusToFailed();
-           return response;
-       }
+
     }
 
     public CategorCreateyResponse createCategory(CategoryCreateRequest request){
