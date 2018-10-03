@@ -40,4 +40,16 @@ public class FileStorageService {
         }
     }
 
+    public boolean deleteFile(String fileName,PathCategory pathCategory){
+        try{
+            Path target = Paths.get(this.path.get(pathCategory)+"/"+fileName).toAbsolutePath();
+            Files.delete(target);
+            return true;
+        }
+        catch (IOException e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }

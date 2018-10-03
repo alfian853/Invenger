@@ -8,6 +8,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Proxy;
 import org.springframework.jmx.export.annotation.ManagedResource;
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -40,7 +41,7 @@ public class User extends AuditModel implements UserDetails {
     @Column(length = 72,nullable = false)
     private String password;
 
-    private String pictureName;
+    private String pictureName = "default-pict.png";
 
     @ManyToOne(fetch = FetchType.LAZY,optional = false)
     @JoinColumn(name = "position_id",referencedColumnName = "id")
@@ -51,7 +52,7 @@ public class User extends AuditModel implements UserDetails {
     private User superior;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "role_id")
+    @JoinColumn(name = "role_id",referencedColumnName = "id")
     private Role role;
 
 

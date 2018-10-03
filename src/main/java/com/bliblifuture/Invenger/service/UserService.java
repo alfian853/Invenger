@@ -185,12 +185,23 @@ public class UserService implements UserDetailsService {
         String fileName = UUID.randomUUID().toString().replace("-","")+
                 "."+ FilenameUtils.getExtension(file.getOriginalFilename());
 
+
         if(fileStorageService.storeFile(file,fileName, FileStorageService.PathCategory.PROFILE_PICT) ){
             User user = this.getSessionUser();
-            user.setPictureName(fileName);
-            userRepository.save(user);
-            response.setNew_pict_src("/profile/pict/"+fileName);
-            response.setStatusToSuccess();
+            String oldFileName = user.getPictureName();
+            if(!oldFileName.equals("default-pict.png") &&
+                    fileStorageService.deleteFile(oldFileName,FileStorageService.PathCategory.PROFILE_PICT)){
+
+                user.setPictureName(fileName);
+                userRepository.save(user);
+                response.setNew_pict_src("/profile/pict/"+fileName);
+                response.setStatusToSuccess();
+
+            }
+            else {
+                fileStorageService.deleteFile(fileName, FileStorageService.PathCategory.PROFILE_PICT);
+                response.setStatusToFailed();
+            }
         }
         else{
             response.setStatusToFailed();
