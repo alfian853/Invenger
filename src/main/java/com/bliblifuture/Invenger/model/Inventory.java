@@ -27,6 +27,10 @@ public class Inventory extends AuditModel{
     //in idr exchange rate
     int price;
 
+    @ManyToOne(fetch = FetchType.LAZY,optional = false)
+    @JoinColumn(name = "category_id",referencedColumnName = "id")
+    private Category category;
+
     @Column(columnDefinition = "text")
     String description;
 

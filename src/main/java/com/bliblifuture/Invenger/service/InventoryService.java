@@ -29,6 +29,12 @@ public class InventoryService {
     public RequestResponse createInventory(InventoryCreateRequest request){
 //        Inventory inventory = new Inventory();
         RequestResponse response = new RequestResponse();
+        Inventory newInventory = new Inventory();
+        newInventory.setName(request.getName());
+        newInventory.setQuantity(request.getQuantity());
+        newInventory.setPrice(request.getPrice());
+        newInventory.setDescription(request.getDescription());
+        inventoryRepository.save(newInventory);
         response.setStatusToSuccess();
         return response;
     }
