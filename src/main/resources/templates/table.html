@@ -14,7 +14,7 @@
 	<script src="http://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.js"></script>
-	<link rel="stylesheet" type="text/css" href="@{css/table.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/table.css}">
 	<script>
 		$(document).ready(function(){
 			$('#myTable').DataTable( {
@@ -27,7 +27,7 @@
     } );
 		});
 	</script>
- 	<title>User Profile</title>
+ 	<title>Table</title>
 </head>
 <body>
     <!--for ajax request    -->
@@ -58,7 +58,7 @@
 	<div id="content">
 		<div class="navbar">
 			<div id="dropdown" onclick="dropDown()">
-				<div style="padding-left: 32px; padding-right: 8px; border-left: 1px solid rgba(24, 28, 33, 0.04);" th:object="${user}" th:text="*{username}"></div>
+				<div style="padding-left: 32px; padding-right: 8px; border-left: 1px solid rgba(24, 28, 33, 0.04);" th:object="${user}" th:text="*{name}"></div>
 				<div class="circle"></div>
 				<i style="padding-left: 8px; padding-right: 8px;" class="fa fa-angle-down"></i>
 			</div>
@@ -73,7 +73,7 @@
 				<div>Log Out</div>
 			</a>
 		</div>
-		<div class="user-text">User Profile</div>
+		<div class="user-text">Tables</div>
 		<div style="padding: 30px;">
 			<table id="myTable" class="display" style="width:100%;">
 				<thead>

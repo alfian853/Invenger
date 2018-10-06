@@ -5,6 +5,7 @@ import com.bliblifuture.Invenger.repository.*;
 import com.bliblifuture.Invenger.request.formRequest.InventoryCreateRequest;
 import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.Invenger.service.InventoryService;
+import com.bliblifuture.Invenger.service.UserService;
 import com.bliblifuture.Invenger.service.ItemCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,12 +25,20 @@ public class InventoryController {
     @Autowired
     InventoryService inventoryService;
 
+    @Autowired
+    UserService userService;
+
 
     @GetMapping("/modal")
     public String getModal(Model model, HttpServletRequest request){
         model.addAttribute("categories",itemCategoryService.getAllItemCategory());
         model.addAttribute("createItemForm",new InventoryCreateRequest());
         return "modal";
+    }
+    @GetMapping("/table")
+    public String getTablePage(Model model){
+        model.addAttribute("user",userService.getProfile());
+        return "table";
     }
 
     @PostMapping("/inventory/create")
