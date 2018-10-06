@@ -23,8 +23,8 @@
     <div id="categoryModal" class="modal">
       <div class="modal-content">
         <div class="modal-header">
-          <span id="close0" class="close">&times;</span>
           <h2>New Category</h2>
+          <span id="close0" class="close">&times;</span>
         </div>
         <div class="modal-body">
             <form>
@@ -50,8 +50,8 @@
     <div id="itemModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <span class="close">&times;</span>
                 <h2>New Item</h2>
+                <span class="close">&times;</span>
             </div>
             <div class="modal-body">
                 <form id="create-item-form" action="#" method="POST" enctype="multipart/form-data" th:object="${createItemForm}">
@@ -79,7 +79,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Item Category</label><br>
-                        <select class="form-input" style="width: 100%;" th:field="category_id">
+                        <select class="form-input" style="width: 100%;" th:name="category_id">
                             <th:block th:each="category : ${categories}">
                                 <option th:value="${category.id}" th:text="${category.name}">Option i</option>
                             </th:block>
@@ -112,7 +112,7 @@
                 headers : { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } ,
                 maxFiles : 1,
                 autoProcessQueue : false,
-                url : "/",
+                url : "#",
 
                 init : function() {
                     myDropzone = this;
@@ -144,6 +144,27 @@
                     processData: false
                 });
 
+            });
+
+            $('#submit-new-ctg').click(function () {
+                $.ajax({
+                    url: "[[@{/items/category/create}]]",
+                    type: 'POST',
+                    contentType : "application/json; charset=utf-8",
+                    data : JSON.stringify({
+                        "name": $('#ctg-new-name').val(),
+                        "parent_id": $('#select-parent-ctg').val()
+                    }),
+                    success: function (response) {
+                        $('#select-parent-ctg').append(
+                            '<option value="'+response['new-category']['id']+'">'+
+                            response['new-category']['name']+'</option>'
+                        );
+                        toastMessage('success', 'Success', 'New category added');
+                    }
+                }).fail(function (xhr, error, thrownError) {
+                    toastMessage('error', 'Error', 'Something wrong');
+                });
             });
 
             $("#categoryBtn").click(function(){

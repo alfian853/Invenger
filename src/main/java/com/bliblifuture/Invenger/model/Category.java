@@ -3,6 +3,7 @@ package com.bliblifuture.Invenger.model;
 
 import com.bliblifuture.Invenger.Utils.PostgreArrayType;
 import com.bliblifuture.Invenger.repository.category.CategoryWithChildId;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
@@ -36,7 +37,7 @@ public class Category implements Serializable {
 
     String name;
 
-    @JsonManagedReference
+    @JsonBackReference
     @Getter(AccessLevel.NONE)
     @JoinColumn(name="parent_id", nullable = true)
     @ManyToOne(fetch = FetchType.LAZY)
