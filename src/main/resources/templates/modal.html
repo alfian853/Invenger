@@ -62,7 +62,8 @@
                     <div class="form-group">
                         <label class="form-label">Photo</label>
                         <div class="dropzone needsclick mx-4" id="uploadFile">
-                            <div class="dz-message needsclick" name="user-pict"> Please Upload jpg, jpeg or png file only
+                            <div class="dz-message needsclick" name="user-pict">
+                                Please Upload jpg, jpeg or png file only
                                 <br> Drop the file here or click here for select file
                                 <i class="fa fa-paper-plane-o ml-1"></i>
                                 <br/>
@@ -98,6 +99,8 @@
     </div>
 
     <script>
+        Dropzone.autoDiscover = false;
+
         $(document).ready(function(){
 
             var file_upload = null;
@@ -107,7 +110,6 @@
                     'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content')
                 }
             });
-
             Dropzone.options.uploadFile = {
                 headers : { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } ,
                 maxFiles : 1,
@@ -126,6 +128,7 @@
                     });
                 }
             };
+            Dropzone.discover();
 
 
             $('form#create-item-form').submit(function(e){
