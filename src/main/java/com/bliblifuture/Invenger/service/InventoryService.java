@@ -27,7 +27,6 @@ public class InventoryService {
 
     // not implemented yet
     public RequestResponse createInventory(InventoryCreateRequest request){
-//        Inventory inventory = new Inventory();
         RequestResponse response = new RequestResponse();
         Inventory newInventory = new Inventory();
         newInventory.setName(request.getName());
