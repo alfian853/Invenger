@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class CategorCreateyResponse extends RequestResponse {
+public class CategoryCreateResponse extends RequestResponse {
 
     @JsonProperty("new-category")
     Category category;

@@ -6,7 +6,7 @@ import com.bliblifuture.Invenger.repository.category.CategoryRepository;
 import com.bliblifuture.Invenger.repository.category.CategoryWithChildId;
 import com.bliblifuture.Invenger.request.jsonRequest.CategoryCreateRequest;
 import com.bliblifuture.Invenger.request.jsonRequest.CategoryEditRequest;
-import com.bliblifuture.Invenger.response.jsonResponse.CategorCreateyResponse;
+import com.bliblifuture.Invenger.response.jsonResponse.CategoryCreateResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.CategoryEditResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,8 +90,8 @@ public class ItemCategoryService {
 
     }
 
-    public CategorCreateyResponse createCategory(CategoryCreateRequest request){
-        CategorCreateyResponse response = new CategorCreateyResponse();
+    public CategoryCreateResponse createCategory(CategoryCreateRequest request){
+        CategoryCreateResponse response = new CategoryCreateResponse();
         if(request.getName().contains("/") || request.getName().length() == 0){
             response.setStatusToFailed();
             return response;
