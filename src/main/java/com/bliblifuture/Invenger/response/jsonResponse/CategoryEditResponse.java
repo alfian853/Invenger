@@ -14,12 +14,10 @@ public class CategoryEditResponse extends RequestResponse {
     private class CategoryData {
         String name;
         Integer id;
-        Integer parent_id;
 
-        public CategoryData(Integer id, String name, Integer parent_id) {
+        public CategoryData(Integer id, String name) {
             this.id = id;
             this.name = name;
-            this.parent_id = parent_id;
         }
     }
 
@@ -27,9 +25,9 @@ public class CategoryEditResponse extends RequestResponse {
     @Setter(AccessLevel.NONE)
     List<CategoryData> categoryDataList = new LinkedList<>();
 
-    public void addCategoryData(Integer id,String name,Integer parent_id){
+    public void addCategoryData(Integer id, String name){
         categoryDataList.add(
-                new CategoryData(id,name,parent_id)
+                new CategoryData(id,name)
         );
     }
 
