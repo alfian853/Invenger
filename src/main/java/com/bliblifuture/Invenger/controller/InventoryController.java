@@ -37,6 +37,7 @@ public class InventoryController {
     }
     @GetMapping("/table")
     public String getTablePage(Model model){
+        model.addAttribute("inventories", inventoryService.getAll());
         model.addAttribute("user",userService.getProfile());
         return "table";
     }
