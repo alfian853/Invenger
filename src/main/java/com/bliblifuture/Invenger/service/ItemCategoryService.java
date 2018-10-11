@@ -63,6 +63,13 @@ public class ItemCategoryService {
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public CategoryEditResponse updateCategory(CategoryEditRequest request){
 
+        CategoryEditResponse response = new CategoryEditResponse();
+
+        if(request.getNewName().contains("/")){
+            response.setStatusToFailed();
+            response.setMessage("category name can't be contain '/' character");
+        }
+
         categories = categoryRepository.getCategoryParentWithChildIdOrderById();
 
         int currentIndex = getCategoryIndex(request.getId());
@@ -80,10 +87,8 @@ public class ItemCategoryService {
             updateCategoryUtil(childId,current.getName(),oldNameLength);
         }
 
-        CategoryEditResponse response = new CategoryEditResponse();
-
         for(CategoryWithChildId element : categories){
-            response.addCategoryData(element.getId(),element.getName(),element.getParentId());
+            response.addCategoryData(element.getId(),element.getName());
         }
 
         return response;
