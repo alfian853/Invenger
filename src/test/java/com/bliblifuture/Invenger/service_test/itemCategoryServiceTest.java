@@ -4,6 +4,7 @@ import com.bliblifuture.Invenger.repository.category.CategoryRepository;
 import com.bliblifuture.Invenger.repository.category.CategoryWithChildId;
 import com.bliblifuture.Invenger.request.jsonRequest.CategoryCreateRequest;
 import com.bliblifuture.Invenger.request.jsonRequest.CategoryEditRequest;
+import com.bliblifuture.Invenger.response.jsonResponse.CategoryCreateResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.CategoryEditResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.Invenger.service.ItemCategoryService;
@@ -16,15 +17,11 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.*;
-import com.bliblifuture.Invenger.response.jsonResponse.CategoryCreateResponse;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import static org.mockito.Mockito.when;
 
 
 public class itemCategoryServiceTest {
@@ -156,17 +153,5 @@ public class itemCategoryServiceTest {
         CategoryEditResponse response = categoryService.updateCategory(request);
         Assert.assertEquals(response, mock_updateCategory_result() );
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
