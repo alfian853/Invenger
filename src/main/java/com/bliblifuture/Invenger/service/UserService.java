@@ -189,9 +189,16 @@ public class UserService implements UserDetailsService {
         if(fileStorageService.storeFile(file,fileName, FileStorageService.PathCategory.PROFILE_PICT) ){
             User user = this.getSessionUser();
             String oldFileName = user.getPictureName();
-            if(!oldFileName.equals("default-pict.png") &&
-                    fileStorageService.deleteFile(oldFileName,FileStorageService.PathCategory.PROFILE_PICT)){
 
+            boolean oldFileDeleted = false;
+            if(oldFileName.equals("default-pict.png")){
+                oldFileDeleted = true;
+            }
+            else{
+                oldFileDeleted = fileStorageService.deleteFile(oldFileName,FileStorageService.PathCategory.PROFILE_PICT);
+            }
+
+            if(oldFileDeleted){
                 user.setPictureName(fileName);
                 userRepository.save(user);
                 response.setNew_pict_src("/profile/pict/"+fileName);
@@ -199,9 +206,11 @@ public class UserService implements UserDetailsService {
 
             }
             else {
+                System.out.println("delete fileee");
                 fileStorageService.deleteFile(fileName, FileStorageService.PathCategory.PROFILE_PICT);
                 response.setStatusToFailed();
             }
+
         }
         else{
             response.setStatusToFailed();
@@ -209,6 +218,5 @@ public class UserService implements UserDetailsService {
         return response;
     }
 
-
-
+    
 }
