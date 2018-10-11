@@ -48,5 +48,10 @@ public class InventoryController {
         return inventoryService.createInventory(request);
     }
 
+    @PostMapping("/inventory/delete")
+    @ResponseBody
+    public RequestResponse removeInventory(@RequestParam("id") Integer id){
+        return inventoryService.deleteInventory(id);
+    }
 
 }

@@ -83,6 +83,7 @@
 						<th>Quantity</th>
 						<th>Description</th>
 						<th>Category</th>
+						<th>Action</th>
 					</tr>
 				</thead>
 				<th:block th:each="inventory : ${inventories}">
@@ -92,6 +93,11 @@
 						<td th:text="${inventory.quantity}"></td>
 						<td th:text="${inventory.description}"></td>
 						<td th:text="${inventory.category.name}"></td>
+						<td>
+							<form method="post" th:action="@{/inventory/delete?id={id}(id=${inventory.id})}">
+								<button type="submit">Delete</button>
+							</form>
+						</td>
 					</tr>
 				</th:block>
 				<tfoot>
@@ -101,6 +107,7 @@
 						<th>Quantity</th>
 						<th>Description</th>
 						<th>Category</th>
+						<th>Action</th>
 					</tr>
 				</tfoot>
 			</table>
