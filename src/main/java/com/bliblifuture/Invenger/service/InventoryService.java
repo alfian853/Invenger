@@ -33,14 +33,15 @@ public class InventoryService {
         return inventoryRepository.findInventoryById(id);
     }
 
-    // not implemented yet
     public RequestResponse createInventory(InventoryCreateRequest request){
         RequestResponse response = new RequestResponse();
+
         String imgName = UUID.randomUUID().toString().replace("-","")+
                 "."+ FilenameUtils.getExtension(request.getPhoto_file().getOriginalFilename());
+
         Category newCategory = new Category();
         newCategory.setId(request.getCategory_id());
-        System.out.println(request);
+
         Inventory newInventory = new Inventory();
         newInventory.setName(request.getName());
         newInventory.setQuantity(request.getQuantity());
@@ -48,9 +49,19 @@ public class InventoryService {
         newInventory.setImage(imgName);
         newInventory.setDescription(request.getDescription());
         newInventory.setCategory(newCategory);
-        inventoryRepository.save(newInventory);
-        fileStorageService.storeFile(request.getPhoto_file(),imgName, FileStorageService.PathCategory.INVENTORY_PICT);
-        response.setStatusToSuccess();
+
+        if(fileStorageService.storeFile(
+                request.getPhoto_file(),
+                imgName,
+                FileStorageService.PathCategory.INVENTORY_PICT)
+        ) {
+            inventoryRepository.save(newInventory);
+            response.setStatusToSuccess();
+        }
+        else{
+            response.setStatusToFailed();
+        }
+
         return response;
     }
 
