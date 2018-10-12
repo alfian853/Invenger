@@ -34,5 +34,7 @@ public class Inventory extends AuditModel{
     @Column(columnDefinition = "text")
     String description;
 
+    @Enumerated(EnumType.STRING)
+    InventoryType type;
 
 }
