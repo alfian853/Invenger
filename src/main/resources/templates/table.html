@@ -1,36 +1,39 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.springframework.org/schema/data/jaxb">
+<html xmlns:th="http://www.springframework.org/schema/data/jaxb"
+	  th:replace="~{masterLayout :: layout(~{::title}, ~{::content}, ~{::headContent})}">
 <head>
-	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
-	<meta content="utf-8" http-equiv="encoding">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
-	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+	<headContent>
 	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.1.0/material.min.css">
 	<link rel="stylesheet" href="http://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
-	<script src="http://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/table.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/modal.css}">
+
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.js"></script>
-	<link rel="stylesheet" type="text/css" th:href="@{/css/table.css}">
+
+    <script src="http://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izimodal/1.5.1/css/iziModal.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/izimodal/1.5.1/js/iziModal.min.js"></script>
+
 	<script>
 		$(document).ready(function(){
 			$('#myTable').DataTable( {
-        columnDefs: [
-            {
-                targets: [ 0, 1, 2 ],
-                className: 'mdl-data-table__cell--non-numeric'
-            }
-        ]
-    } );
+				columnDefs: [
+					{
+						targets: [ 0, 1, 2 ],
+						className: 'mdl-data-table__cell--non-numeric'
+					}
+				]
+			} );
 		});
 	</script>
- 	<title>Table</title>
+	<title>Table</title>
+	</headContent>
+
 </head>
 <body>
-    <!--for ajax request    -->
+<content>
+	<!--for ajax request    -->
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 
@@ -73,6 +76,13 @@
 				<div>Log Out</div>
 			</a>
 		</div>
+
+		<button class="btn" id="categoryBtn">Category</button>
+		<button class="btn" id="itemBtn">Item</button>
+		<button id="trigger">heree</button>
+
+
+
 		<div class="user-text">Tables</div>
 		<div style="padding: 30px;">
 			<table id="myTable" class="display" style="width:100%;">
@@ -86,6 +96,7 @@
 						<th>Action</th>
 					</tr>
 				</thead>
+				<tbody>
 				<th:block th:each="inventory : ${inventories}">
 					<tr>
 						<td th:text="${inventory.name}"></td>
@@ -94,12 +105,14 @@
 						<td th:text="${inventory.description}"></td>
 						<td th:text="${inventory.category.name}"></td>
 						<td>
-							<form method="post" th:action="@{/inventory/delete?id={id}(id=${inventory.id})}">
-								<button type="submit">Delete</button>
-							</form>
+							<!--<form method="post" th:action="@{/inventory/delete?id={id}(id=${inventory.id})}">-->
+							<button type="submit" th:onclick="|loadDetail(${inventory.id})|">Detail</button>
+							<!--</form>-->
+							<!--<button class="btn btn-success" onclick="loadDetail()">view detail</button>-->
 						</td>
 					</tr>
 				</th:block>
+				</tbody>
 				<tfoot>
 					<tr>
 						<th>Name</th>
@@ -113,53 +126,255 @@
 			</table>
 		</div>
 	</div>
-    <!--Change Picture Modal-->
+
+
+	<div id="categoryModal" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h2>New Category</h2>
+				<span id="close0" class="close">&times;</span>
+			</div>
+			<div class="modal-body">
+				<form>
+					<div class="form-group">
+						<label class="form-label">Category Name</label><br>
+						<input id="ctg-new-name" class="form-input" type="" name="">
+					</div>
+					<div class="form-group">
+						<label class="form-label">Category Parent</label><br>
+						<select id="select-parent-ctg" class="form-input" style="width: 100%;">
+							<th:block th:each="category : ${categories}">
+								<option th:value="${category.id}" th:text="${category.name}">Option i</option>
+							</th:block>
+						</select>
+					</div>
+					<div class="form-action">
+						<div id="submit-new-ctg" class="submit">Add Category</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div id="itemModal" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h2>New Item</h2>
+				<span id="close1" class="close">&times;</span>
+			</div>
+			<div class="modal-body">
+				<form id="create-item-form" action="#" method="POST" enctype="multipart/form-data" th:object="${createItemForm}">
+					<div class="form-group">
+						<label class="form-label">Item Name *</label><br>
+						<input class="form-input" th:field="*{name}">
+					</div>
+					<div class="form-group">
+						<label class="form-label">Photo</label>
+						<div class="dropzone needsclick mx-4" id="uploadFile">
+							<div class="dz-message needsclick" name="user-pict">
+								Please Upload jpg, jpeg or png file only
+								<br> Drop the file here or click here for select file
+								<i class="fa fa-paper-plane-o ml-1"></i>
+								<br/>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="form-label">Item Quantity *</label><br>
+						<input class="form-input" th:field="*{quantity}">
+					</div>
+					<div class="form-group">
+						<label class="form-label">Item Price</label><br>
+						<input class="form-input" th:field="*{price}">
+					</div>
+					<div class="form-group">
+						<label class="form-label">Item Category</label><br>
+						<select class="form-input" style="width: 100%;" th:name="category_id">
+							<th:block th:each="category : ${categories}">
+								<option th:value="${category.id}" th:text="${category.name}">Option i</option>
+							</th:block>
+						</select>
+					</div>
+					<div class="form-group">
+						<label class="form-label">Description</label><br>
+						<input class="form-input" th:field="*{description}">
+					</div>
+					<div class="form-action">
+						<button class="submit" id="add-item-submit">Add Item</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div id="inventory-detail-modal"></div>
+
 	<script>
-        function myFunction(){
-			var z = document.getElementsByClassName("text");
-			var a = document.getElementsByClassName("icon");
-			var y = document.getElementById("top");
-		    var x = document.getElementById("invenger-text");
-		    if (x.style.display === "none"){
-		    	document.getElementById("sidebar").style.width = "250px";
-		    	document.getElementById("content").style.marginLeft = "250px";
-		        x.style.display = "flex";
-		        y.style.padding = "18px 32px";
-		        document.getElementById("element").style.textAlign = "left";
-		        document.getElementById("element").style.margin = "12px 32px";
-		        for (var i = z.length - 1; i >= 0; i--) {
-		        	z[i].style.display = "flex";
-		        }
-		        for (var i = a.length - 1; i >= 0; i--) {
-		        	a[i].style.padding = "12px 32px";
-		        }
-		    }
-		    else{
-		    	document.getElementById("sidebar").style.width = "auto";
-		    	document.getElementById("content").style.marginLeft = "57.15px";
-		        x.style.display = "none";
-		        y.style.padding = "20px 20px";
-		        document.getElementById("element").style.textAlign = "center";
-		        document.getElementById("element").style.margin = "12px 0px";
-		        for (var i = z.length - 1; i >= 0; i--) {
-		        	z[i].style.display = "none";
-		        }
-		        for (var i = a.length - 1; i >= 0; i--) {
-		        	a[i].style.padding = "12px 20px 15px 20px";
-		        }
-		    }
-		}
-		function dropDown(){
-			var link = document.getElementById("link");
-			var drop = document.getElementById("dropdown");
-			if(link.style.display==="none"){
-				link.style.display="block";
-				// drop.style.color="rgb(78, 81, 85)";
-			}
-			else{
-				link.style.display="none";
-			}
-		}
+        Dropzone.autoDiscover = false;
+
+        $('#inventory-detail-modal').iziModal({
+            title : 'invetory detail',
+            width : screen.width*0.8,
+            height : screen.height,
+            closeButton : true,
+            onOpening : function (modal) {
+                modal.startLoading();
+                $.get('/inventory/detail/1',function (data) {
+                    $('#inventory-detail-modal .iziModal-content').html(data);
+                    // $('.dropdown-toggle').dropdown();
+                    modal.stopLoading();
+                    // $('.dropdown-toggle').dropdown();
+                });
+            }
+        });
+
+        function loadDetail(idCategory){
+
+
+            $('#inventory-detail-modal').iziModal('open');
+
+        }
+
+        $(document).ready(function() {
+            var file_upload = null;
+
+            $('#trigger').click(function () {
+				$('#inventory-detail-modal').iziModal('open');
+            });
+
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content')
+                }
+            });
+            Dropzone.options.uploadFile = {
+                headers : { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } ,
+                maxFiles : 1,
+                autoProcessQueue : false,
+                url : "#",
+
+                init : function() {
+                    myDropzone = this;
+                    var prevFile = null;
+                    myDropzone.processQueue();
+                    this.on("addedfile", function(file) {
+                        if(file_upload != null){
+                            this.removeFile(file_upload);
+                        }
+                        file_upload = file;
+                    });
+                }
+            };
+            Dropzone.discover();
+
+
+            $('form#create-item-form').submit(function(e){
+                e.preventDefault();
+                var form = new FormData(this);
+                form.append("photo_file",file_upload);
+                $.ajax({
+                    type: "POST",
+                    url: "[[@{/inventory/create}]]",
+                    data: form,
+                    success: function(data){
+                        console.log(data);
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false
+                });
+
+            });
+
+            $('#submit-new-ctg').click(function () {
+                $.ajax({
+                    url: "[[@{/items/category/create}]]",
+                    type: 'POST',
+                    contentType : "application/json; charset=utf-8",
+                    data : JSON.stringify({
+                        "name": $('#ctg-new-name').val(),
+                        "parent_id": $('#select-parent-ctg').val()
+                    }),
+                    success: function (response) {
+                        $('#select-parent-ctg').append(
+                            '<option value="'+response['new-category']['id']+'">'+
+                            response['new-category']['name']+'</option>'
+                        );
+                        toastMessage('success', 'Success', 'New category added');
+                    }
+                }).fail(function (xhr, error, thrownError) {
+                    toastMessage('error', 'Error', 'Something wrong');
+                });
+            });
+
+
+            $("#categoryBtn").click(function(){
+                $("#categoryModal").show();
+            });
+            $("#close0").click(function(){
+                $("#categoryModal").hide();
+            });
+            $("#itemBtn").click(function(){
+                $("#itemModal").show();
+            });
+            $("#close1").click(function(){
+                $("#itemModal").hide();
+            });
+            $(window).click(function(e){
+                if(e.target.id=="categoryModal"){
+                    $("#categoryModal").hide();
+                }
+                if(e.target.id=="itemModal"){
+                    $("#itemModal").hide();
+                }
+            });
+
+            function myFunction(){
+                var z = document.getElementsByClassName("text");
+                var a = document.getElementsByClassName("icon");
+                var y = document.getElementById("top");
+                var x = document.getElementById("invenger-text");
+                if (x.style.display === "none"){
+                    document.getElementById("sidebar").style.width = "250px";
+                    document.getElementById("content").style.marginLeft = "250px";
+                    x.style.display = "flex";
+                    y.style.padding = "18px 32px";
+                    document.getElementById("element").style.textAlign = "left";
+                    document.getElementById("element").style.margin = "12px 32px";
+                    for (var i = z.length - 1; i >= 0; i--) {
+                        z[i].style.display = "flex";
+                    }
+                    for (var i = a.length - 1; i >= 0; i--) {
+                        a[i].style.padding = "12px 32px";
+                    }
+                }
+                else{
+                    document.getElementById("sidebar").style.width = "auto";
+                    document.getElementById("content").style.marginLeft = "57.15px";
+                    x.style.display = "none";
+                    y.style.padding = "20px 20px";
+                    document.getElementById("element").style.textAlign = "center";
+                    document.getElementById("element").style.margin = "12px 0px";
+                    for (var i = z.length - 1; i >= 0; i--) {
+                        z[i].style.display = "none";
+                    }
+                    for (var i = a.length - 1; i >= 0; i--) {
+                        a[i].style.padding = "12px 20px 15px 20px";
+                    }
+                }
+            }
+            function dropDown(){
+                var link = document.getElementById("link");
+                var drop = document.getElementById("dropdown");
+                if(link.style.display==="none"){
+                    link.style.display="block";
+                    // drop.style.color="rgb(78, 81, 85)";
+                }
+                else{
+                    link.style.display="none";
+                }
+            }
+        });
+
 	</script>
+</content>
 </body>
 </html> 
