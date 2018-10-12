@@ -4,10 +4,13 @@ import com.bliblifuture.Invenger.model.Inventory;
 import com.bliblifuture.Invenger.model.Category;
 import com.bliblifuture.Invenger.repository.InventoryRepository;
 import com.bliblifuture.Invenger.request.formRequest.InventoryCreateRequest;
+import com.bliblifuture.Invenger.request.jsonRequest.InventoryEditRequest;
 import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.List;
@@ -62,6 +65,12 @@ public class InventoryService {
             response.setStatusToFailed();
         }
 
+        return response;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public RequestResponse updateInventory(InventoryEditRequest request){
+        RequestResponse response = new RequestResponse();
         return response;
     }
 
