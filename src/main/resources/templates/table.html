@@ -12,9 +12,8 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.js"></script>
 
     <script src="http://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izimodal/1.5.1/css/iziModal.min.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/izimodal/1.5.1/js/iziModal.min.js"></script>
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/css/iziModal.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/js/iziModal.min.js"></script>
 	<script>
 		$(document).ready(function(){
 			$('#myTable').DataTable( {
@@ -28,8 +27,14 @@
 		});
 	</script>
 	<title>Table</title>
-	</headContent>
+	<style>
+		/*.dropzone .dz-preview .dz-image {*/
+			/*width: 250px;*/
+			/*height: 250px;*/
+		/*}*/
+	</style>
 
+	</headContent>
 </head>
 <body>
 <content>
@@ -212,22 +217,26 @@
 
         $('#inventory-detail-modal').iziModal({
             title : 'invetory detail',
-            width : screen.width*0.8,
-            height : screen.height,
+            width : screen.width*0.9,
+            height : screen.height*0.9,
             closeButton : true,
+            fullScreen : true,
             onOpening : function (modal) {
                 modal.startLoading();
                 $.get('/inventory/detail/1',function (data) {
                     $('#inventory-detail-modal .iziModal-content').html(data);
-                    // $('.dropdown-toggle').dropdown();
                     modal.stopLoading();
-                    // $('.dropdown-toggle').dropdown();
+                    $('.dropdown-toggle').dropdown();
+                }).fail(function (file,response) {
+                    modal.stopLoading();
+                    toastMessage('error','Failed','Something wrong :(');
+                    $('.iziModal-button-close').click();
                 });
             }
+
         });
 
         function loadDetail(idCategory){
-
 
             $('#inventory-detail-modal').iziModal('open');
 
@@ -250,7 +259,6 @@
                 maxFiles : 1,
                 autoProcessQueue : false,
                 url : "#",
-
                 init : function() {
                     myDropzone = this;
                     var prevFile = null;
@@ -260,9 +268,21 @@
                             this.removeFile(file_upload);
                         }
                         file_upload = file;
+                        file.previewElement.addEventListener("click", function() {
+                            myDropzone.hiddenFileInput.click();
+                        });
                     });
                 }
             };
+
+            // var myFile = {
+            //     name: "image-name-example",
+            //     size: 987654321
+            // };
+			//
+            // var myDropzone = Dropzone.forElement("my-dropzone-form");
+            // myDropzone.emit("addedfile", myFile);
+
             Dropzone.discover();
 
 

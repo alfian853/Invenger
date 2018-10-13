@@ -1,26 +1,29 @@
-<div class="modal-body">
-    <div class="row">
+<div class="modal-body" xmlns:th="http://www.w3.org/1999/xhtml">
+    <form id="inventory-detail-form" action="#" method="POST" enctype="multipart/form-data" class="row">
         <div class="col-md-6">
             <div class="row">
                 <div class="col-md-12">
-                    <img class="d-block img-fluid mx-auto rounded" src="https://pingendo.com/assets/photos/wireframe/photo-1.jpg">
+                    <img id="img-dropzone-temp" class="d-block img-fluid mx-auto rounded"
+                         th:src="@{/inventory/pict/{link}(link=${inventory.image})}" style="">
                 </div>
             </div>
-            <div class="row">
+            <div class="row" style="margin-left: 10px">
                 <div class="col-md-12">
                     <div class="btn-group">
-                        <a href="#" class="btn btn-primary my-2">List of Borrower</a>
+                        <label>Change picture</label>
+                        <input type="file" name="pict" value="" id="upload-img-btn" class="btn btn-primary my-2"
+                        onchange="update(this);">
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row" style="margin-left: 10px">
                 <div class="col-md-12">
                     <div class="btn-group">
                         <a href="#" class="btn btn-primary my-0">Assign item to single user</a>
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row" style="margin-left: 10px">
                 <div class="col-md-12 m-0">
                     <div class="btn-group">
                         <a href="#" class="btn btn-primary my-2">Assign item to multiple user</a>
@@ -28,81 +31,177 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6" style="padding-left: 0px">
             <div class="row my-2">
-                <div class="col-md-6">
-                    <label>Name :</label>
+                <div class="col-md-5">
+                    <label>Name* :</label>
                 </div>
                 <div class="col-md-6">
-                    <form class="form-inline">
                         <div class="input-group">
-                            <input type="email" class="form-control" placeholder="Name"> </div>
-                    </form>
+                            <input type="text" name="name" th:value="${inventory.name}" class="form-control"
+                                   placeholder="Name" onchange="update(this);">
+                        </div>
                 </div>
             </div>
             <div class="row my-2">
-                <div class="col-md-6">
-                    <label>Inventory Type :</label>
+                <div class="col-md-5">
+                    <label>Inventory Type* :</label>
                 </div>
                 <div class="col-md-6">
                     <div class="btn-group">
-                        <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown">Stockable</button>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">Consumable</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Stockable</a>
-                        </div>
+                        <select name="type" th:value="${inventory.type}" class="btn-outline-primary form-input"
+                                style="width: 100%;" onchange="update(this);">
+                            <th:block th:each="type : ${itemTypes}">
+                                <th:block th:switch="${type}">
+                                    <option th:case="${inventory.type}" selected="selected" th:value="${type}" th:text="${type}">Option i</option>
+                                    <option th:case="*" th:value="${type}" th:text="${type}">Option i</option>
+                                </th:block>
+                            </th:block>
+                        </select>
                     </div>
                 </div>
             </div>
             <div class="row my-2">
-                <div class="col-md-6">
-                    <label>Category :</label>
+                <div class="col-md-5">
+                    <label>Category* :</label>
                 </div>
                 <div class="col-md-6">
-                    <div class="btn-group">
-                        <button class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown"> All</button>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">All</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">All/Furniture</a>
-                        </div>
+                    <div class="input-group">
+                        <select class="btn-outline-primary form-input" style="width: 100%;"
+                                th:name="category_id" onchange="update(this);">
+                            <th:block th:each="category : ${categories}">
+                                    <th:block th:switch="${category.id}">
+                                        <option th:case="${inventory.category.id}" selected="selected" th:value="${category.id}" th:text="${category.name}">Option i</option>
+                                        <option th:case="*" th:value="${category.id}" th:text="${category.name}">Option i</option>
+                                    </th:block>
+
+                            </th:block>
+                        </select>
                     </div>
                 </div>
             </div>
             <div class="row my-2">
-                <div class="col-md-6">
-                    <label>Price :</label>
+                <div class="col-md-5">
+                    <label>Price* :</label>
                 </div>
                 <div class="col-md-6">
                     <form class="form-inline">
                         <div class="input-group">
-                            <input type="number" class="form-control" placeholder="Price"> </div>
+                            <input type="number" name="price" th:value="${inventory.price}" class="form-control"
+                                   placeholder="Price" onchange="update(this);" min="0" required value="0">
+                        </div>
                     </form>
                 </div>
             </div>
             <div class="row my-2">
-                <div class="col-md-6">
-                    <label>Quantity :</label>
+                <div class="col-md-5">
+                    <label>Quantity* :</label>
                 </div>
                 <div class="col-md-6">
-                    <input type="number" class="form-control" placeholder="Quantity">
+                    <input class="form-control" placeholder="Quantity" type="number"
+                           name="quantity" th:value="${inventory.quantity}" min="0"
+                           required value="0" onchange="update(this);">
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-12">
-                    <textarea class="form-control" id="Textarea" rows="3" placeholder="Type here"></textarea>
+                <div class="col-md-3">
+                    <label>Description :</label>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12 text-right my-3">
-                    <a class="btn btn-primary" href="#">Print Item detail </a>
+                <div class="col-md-9">
+                    <textarea class="form-control" id="Textarea" rows="3" placeholder="Type here"
+                              name="description" th:text="${inventory.description}"
+                              onchange="update(this);"></textarea>
                 </div>
             </div>
         </div>
-    </div>
+    </form>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn btn-primary">Save changes</button>
-    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    <button id='item-detail-save-btn' data-izimodal-zindex="20000" data-izimodal-preventclose="" type="button" class="btn btn-primary">Save changes</button>
+    <button id="item-detail-close-btn" type="button" class="btn btn-secondary">Close</button>
 </div>
+
+<!--<div id="inventory-edit-verif">-->
+    <!--<h1>ejejeje</h1>-->
+<!--</div>-->
+
+<script>
+
+    var listOfField = {
+        'name' : '[[${inventory.name}]]',
+        'type' : '[[${inventory.type}]]',
+        'category_id' : '[[${inventory.category.id}]]',
+        'price' : '[[${inventory.price}]]',
+        'quantity' : '[[${inventory.quantity}]]',
+        'description' : '[[${inventory.description}]]',
+        'pict' : ''
+    };
+
+    function update(field){
+        var attr = $(field).attr('name');
+        if( $(field).val() !== listOfField[attr] ){
+            $(field).notify('Click to cancel change',{
+                position : 'left',
+                autoHide : false,
+                clickToHide: false,
+                className : 'warn'
+            });
+            $(field).prev().click(function () {
+                $('.notifyjs-wrapper').remove();
+                $(field).val(listOfField[attr]);
+            });
+
+        }
+    }
+
+    $(document).ready(function() {
+
+
+
+        $('#item-detail-save-btn').click(function () {
+            var changedData = {};
+            for(var fieldName in listOfField){
+                var currentVal = $('[name=\"'+fieldName+'\"]').val();
+
+                // console.log(currentVal.val);
+                if(listOfField[fieldName] !== currentVal){
+                   changedData[fieldName] = currentVal;
+                }
+            }
+
+            iziToast.question({
+                timeout: 20000,
+                close: true,
+                overlay: true,
+                displayMode: 'once',
+                id: 'question',
+                zindex: 999,
+                title: 'Hey',
+                message: 'Are you sure for update this inventory data?',
+                position: 'center',
+                buttons: [
+                    ['<button><b>YES</b></button>', function (instance, toast) {
+
+                        instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+
+                    }, true],
+                    ['<button>NO</button>', function (instance, toast) {
+
+                        instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+
+                    }]
+                ]
+            });// end iziToast
+
+
+
+
+        });// end click listener
+
+
+        $('#item-detail-close-btn').click(function () {
+           $('.iziModal-button-close').click();
+        });
+
+    });
+</script>
