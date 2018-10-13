@@ -1,17 +1,20 @@
 package com.bliblifuture.Invenger.controller;
 
-import com.bliblifuture.Invenger.model.Position;
-import com.bliblifuture.Invenger.repository.*;
+import com.bliblifuture.Invenger.model.Inventory;
+import com.bliblifuture.Invenger.model.InventoryType;
+import com.bliblifuture.Invenger.repository.InventoryRepository;
 import com.bliblifuture.Invenger.request.formRequest.InventoryCreateRequest;
 import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.Invenger.service.InventoryService;
-import com.bliblifuture.Invenger.service.UserService;
 import com.bliblifuture.Invenger.service.ItemCategoryService;
+import com.bliblifuture.Invenger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -39,6 +42,8 @@ public class InventoryController {
     public String getTablePage(Model model){
         model.addAttribute("inventories", inventoryService.getAll());
         model.addAttribute("user",userService.getProfile());
+        model.addAttribute("categories",itemCategoryService.getAllItemCategory());
+        model.addAttribute("createItemForm",new InventoryCreateRequest());
         return "table";
     }
 
@@ -53,5 +58,15 @@ public class InventoryController {
     public RequestResponse removeInventory(@RequestParam("id") Integer id){
         return inventoryService.deleteInventory(id);
     }
+
+    @GetMapping("/inventory/detail/{id}")
+    public String getInventoryDetail(Model model, @PathVariable("id") Integer id){
+        model.addAttribute("inventory", inventoryService.getById(id));
+        model.addAttribute("categories",itemCategoryService.getAllItemCategory());
+        model.addAttribute("itemTypes", InventoryType.getAllType());
+        return "inventorydetail";
+    }
+
+
 
 }
