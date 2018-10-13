@@ -4,6 +4,7 @@ import com.bliblifuture.Invenger.model.Inventory;
 import com.bliblifuture.Invenger.model.InventoryType;
 import com.bliblifuture.Invenger.repository.InventoryRepository;
 import com.bliblifuture.Invenger.request.formRequest.InventoryCreateRequest;
+import com.bliblifuture.Invenger.request.jsonRequest.InventoryEditRequest;
 import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.Invenger.service.InventoryService;
 import com.bliblifuture.Invenger.service.ItemCategoryService;
@@ -47,10 +48,29 @@ public class InventoryController {
         return "table";
     }
 
+    @GetMapping("/table2")
+    public String getTablePage2(Model model){
+        model.addAttribute("inventories", inventoryService.getAll());
+        model.addAttribute("categories",itemCategoryService.getAllItemCategory());
+        model.addAttribute("createItemForm",new InventoryCreateRequest());
+        return "table2";
+    }
+
     @PostMapping("/inventory/create")
     @ResponseBody
     public RequestResponse addNewInventory(@Valid @ModelAttribute InventoryCreateRequest request){
         return inventoryService.createInventory(request);
+    }
+
+    @PostMapping("/inventory/edit")
+    public RequestResponse editInventory(@RequestBody InventoryEditRequest request){
+        try {
+            return inventoryService.updateInventory(request);
+        } catch (Exception e) {
+            RequestResponse response = new RequestResponse();
+            response.setStatusToFailed();
+            return response;
+        }
     }
 
     @PostMapping("/inventory/delete")
