@@ -90,7 +90,7 @@ public class ItemCategoryService {
         for(CategoryWithChildId element : categories){
             response.addCategoryData(element.getId(),element.getName());
         }
-
+        response.setStatusToSuccess();
         return response;
 
     }

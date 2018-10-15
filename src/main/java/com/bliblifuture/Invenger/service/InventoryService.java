@@ -7,6 +7,7 @@ import com.bliblifuture.Invenger.repository.InventoryRepository;
 import com.bliblifuture.Invenger.repository.category.CategoryRepository;
 import com.bliblifuture.Invenger.request.formRequest.InventoryCreateRequest;
 import com.bliblifuture.Invenger.request.formRequest.InventoryEditRequest;
+import com.bliblifuture.Invenger.response.jsonResponse.InventoryCreateResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,8 +45,8 @@ public class InventoryService {
         return inventoryRepository.findInventoryById(id);
     }
 
-    public RequestResponse createInventory(InventoryCreateRequest request){
-        RequestResponse response = new RequestResponse();
+    public InventoryCreateResponse createInventory(InventoryCreateRequest request){
+        InventoryCreateResponse response = new InventoryCreateResponse();
 
         String imgName = UUID.randomUUID().toString().replace("-","")+
                 "."+ FilenameUtils.getExtension(request.getPhoto_file().getOriginalFilename());
@@ -60,6 +61,7 @@ public class InventoryService {
         newInventory.setImage(imgName);
         newInventory.setDescription(request.getDescription());
         newInventory.setCategory(newCategory);
+        newInventory.setType(request.getType());
 
         if(fileStorageService.storeFile(
                 request.getPhoto_file(),
@@ -71,6 +73,10 @@ public class InventoryService {
         }
         else{
             response.setStatusToFailed();
+        }
+
+        if(response.getStatus().equals("success")){
+            response.setInventory_id(newInventory.getId());
         }
 
         return response;

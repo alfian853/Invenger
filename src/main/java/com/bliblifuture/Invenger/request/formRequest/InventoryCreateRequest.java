@@ -1,9 +1,11 @@
 package com.bliblifuture.Invenger.request.formRequest;
 
+import com.bliblifuture.Invenger.model.InventoryType;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Data
 public class InventoryCreateRequest {
@@ -13,6 +15,7 @@ public class InventoryCreateRequest {
 
     MultipartFile photo_file;
 
+    @NotNull
     Integer category_id;
 
     Integer quantity;
@@ -20,5 +23,8 @@ public class InventoryCreateRequest {
     Integer price;
 
     String description;
+
+    @NotNull
+    InventoryType type;
 
 }

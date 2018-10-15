@@ -182,9 +182,7 @@ public class UserService implements UserDetailsService {
             response.setStatusToSuccess();
             return response;
         }
-        String fileName = UUID.randomUUID().toString().replace("-","")+
-                "."+ FilenameUtils.getExtension(file.getOriginalFilename());
-
+        String fileName = myUtils.getRandomFileName(file);
 
         if(fileStorageService.storeFile(file,fileName, FileStorageService.PathCategory.PROFILE_PICT) ){
             User user = this.getSessionUser();
