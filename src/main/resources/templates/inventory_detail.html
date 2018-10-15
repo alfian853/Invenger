@@ -67,15 +67,9 @@
                 </div>
                 <div class="col-md-6">
                     <div class="input-group">
-                        <select class="btn-outline-primary form-input" style="width: 100%;"
-                                th:name="category_id" onchange="update(this);">
-                            <th:block th:each="category : ${categories}">
-                                    <th:block th:switch="${category.id}">
-                                        <option th:case="${inventory.category.id}" selected="selected" th:value="${category.id}" th:text="${category.name}">Option i</option>
-                                        <option th:case="*" th:value="${category.id}" th:text="${category.name}">Option i</option>
-                                    </th:block>
-
-                            </th:block>
+                        <select id="item-detail-category" class="btn-outline-primary form-input" style="width: 100%;"
+                            th:name="category_id" onchange="update(this);">
+                            <!--option initialize in the script below-->
                         </select>
                     </div>
                 </div>
@@ -121,12 +115,8 @@
     <button id="item-detail-close-btn" type="button" class="btn btn-secondary">Close</button>
 </div>
 
-<!--<div id="inventory-edit-verif">-->
-    <!--<h1>ejejeje</h1>-->
-<!--</div>-->
-
 <script>
-
+    var inventory_id = '[[${inventory.id}]]';
     var listOfField = {
         'name' : '[[${inventory.name}]]',
         'type' : '[[${inventory.type}]]',
@@ -136,6 +126,8 @@
         'description' : '[[${inventory.description}]]',
         'pict' : ''
     };
+
+    var upload_file = null;
 
     function update(field){
         var attr = $(field).attr('name');
@@ -153,22 +145,38 @@
 
         }
     }
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content')
+        }
+    });
 
     $(document).ready(function() {
 
+        for(var key in listCategory){
+            if(key == '[[${inventory.category.id}]]'){
+                $('#item-detail-category').append(
+                    '<option selected=\"selected\" value=\"'+key+'\" >'+listCategory[key]+'</option>'
+                );
+            }
+            else{
+                $('#item-detail-category').append(
+                    '<option value=\"'+key+'\" >'+listCategory[key]+'</option>'
+                );
+            }
+        }
 
 
         $('#item-detail-save-btn').click(function () {
             var changedData = {};
             for(var fieldName in listOfField){
-                var currentVal = $('[name=\"'+fieldName+'\"]').val();
+                var currentVal = $('#inventory-detail-form [name=\"'+fieldName+'\"]').val();
 
-                // console.log(currentVal.val);
-                if(listOfField[fieldName] !== currentVal){
+                if(listOfField[fieldName] != currentVal){
                    changedData[fieldName] = currentVal;
                 }
             }
-
+            // console.log(changedData);
             iziToast.question({
                 timeout: 20000,
                 close: true,
@@ -181,8 +189,48 @@
                 position: 'center',
                 buttons: [
                     ['<button><b>YES</b></button>', function (instance, toast) {
-
                         instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+                        var form = new FormData();
+                        form.append('id',inventory_id);
+
+                        for(var field in changedData){
+                            if(field !== 'pict'){
+                                form.append(field, changedData[field]);
+                                console.log('append '+field+' to '+changedData[field]);
+                            }
+                            else{
+                                form.append('pict',
+                                    $('#inventory-detail-form [name=\"pict\"]')[0].files[0]);
+
+                            }
+                        }
+
+                        $.ajax({
+                            type: "POST",
+                            url: "[[@{/inventory/edit}]]",
+                            data: form,
+                            success: function(data){
+                                console.log(data);
+                                for(var field in changedData){
+                                    if(field === 'category_id'){
+                                        $('#row-'+inventory_id+' '+'[col=\"category\"').text(
+                                            listCategory[changedData[field]]
+                                        );
+                                    }
+                                    else{
+                                        var target = $('#row-'+inventory_id+' '+'[col=\"'+field+'\"]');
+                                        if(target != null){
+                                            target.text(changedData[field]);
+                                        }
+                                    }
+                                }
+                            },
+                            cache: false,
+                            contentType: false,
+                            processData: false
+                        });
+                        toastMessage('success','Update Success','.');
+                        $('.iziModal-button-close').click();
 
                     }, true],
                     ['<button>NO</button>', function (instance, toast) {

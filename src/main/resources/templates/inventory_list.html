@@ -14,9 +14,9 @@
     <script src="http://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/css/iziModal.min.css">
     <script src="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/js/iziModal.min.js"></script>
-	<script>
+	<script th:inline = "javascript">
 		$(document).ready(function(){
-			$('#myTable').DataTable( {
+			$('#itemsTable').DataTable( {
 				columnDefs: [
 					{
 						targets: [ 0, 1, 2 ],
@@ -25,14 +25,14 @@
 				]
 			} );
 		});
-	</script>
+		var listCategory = {};
+        /*[# th:each="category : ${categories}"]*/
+
+        listCategory["[(${category.id})]"]=[[${category.name}]];
+
+        /*[/]*/
+    </script>
 	<title>Table</title>
-	<style>
-		/*.dropzone .dz-preview .dz-image {*/
-			/*width: 250px;*/
-			/*height: 250px;*/
-		/*}*/
-	</style>
 
 	</headContent>
 </head>
@@ -84,36 +84,33 @@
 
 		<button class="btn" id="categoryBtn">Category</button>
 		<button class="btn" id="itemBtn">Item</button>
-		<button id="trigger">heree</button>
 
 
 
 		<div class="user-text">Tables</div>
 		<div style="padding: 30px;">
-			<table id="myTable" class="display" style="width:100%;">
+			<table id="itemsTable" class="display" style="width:100%;">
 				<thead>
 					<tr>
 						<th>Name</th>
 						<th>Price</th>
 						<th>Quantity</th>
-						<th>Description</th>
 						<th>Category</th>
+						<th>Type</th>
 						<th>Action</th>
 					</tr>
 				</thead>
-				<tbody>
+				<tbody id="items-table-body">
 				<th:block th:each="inventory : ${inventories}">
-					<tr>
-						<td th:text="${inventory.name}"></td>
-						<td th:text="${inventory.price}"></td>
-						<td th:text="${inventory.quantity}"></td>
-						<td th:text="${inventory.description}"></td>
-						<td th:text="${inventory.category.name}"></td>
+					<tr th:id="|row-${inventory.id}|">
+						<td col="name" th:text="${inventory.name}"></td>
+						<td col="price" th:text="${inventory.price}"></td>
+						<td col="quantity" th:text="${inventory.quantity}"></td>
+						<td col="category" th:text="${inventory.category.name}"></td>
+						<td col="type" th:text="${inventory.type}"></td>
 						<td>
 							<!--<form method="post" th:action="@{/inventory/delete?id={id}(id=${inventory.id})}">-->
 							<button type="submit" th:onclick="|loadDetail(${inventory.id})|">Detail</button>
-							<!--</form>-->
-							<!--<button class="btn btn-success" onclick="loadDetail()">view detail</button>-->
 						</td>
 					</tr>
 				</th:block>
@@ -133,111 +130,115 @@
 	</div>
 
 
-	<div id="categoryModal" class="modal">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h2>New Category</h2>
-				<span id="close0" class="close">&times;</span>
-			</div>
-			<div class="modal-body">
-				<form>
-					<div class="form-group">
-						<label class="form-label">Category Name</label><br>
-						<input id="ctg-new-name" class="form-input" type="" name="">
-					</div>
-					<div class="form-group">
-						<label class="form-label">Category Parent</label><br>
-						<select id="select-parent-ctg" class="form-input" style="width: 100%;">
-							<th:block th:each="category : ${categories}">
-								<option th:value="${category.id}" th:text="${category.name}">Option i</option>
-							</th:block>
-						</select>
-					</div>
-					<div class="form-action">
-						<div id="submit-new-ctg" class="submit">Add Category</div>
-					</div>
-				</form>
-			</div>
-		</div>
+	<div id="categoryModal">
+        <div class="modal-body">
+            <form>
+                <div class="form-group">
+                    <label class="form-label">Category Name</label><br>
+                    <input id="ctg-new-name" class="form-input" style="width: 100%;" type="text" name="">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category Parent</label><br>
+                    <select id="select-parent-ctg" class="form-input" style="width: 100%;">
+                        <th:block th:each="category : ${categories}">
+                            <option th:value="${category.id}" th:text="${category.name}">Option i</option>
+                        </th:block>
+                    </select>
+                </div>
+                <div class="form-action">
+                    <div id="submit-new-ctg" class="submit">Add Category</div>
+                </div>
+            </form>
+        </div>
 	</div>
-	<div id="itemModal" class="modal">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h2>New Item</h2>
-				<span id="close1" class="close">&times;</span>
-			</div>
-			<div class="modal-body">
-				<form id="create-item-form" action="#" method="POST" enctype="multipart/form-data" th:object="${createItemForm}">
-					<div class="form-group">
-						<label class="form-label">Item Name *</label><br>
-						<input class="form-input" th:field="*{name}">
-					</div>
-					<div class="form-group">
-						<label class="form-label">Photo</label>
-						<div class="dropzone needsclick mx-4" id="uploadFile">
-							<div class="dz-message needsclick" name="user-pict">
-								Please Upload jpg, jpeg or png file only
-								<br> Drop the file here or click here for select file
-								<i class="fa fa-paper-plane-o ml-1"></i>
-								<br/>
-							</div>
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="form-label">Item Quantity *</label><br>
-						<input class="form-input" th:field="*{quantity}">
-					</div>
-					<div class="form-group">
-						<label class="form-label">Item Price</label><br>
-						<input class="form-input" th:field="*{price}">
-					</div>
-					<div class="form-group">
-						<label class="form-label">Item Category</label><br>
-						<select class="form-input" style="width: 100%;" th:name="category_id">
-							<th:block th:each="category : ${categories}">
-								<option th:value="${category.id}" th:text="${category.name}">Option i</option>
-							</th:block>
-						</select>
-					</div>
-					<div class="form-group">
-						<label class="form-label">Description</label><br>
-						<input class="form-input" th:field="*{description}">
-					</div>
-					<div class="form-action">
-						<button class="submit" id="add-item-submit">Add Item</button>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
+
+    <div id="create-item-modal">
+        <div class="modal-body">
+            <form id="create-item-form" action="#" method="POST" enctype="multipart/form-data" th:object="${createItemForm}">
+                <div class="form-group">
+                    <label class="form-label">Item Name *</label><br>
+                    <input class="form-input" th:field="*{name}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Photo</label>
+                    <div class="needsclick mx-4 dropzone" id="uploadFile">
+                        <div class="dz-message needsclick" name="user-pict">
+                            Please Upload jpg, jpeg or png file only
+                            <br> Drop the file here or click here for select file
+                            <i class="fa fa-paper-plane-o ml-1"></i>
+                            <br/>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Item Quantity *</label><br>
+                    <input class="form-input" type="number" min="0" th:field="*{quantity}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Item Price</label><br>
+                    <input class="form-input" type="number" min="0" th:field="*{price}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Item Category</label><br>
+                    <select class="form-input" style="width: 100%;" name="category_id">
+                        <th:block id="new-item-ctg" th:each="category : ${categories}">
+                            <option th:value="${category.id}" th:text="${category.name}">Option i</option>
+                        </th:block>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Item type</label>
+                    <select class="form-input" style="width: 100%;" name="type">
+                        <th:block th:each="type : ${itemTypes}">
+                            <option th:value="${type}" th:text="${type}">Option i</option>
+                        </th:block>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label><br>
+                    <input class="form-input" th:field="*{description}">
+                </div>
+                <div class="form-action">
+                    <button class="submit" id="add-item-submit">Add Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 	<div id="inventory-detail-modal"></div>
 
-	<script>
+
+
+
+    <script>
         Dropzone.autoDiscover = false;
-
-        $('#inventory-detail-modal').iziModal({
-            title : 'invetory detail',
-            width : screen.width*0.9,
-            height : screen.height*0.9,
-            closeButton : true,
-            fullScreen : true,
-            onOpening : function (modal) {
-                modal.startLoading();
-                $.get('/inventory/detail/1',function (data) {
-                    $('#inventory-detail-modal .iziModal-content').html(data);
-                    modal.stopLoading();
-                    $('.dropdown-toggle').dropdown();
-                }).fail(function (file,response) {
-                    modal.stopLoading();
-                    toastMessage('error','Failed','Something wrong :(');
-                    $('.iziModal-button-close').click();
-                });
-            }
-
-        });
 
         function loadDetail(idCategory){
 
+            $('#inventory-detail-modal').iziModal({
+                title : 'invetory detail',
+                width : screen.width*0.9,
+                height : screen.height*0.9,
+                closeButton : true,
+                fullScreen : true,
+                history: false,
+                onOpening : function (modal) {
+                    modal.startLoading();
+                    $.get('/inventory/detail/'+idCategory,function (data) {
+                        $('#inventory-detail-modal .iziModal-content').html(data);
+                        modal.stopLoading();
+                        $('.dropdown-toggle').dropdown();
+                    }).fail(function (file,response) {
+                        modal.stopLoading();
+                        toastMessage('error','Failed','Something wrong :(');
+                        $('.iziModal-button-close').click();
+                    });
+                },
+                onClosed : function (modal) {
+                    $('#inventory-detail-modal').iziModal('destroy');
+                }
+
+            });
             $('#inventory-detail-modal').iziModal('open');
 
         }
@@ -245,46 +246,61 @@
         $(document).ready(function() {
             var file_upload = null;
 
-            $('#trigger').click(function () {
-				$('#inventory-detail-modal').iziModal('open');
+            $('#create-item-modal').iziModal({
+                title : 'Create Item',
+                width : screen.width*0.5,
+                height : screen.height*0.9,
+                closeButton : true,
+                fullScreen : true,
+                history: false,
+                onClosed : function (modal) {
+                    $('#create-item-form')[0].reset();
+                }
+
             });
+
+            $('#categoryModal').iziModal({
+                title : 'Create Item Category',
+                width : screen.width*0.2,
+                height : screen.height*0.9,
+                closeButton : true,
+                fullScreen : true,
+                history: false,
+                onClosed : function (modal) {
+                    $('#categoryModal form')[0].reset();
+                }
+            });
+
 
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content')
                 }
             });
+            // var createItemDZ = new Dropzone('#uploadFile',{
+            var uploadFileDZ = null;
             Dropzone.options.uploadFile = {
                 headers : { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } ,
                 maxFiles : 1,
                 autoProcessQueue : false,
                 url : "#",
                 init : function() {
-                    myDropzone = this;
+                    uploadFileDZ = this;
                     var prevFile = null;
-                    myDropzone.processQueue();
+                    uploadFileDZ.processQueue();
                     this.on("addedfile", function(file) {
                         if(file_upload != null){
                             this.removeFile(file_upload);
                         }
                         file_upload = file;
                         file.previewElement.addEventListener("click", function() {
-                            myDropzone.hiddenFileInput.click();
+                            uploadFileDZ.hiddenFileInput.click();
                         });
                     });
                 }
             };
 
-            // var myFile = {
-            //     name: "image-name-example",
-            //     size: 987654321
-            // };
-			//
-            // var myDropzone = Dropzone.forElement("my-dropzone-form");
-            // myDropzone.emit("addedfile", myFile);
-
             Dropzone.discover();
-
 
             $('form#create-item-form').submit(function(e){
                 e.preventDefault();
@@ -294,8 +310,23 @@
                     type: "POST",
                     url: "[[@{/inventory/create}]]",
                     data: form,
-                    success: function(data){
-                        console.log(data);
+                    success: function(response){
+						$('#items-table-body').append('<tr id=\"row-'+response['inventory_id']+'\"/tr>');
+						$('#row-'+response['inventory_id']).append('<td col=\"name\">'+form.get('name')+'</td>');
+						$('#row-'+response['inventory_id']).append('<td col=\"price\">'+form.get('price')+'</td>');
+						$('#row-'+response['inventory_id']).append('<td col=\"quantity\">'+form.get('quantity')+'</td>');
+						$('#row-'+response['inventory_id']).append('<td col=\"category\">'+
+							listCategory[form.get('category_id')]+'</td>');
+						$('#row-'+response['inventory_id']).append('<td col=\"type\">'+form.get('name')+'</td>');
+						$('#row-'+response['inventory_id']).append(
+						    '<td>' +
+								'<button type=\"submit\" onclick=loadDetail('+response['inventory_id']+') >Detail</button>'
+						);
+
+						toastMessage('success','Success','New item added to table');
+						$('#create-item-modal').iziModal('close');
+                        uploadFileDZ.removeFile(file_upload);
+
                     },
                     cache: false,
                     contentType: false,
@@ -319,6 +350,8 @@
                             response['new-category']['name']+'</option>'
                         );
                         toastMessage('success', 'Success', 'New category added');
+                        listCategory[response['new-category']['id']] = response['new-category']['name'];
+                        $('#categoryModal').iziModal('close');
                     }
                 }).fail(function (xhr, error, thrownError) {
                     toastMessage('error', 'Error', 'Something wrong');
@@ -327,24 +360,14 @@
 
 
             $("#categoryBtn").click(function(){
-                $("#categoryModal").show();
+                $("#categoryModal").iziModal('open');
             });
             $("#close0").click(function(){
                 $("#categoryModal").hide();
             });
             $("#itemBtn").click(function(){
-                $("#itemModal").show();
-            });
-            $("#close1").click(function(){
-                $("#itemModal").hide();
-            });
-            $(window).click(function(e){
-                if(e.target.id=="categoryModal"){
-                    $("#categoryModal").hide();
-                }
-                if(e.target.id=="itemModal"){
-                    $("#itemModal").hide();
-                }
+                $('#create-item-modal').iziModal('open');
+
             });
 
             function myFunction(){
@@ -386,7 +409,7 @@
                 var drop = document.getElementById("dropdown");
                 if(link.style.display==="none"){
                     link.style.display="block";
-                    // drop.style.color="rgb(78, 81, 85)";
+                    drop.style.color="rgb(78, 81, 85)";
                 }
                 else{
                     link.style.display="none";
