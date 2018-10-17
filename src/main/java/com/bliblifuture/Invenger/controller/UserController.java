@@ -2,6 +2,7 @@ package com.bliblifuture.Invenger.controller;
 
 import com.bliblifuture.Invenger.Utils.MyUtils;
 import com.bliblifuture.Invenger.model.User;
+import com.bliblifuture.Invenger.request.formRequest.UserCreateRequest;
 import com.bliblifuture.Invenger.request.jsonRequest.ProfileRequest;
 import com.bliblifuture.Invenger.response.jsonResponse.AlertResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.FormFieldResponse;
@@ -68,6 +69,13 @@ public class UserController {
     public UploadProfilePictResponse uploadProfilePict
             (@RequestParam("file") MultipartFile file){
         return userService.changeProfilePict(file);
+    }
+
+    @GetMapping("/user/all")
+    public String getUserTablePage(Model model){
+        model.addAttribute("users", userService.getAll());
+        model.addAttribute("user",userService.getProfile());
+        return "user/user_list";
     }
 
 }

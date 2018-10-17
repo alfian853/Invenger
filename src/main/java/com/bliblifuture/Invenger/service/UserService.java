@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 @Service
@@ -41,6 +42,10 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     MyUtils myUtils;
+
+    public List<User> getAll(){
+        return userRepository.findAll();
+    }
 
 
     public User getSessionUser(){
