@@ -4,9 +4,7 @@ import com.bliblifuture.Invenger.Utils.MyUtils;
 import com.bliblifuture.Invenger.model.User;
 import com.bliblifuture.Invenger.request.formRequest.UserCreateRequest;
 import com.bliblifuture.Invenger.request.jsonRequest.ProfileRequest;
-import com.bliblifuture.Invenger.response.jsonResponse.AlertResponse;
-import com.bliblifuture.Invenger.response.jsonResponse.FormFieldResponse;
-import com.bliblifuture.Invenger.response.jsonResponse.UploadProfilePictResponse;
+import com.bliblifuture.Invenger.response.jsonResponse.*;
 import com.bliblifuture.Invenger.service.PositionService;
 import com.bliblifuture.Invenger.service.RoleService;
 import com.bliblifuture.Invenger.service.UserService;
@@ -17,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.Map;
 
 
@@ -85,7 +84,13 @@ public class UserController {
         model.addAttribute("user",userService.getProfile());
         model.addAttribute("roles", roleService.getAllRole());
         model.addAttribute("positions", positionService.getAllPosition());
+        model.addAttribute("createUserForm", new UserCreateRequest());
         return "user/user_list";
     }
 
+    @PostMapping("/user/create")
+    @ResponseBody
+    public UserCreateResponse addNewUser(@Valid @ModelAttribute UserCreateRequest request){
+        return userService.createUser(request);
+    }
 }

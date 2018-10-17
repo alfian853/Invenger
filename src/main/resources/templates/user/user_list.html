@@ -26,6 +26,12 @@
 			} );
 		});
 
+		var listPosition = {};
+        listPosition["[(${position.id})]"]=[[${position.name}]];
+
+        var listRole = {};
+        listRole["[(${role.id})]"]=[[${role.name}]];
+
     </script>
         <title>Table</title>
 
@@ -91,14 +97,14 @@
                     <th>Action</th>
                 </tr>
                 </thead>
-                <tbody id="items-table-body">
+                <tbody id="users-table-body">
                 <th:block th:each="user : ${users}">
-                    <tr>
-                        <td th:text="${user.username}"></td>
-                        <td th:text="${user.email}"></td>
-                        <td th:text="${user.telp}"></td>
-                        <td th:text="${user.position.name}"></td>
-                        <td th:text="${user.role.name}"></td>
+                    <tr th:id="|row-${user.id}|">
+                        <td col="username" th:text="${user.username}"></td>
+                        <td col="email" th:text="${user.email}"></td>
+                        <td col="telp" th:text="${user.telp}"></td>
+                        <td col="position" th:text="${user.position.name}"></td>
+                        <td col="role" th:text="${user.role.name}"></td>
                         <td>
                             <!--<form method="post" th:action="@{/inventory/delete?id={id}(id=${inventory.id})}">-->
                             <button type="submit">More</button>
@@ -121,22 +127,22 @@
 
         <div id="create-user-modal">
             <div class="modal-body">
-                <form id="create-user-form" action="#" method="POST" enctype="multipart/form-data">
+                <form id="create-user-form" action="#" method="POST" enctype="multipart/form-data" th:object="${createUserForm}">
                     <div class="form-group">
                         <label class="form-label">Username *</label><br>
-                        <input class="form-input">
+                        <input class="form-input" th:field="*{username}">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Email</label><br>
-                        <input class="form-input">
+                        <label class="form-label">User Email</label><br>
+                        <input class="form-input" th:field="*{email}">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Password</label><br>
-                        <input class="form-input" type="password">
+                        <label class="form-label">User Password</label><br>
+                        <input class="form-input" type="password" th:field="*{password}">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Telp</label><br>
-                        <input class="form-input">
+                        <input class="form-input" th:field="*{telp}">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Position</label>
@@ -155,7 +161,7 @@
                         </select>
                     </div>
                     <div class="form-action">
-                        <button class="submit" id="add-user-submit">Add User</button>
+                        <button class="submit" id="add-item-submit">Add User</button>
                     </div>
                 </form>
             </div>
@@ -164,9 +170,8 @@
     </div>
 
     <script>
-        Dropzone.autoDiscover = false;
+
         $(document).ready(function() {
-            var file_upload = null;
 
             $('#create-user-modal').iziModal({
                 title : 'New User',
@@ -187,9 +192,38 @@
                 }
             });
 
-            var uploadFileDZ = null;
 
-            Dropzone.discover();
+
+            $('form#create-user-form').submit(function(e){
+                e.preventDefault();
+                var form = new FormData(this);
+                $.ajax({
+                    type: "POST",
+                    url: "[[@{/user/create}]]",
+                    data: form,
+                    success: function(response){
+						$('#users-table-body').append('<tr id=\"row-'+response['user_id']+'\"/tr>');
+						$('#row-'+response['user_id']).append('<td col=\"username\">'+form.get('username')+'</td>');
+						$('#row-'+response['user_id']).append('<td col=\"email\">'+form.get('email')+'</td>');
+						$('#row-'+response['user_id']).append('<td col=\"telp\">'+form.get('telp')+'</td>');
+						$('#row-'+response['user_id']).append('<td col=\"position\">'+
+							listPosition[form.get('position_id')]+'</td>');
+						$('#row-'+response['user_id']).append('<td col=\"role\">'+
+							listRole[form.get('role_id')]+'</td>');
+						$('#row-'+response['user_id']).append(
+						    '<td>' +
+								'<button type=\"submit\">More</button>'+'</td>'
+						);
+
+						toastMessage('success','Success','New user added to table');
+						$('#create-user-modal').iziModal('close');
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false
+                });
+
+            });
 
             $("#userBtn").click(function(){
                 $('#create-user-modal').iziModal('open');

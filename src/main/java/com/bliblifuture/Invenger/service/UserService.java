@@ -4,13 +4,17 @@ import com.bliblifuture.Invenger.Utils.MyUtils;
 import com.bliblifuture.Invenger.annotation.imp.PasswordValdator;
 import com.bliblifuture.Invenger.annotation.imp.PhoneValidator;
 import com.bliblifuture.Invenger.model.Position;
+import com.bliblifuture.Invenger.model.Role;
 import com.bliblifuture.Invenger.model.User;
 import com.bliblifuture.Invenger.repository.PositionRepository;
 import com.bliblifuture.Invenger.repository.RoleRepository;
 import com.bliblifuture.Invenger.repository.UserRepository;
+import com.bliblifuture.Invenger.request.formRequest.UserCreateRequest;
 import com.bliblifuture.Invenger.request.jsonRequest.ProfileRequest;
 import com.bliblifuture.Invenger.response.jsonResponse.FormFieldResponse;
+import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.UploadProfilePictResponse;
+import com.bliblifuture.Invenger.response.jsonResponse.UserCreateResponse;
 import com.bliblifuture.Invenger.response.viewDto.ProfileDTO;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +51,29 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
+    public UserCreateResponse createUser(UserCreateRequest request){
+        UserCreateResponse response = new UserCreateResponse();
+
+        Position newPosition = new Position();
+        newPosition.setId(request.getPosition_id());
+
+        Role newRole = new Role();
+        newRole.setId(request.getRole_id());
+
+        User newUser = new User();
+        newUser.setUsername(request.getUsername());
+        newUser.setEmail(request.getEmail());
+        newUser.setPassword(request.getPassword());
+        newUser.setTelp(request.getTelp());
+        newUser.setPosition(newPosition);
+        newUser.setRole(newRole);
+
+        userRepository.save(newUser);
+        response.setStatusToSuccess();
+        response.setUser_id(newUser.getId());
+
+        return response;
+    }
 
     public User getSessionUser(){
         if(SecurityContextHolder.getContext().getAuthentication() == null){
