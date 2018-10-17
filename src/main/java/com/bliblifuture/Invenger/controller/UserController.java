@@ -7,6 +7,8 @@ import com.bliblifuture.Invenger.request.jsonRequest.ProfileRequest;
 import com.bliblifuture.Invenger.response.jsonResponse.AlertResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.FormFieldResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.UploadProfilePictResponse;
+import com.bliblifuture.Invenger.service.PositionService;
+import com.bliblifuture.Invenger.service.RoleService;
 import com.bliblifuture.Invenger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,6 +25,12 @@ public class UserController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    RoleService roleService;
+
+    @Autowired
+    PositionService positionService;
 
     @Autowired
     MyUtils myUtils;
@@ -75,6 +83,8 @@ public class UserController {
     public String getUserTablePage(Model model){
         model.addAttribute("users", userService.getAll());
         model.addAttribute("user",userService.getProfile());
+        model.addAttribute("roles", roleService.getAllRole());
+        model.addAttribute("positions", positionService.getAllPosition());
         return "user/user_list";
     }
 
