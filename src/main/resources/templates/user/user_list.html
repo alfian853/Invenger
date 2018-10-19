@@ -25,13 +25,15 @@
 				]
 			} );
 		});
-
 		var listPosition = {};
+        /*[# th:each="position : ${positions}"]*/
         listPosition["[(${position.id})]"]=[[${position.name}]];
+        /*[/]*/
 
         var listRole = {};
+        /*[# th:each="role : ${roles}"]*/
         listRole["[(${role.id})]"]=[[${role.name}]];
-
+        /*[/]*/
     </script>
         <title>Table</title>
 
@@ -106,7 +108,6 @@
                         <td col="position" th:text="${user.position.name}"></td>
                         <td col="role" th:text="${user.role.name}"></td>
                         <td>
-                            <!--<form method="post" th:action="@{/inventory/delete?id={id}(id=${inventory.id})}">-->
                             <button type="submit">More</button>
                         </td>
                     </tr>
