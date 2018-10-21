@@ -35,7 +35,7 @@ public class InventoryController {
         model.addAttribute("categories",itemCategoryService.getAllItemCategory());
         model.addAttribute("itemTypes", InventoryType.getAllType());
         model.addAttribute("createItemForm",new InventoryCreateRequest());
-        return "inventory_list";
+        return "inventory/inventory_list";
     }
 
     @PostMapping("/inventory/create")
@@ -66,7 +66,7 @@ public class InventoryController {
     public String getInventoryDetail(Model model, @PathVariable("id") Integer id){
         model.addAttribute("inventory", inventoryService.getById(id));
         model.addAttribute("itemTypes", InventoryType.getAllType());
-        return "inventory_detail";
+        return "inventory/inventory_detail";
     }
 
 
