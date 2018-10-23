@@ -54,6 +54,9 @@ public class UserService implements UserDetailsService {
     public UserCreateResponse createUser(UserCreateRequest request){
         UserCreateResponse response = new UserCreateResponse();
 
+        String imgName = UUID.randomUUID().toString().replace("-","")+
+                "."+ FilenameUtils.getExtension(request.getProfile_photo().getOriginalFilename());
+
         Position newPosition = new Position();
         newPosition.setId(request.getPosition_id());
 
@@ -63,14 +66,27 @@ public class UserService implements UserDetailsService {
         User newUser = new User();
         newUser.setUsername(request.getUsername());
         newUser.setEmail(request.getEmail());
-        newUser.setPassword(request.getPassword());
+        newUser.setPassword(myUtils.getBcryptHash(request.getPassword()));
         newUser.setTelp(request.getTelp());
+        newUser.setPictureName(imgName);
         newUser.setPosition(newPosition);
         newUser.setRole(newRole);
 
-        userRepository.save(newUser);
-        response.setStatusToSuccess();
-        response.setUser_id(newUser.getId());
+        if(fileStorageService.storeFile(
+                request.getProfile_photo(),
+                imgName,
+                FileStorageService.PathCategory.PROFILE_PICT)
+        ) {
+            userRepository.save(newUser);
+            response.setStatusToSuccess();
+        }
+        else{
+            response.setStatusToFailed();
+        }
+
+        if(response.getStatus().equals("success")){
+            response.setUser_id(newUser.getId());
+        }
 
         return response;
     }
