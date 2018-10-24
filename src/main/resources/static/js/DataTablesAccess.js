@@ -16,16 +16,20 @@ class DTAccess{
         return this.getRowById(id).find('[col=\"'+col_name+'\"]');
     }
 
+    removeRowById(id){
+        this.datatables.rows(this.row_prefix+id).remove().draw();
+    }
+
     addData(id,data,columns_name){
-        if(columns_name.count() > this.column_len){
+        if(columns_name.length > this.column_len){
             throw "columns name count can't be greater than "+this.column_len
         }
         this.datatables.row.add(data)
             .draw()
             .node().id = this.row_prefix + id;
 
-        let target = $(this.row_prefix + id);
-
+        let target = this.getRowById(id);
+        console.log(target);
         for(let i = 0; i < this.column_len; i++){
             target.find('td:eq('+i+')').attr('col',columns_name[i]);
         }

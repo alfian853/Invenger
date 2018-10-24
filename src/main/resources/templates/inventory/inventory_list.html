@@ -63,7 +63,7 @@
 				</thead>
 				<tbody id="items-table-body">
 				<th:block th:each="inventory : ${inventories}">
-					<tr th:id="|row-${inventory.id}|">
+					<tr th:id="|item-${inventory.id}|">
 						<td col="name" th:text="${inventory.name}"></td>
 						<td col="price" th:text="${inventory.price}"></td>
 						<td col="quantity" th:text="${inventory.quantity}"></td>

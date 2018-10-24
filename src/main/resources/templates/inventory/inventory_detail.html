@@ -115,6 +115,15 @@
     <button id="item-detail-close-btn" type="button" class="btn btn-secondary">Close</button>
 </div>
 
+<!--/*
+Documentation
+
+        list of global variable usage
+        [
+            tableAccess => global access for dataTables, initialize in inventory_list.html,
+            listCategory => list of all category, initialize in inventory_list.html
+        ]
+*/-->
 <script>
     var inventory_id = '[[${inventory.id}]]';
     var listOfField = {
@@ -176,14 +185,14 @@
                    changedData[fieldName] = currentVal;
                 }
             }
-            // console.log(changedData);
+
             iziToast.question({
                 timeout: 20000,
                 close: true,
                 overlay: true,
                 displayMode: 'once',
                 id: 'question',
-                zindex: 999,
+                zindex: 99999,
                 title: 'Hey',
                 message: 'Are you sure for update this inventory data?',
                 position: 'center',
@@ -213,12 +222,14 @@
                                 console.log(data);
                                 for(var field in changedData){
                                     if(field === 'category_id'){
-                                        $('#row-'+inventory_id+' '+'[col=\"category\"').text(
+                                        tableAccess.getColByRowId(inventory_id,'category').text(
                                             listCategory[changedData[field]]
                                         );
                                     }
                                     else{
-                                        var target = $('#row-'+inventory_id+' '+'[col=\"'+field+'\"]');
+                                        var target = tableAccess.getColByRowId(inventory_id,field);
+                                        console.log(target);
+                                        console.log(tableAccess);
                                         if(target != null){
                                             target.text(changedData[field]);
                                         }
