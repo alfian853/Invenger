@@ -18,10 +18,6 @@
         <div class="col-md-5">
             <select id="AI-item-select" style="width: 70%">
                 <option></option>
-                <th:block th:each="item : ${inventories}">
-                    <option th:value="${item.id}" th:text="${item.name}" th:qty="${item.quantity}"
-                    th:ctg="${item.category.name}"></option>
-                </th:block>
             </select>
         </div>
         <div class="col-md-2">
@@ -42,23 +38,6 @@
         </div>
     </div>
     <div class="row" id="selected-items">
-        <!--example item-->
-        <div class="row" item_id="0">
-            <div class="col-4">
-                <input type="text" name="name" disabled="disabled" value="namabarang">
-            </div>
-            <div class="col-4">
-                <input type="text" name="category" disabled="disabled" value="/parent/child">
-            </div>
-            <div class="col-2">
-                <input type="text" name="quantity" value="3" max="10">
-            </div>
-            <div class="col-2">
-                <button type="button" class="btn btn-secondary" onclick="removeItem('+id+')">
-                    <i class="fas fa-minus"></i>
-                </button>
-            </div>
-        </div>
     </div>
     <div class="modal-footer">
         <button id="item-assign-submit" class="btn btn-primary">Assign</button>
@@ -81,10 +60,23 @@
         isSelected[id]=false;
     }
 
-    $('#AI-item-select').select2({
+    var item_select = $('#AI-item-select');
+    item_select.select2({
         selectOnClose : false,
         placeholder : 'please select item'
     });
+
+    var items = tableAccess.getAll();
+    var len = items.length;
+
+    for(let i = 0; i < len; ++i){
+        item_select.append(
+            '<option value=\"'+tableAccess.getPrefixLessId(items[i].DT_RowId)+'\" qty=\"'+items[i][2]+'\" '+
+            'ctg=\"'+items[i][3]+'\">'+items[i][0]+'</option>'
+        )
+    }
+
+
 
     $('#AI-users-select').select2({
         selectOnClose : false,
@@ -153,12 +145,15 @@
        console.log(data);
         $.ajax({
             type: "POST",
-            url: "[[@{/lendment/assign-to-user}]]",
+            url: "[[@{/lendment/create}]]",
             data: JSON.stringify(data),
             contentType : "application/json; charset=utf-8",
             success: function(data){
-                console.log(data);
+                toastMessage('success','Success','');
+                $('.iziModal-button-close').click();
             }
+        }).fail(function () {
+            toastMessage('error','Error','Something wrong :(');
         });
 
 

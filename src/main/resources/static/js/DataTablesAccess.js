@@ -12,8 +12,16 @@ class DTAccess{
         return $('#'+this.row_prefix+id);
     }
 
-    getColById(id,col_name){
-        return this.getRowById(id).find('[col=\"'+col_name+'\"]');
+    getColByRowId(id,col_name){
+        return this.getRowById(id).find('td[col=\"'+col_name+'\"]');
+    }
+
+    getAll(){
+        return this.datatables.rows().data();
+    }
+
+    getPrefixLessId(prefixedId){
+        return prefixedId.slice(this.row_prefix.length);
     }
 
     removeRowById(id){
