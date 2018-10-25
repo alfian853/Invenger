@@ -45,6 +45,16 @@
     </div>
 </div>
 
+
+<!--/*
+Documentation
+
+        list of global variable usage
+        [
+            tableAccess => global access for dataTables, initialize in inventory_list.html,
+        ]
+*/-->
+
 <script>
 
     var isSelected = {};
@@ -60,18 +70,34 @@
         isSelected[id]=false;
     }
 
+    function qtyInputChange(input) {
+        let maks = parseInt($(input).attr('max'));
+        console.log(maks);
+        console.log(parseInt($(input).val()));
+        if(maks < parseInt($(input).val()) ){
+            $(input).notify('quantity can\'t be greater than '+maks,{
+                position : 'left',
+                autoHide : true,
+                clickToHide: true,
+                className : 'warn'
+            });
+            $(input).val(maks);
+        }
+
+    }
+
     var item_select = $('#AI-item-select');
     item_select.select2({
         selectOnClose : false,
         placeholder : 'please select item'
     });
 
-    var items = tableAccess.getAll();
+    var items = window.tableAccess.getAll();
     var len = items.length;
 
     for(let i = 0; i < len; ++i){
         item_select.append(
-            '<option value=\"'+tableAccess.getPrefixLessId(items[i].DT_RowId)+'\" qty=\"'+items[i][2]+'\" '+
+            '<option value=\"'+window.tableAccess.getPrefixLessId(items[i].DT_RowId)+'\" qty=\"'+items[i][2]+'\" '+
             'ctg=\"'+items[i][3]+'\">'+items[i][0]+'</option>'
         )
     }
@@ -103,7 +129,8 @@
             '       <input type="text" name="name" disabled="disabled" value="'+name+'\">' +
             '   </div>' +
             '   <div class="col-2">' +
-            '       <input type="text" name="quantity" value="3" max="'+qty+'">' +
+            '       <input type="text" name="quantity" value="0" max="'+qty+'" ' +
+            'placeholder=\"max : '+qty+'\" onchange=\"qtyInputChange(this)\">' +
             '   </div>' +
             '   <div class="col-2">' +
             '       <button type="button" class="btn btn-secondary" onclick="removeItem('+id+')">' +
@@ -119,24 +146,23 @@
     });
 
     $('#item-assign-submit').click(function () {
-       var data = {};
-       data['user_id'] = $('#AI-users-select').val();
-       var items = [];
+        var data = {};
+        data['user_id'] = $('#AI-users-select').val();
+        var items = [];
         var valid = true;
-       $('#selected-items > .row').each(function () {
-
-           var item = {};
-           item['id'] = $(this).attr('item_id');
-           item['quantity'] = $(this).find('[name=\"quantity\"]').val();
-           if(item['quantity'] === '' || item['quantity'] == null){
-               $(this).find('[name=\"quantity\"]').notify('Required',{
+        $('#selected-items > .row').each(function () {
+            var item = {};
+            item['id'] = $(this).attr('item_id');
+            item['quantity'] = $(this).find('[name=\"quantity\"]').val();
+            if(item['quantity'] === '' || item['quantity'] == null){
+                $(this).find('[name=\"quantity\"]').notify('Required',{
                    position : 'right',
                    className : 'warn'
-               });
-               valid = false;
-               return;
-           }
-           items.push(item);
+                });
+                valid = false;
+                return;
+            }
+            items.push(item);
        });
        if(!valid){
            return;
@@ -148,8 +174,20 @@
             url: "[[@{/lendment/create}]]",
             data: JSON.stringify(data),
             contentType : "application/json; charset=utf-8",
-            success: function(data){
-                toastMessage('success','Success','');
+            success: function(response){
+                if(response['status'] === 'success'){
+                    let len = items.length;
+                    for(let i = 0; i < len; i++){
+                        let id = items[i]['id'];
+                        let qty = parseInt(items[i]['quantity']);
+
+                        let col = window.tableAccess.getColByRowId(id,'quantity');
+                        let tmp = parseInt(col.text());
+                        col.text(tmp - qty);
+                        console.log('edit =>'+col.text());
+                        toastMessage('success','Success','');
+                    }
+                }
                 $('.iziModal-button-close').click();
             }
         }).fail(function () {

@@ -5,29 +5,36 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
-public class AssignItemsToUserRequest {
+public class LendmentCreateRequest {
 
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
     static class Item{
+        @NotNull
         Integer id;
+
+        @NotNull
         Integer quantity;
     }
 
+    @NotNull
     @JsonProperty("user_id")
     Integer userId;
 
+    @NotEmpty
     List<Item> items;
 
-    Integer getChildIdAt(int index){
+    public Integer getChildIdAt(int index){
         return items.get(index).getId();
     }
 
-    Integer getChildQuantityAt(int index){
+    public Integer getChildQuantityAt(int index){
         return items.get(index).getQuantity();
     }
 
