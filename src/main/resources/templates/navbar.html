@@ -31,5 +31,10 @@
                 link.style.display="none";
             }
         }
+        $("a#fakeAnchor").click(function()
+        {
+            $("#formAnchor").submit();
+            return false;
+        });
     </script>
 </div>
