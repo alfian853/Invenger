@@ -45,45 +45,11 @@
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 
-    <div id="sidebar">
-        <div id="top">
-            <div id="invenger-text">INVENGER</div><i onclick="myFunction()" id="bars" class="fa fa-bars"></i>
-        </div>
-        <div id="element">MENUS</div>
-        <a class="icon" href="">
-            <i class="fa fa-cloud"></i><div class="text">Options</div>
-        </a>
-        <a class="icon" id="selected" href="">
-            <i class="fa fa-cloud"></i><div class="text">Options</div>
-        </a>
-        <a class="icon" href="">
-            <i class="fa fa-cloud"></i><div class="text">Options</div>
-        </a>
-        <a class="icon" href="">
-            <i class="fa fa-cloud"></i><div class="text">Options</div>
-        </a>
-        <a class="icon" href="">
-            <i class="fa fa-cloud"></i><div class="text">Options</div>
-        </a>
-    </div>
+
+    <div th:replace="sidebar :: left_sidebar"></div>
+
     <div id="content">
-        <div class="navbar">
-            <div id="dropdown" onclick="dropDown()">
-                <div style="padding-left: 32px; padding-right: 8px; border-left: 1px solid rgba(24, 28, 33, 0.04);" th:object="${user}" th:text="*{name}"></div>
-                <div class="circle"></div>
-                <i style="padding-left: 8px; padding-right: 8px;" class="fa fa-angle-down"></i>
-            </div>
-        </div>
-        <div id="link">
-            <a th:href="@{/profile}" style="border-bottom: 1px solid rgba(24,28,33,0.04);">
-                <i style="padding-right: 8px;" class="fa fa-user"></i>
-                <div>My Profile</div>
-            </a>
-            <a href="">
-                <i style="padding-right: 8px;" class="fa fa-sign-out"></i>
-                <div>Log Out</div>
-            </a>
-        </div>
+        <div th:replace="navbar :: navbar"></div>
 
         <div class="user-text">Users Table</div>
         <button class="btn" id="userBtn">New User</button>
@@ -267,51 +233,6 @@
                 $('#create-user-modal').iziModal('open');
             });
 
-            function myFunction(){
-                var z = document.getElementsByClassName("text");
-                var a = document.getElementsByClassName("icon");
-                var y = document.getElementById("top");
-                var x = document.getElementById("invenger-text");
-                if (x.style.display === "none"){
-                    document.getElementById("sidebar").style.width = "250px";
-                    document.getElementById("content").style.marginLeft = "250px";
-                    x.style.display = "flex";
-                    y.style.padding = "18px 32px";
-                    document.getElementById("element").style.textAlign = "left";
-                    document.getElementById("element").style.margin = "12px 32px";
-                    for (var i = z.length - 1; i >= 0; i--) {
-                        z[i].style.display = "flex";
-                    }
-                    for (var i = a.length - 1; i >= 0; i--) {
-                        a[i].style.padding = "12px 32px";
-                    }
-                }
-                else{
-                    document.getElementById("sidebar").style.width = "auto";
-                    document.getElementById("content").style.marginLeft = "57.15px";
-                    x.style.display = "none";
-                    y.style.padding = "20px 20px";
-                    document.getElementById("element").style.textAlign = "center";
-                    document.getElementById("element").style.margin = "12px 0px";
-                    for (var i = z.length - 1; i >= 0; i--) {
-                        z[i].style.display = "none";
-                    }
-                    for (var i = a.length - 1; i >= 0; i--) {
-                        a[i].style.padding = "12px 20px 15px 20px";
-                    }
-                }
-            }
-            function dropDown(){
-                var link = document.getElementById("link");
-                var drop = document.getElementById("dropdown");
-                if(link.style.display==="none"){
-                    link.style.display="block";
-                    drop.style.color="rgb(78, 81, 85)";
-                }
-                else{
-                    link.style.display="none";
-                }
-            }
         });
 
 	</script>
