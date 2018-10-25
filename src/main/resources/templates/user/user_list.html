@@ -74,7 +74,7 @@
                         <td col="position" th:text="${user.position.name}"></td>
                         <td col="role" th:text="${user.role.name}"></td>
                         <td>
-                            <button type="submit">More</button>
+                            <button type="submit" th:onclick="|loadDetail(${user.id})|">More</button>
                         </td>
                     </tr>
                 </th:block>
@@ -147,9 +147,43 @@
 
     </div>
 
+    <div id="user-detail-modal"></div>
+
     <script>
         Dropzone.autoDiscover = false;
+
+        function loadDetail(idCategory){
+
+            $('#user-detail-modal').iziModal({
+                title : 'Users detail',
+                width : screen.width*0.9,
+                height : screen.height*0.9,
+                closeButton : true,
+                fullScreen : true,
+                history: false,
+                onOpening : function (modal) {
+                    modal.startLoading();
+                    $.get('/user/detail/'+idCategory,function (html) {
+                        $('#user-detail-modal .iziModal-content').html(html);
+                        modal.stopLoading();
+                        $('.dropdown-toggle').dropdown();
+                    }).fail(function (file,response) {
+                        modal.stopLoading();
+                        toastMessage('error','Failed','Something wrong :(');
+                        $('.iziModal-button-close').click();
+                    });
+                },
+                onClosed : function (modal) {
+                    $('#user-detail-modal').iziModal('destroy');
+                }
+
+            });
+            $('#user-detail-modal').iziModal('open');
+
+        }
+
         $(document).ready(function() {
+
             var file_upload = null;
 
             $('#create-user-modal').iziModal({
@@ -215,7 +249,7 @@
 							listRole[form.get('role_id')]+'</td>');
 						$('#row-'+response['user_id']).append(
 						    '<td>' +
-								'<button type=\"submit\">More</button>'+'</td>'
+								'<button type=\"submit\" onclick=loadDetail('+response['user_id']+') >More</button>'
 						);
 
 						toastMessage('success','Success','New user added to table');

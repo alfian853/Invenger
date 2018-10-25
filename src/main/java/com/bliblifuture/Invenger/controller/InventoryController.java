@@ -65,7 +65,6 @@ public class InventoryController {
     @GetMapping("/inventory/detail/{id}")
     public String getInventoryDetail(Model model, @PathVariable("id") Integer id){
         model.addAttribute("inventory", inventoryService.getById(id));
-        model.addAttribute("itemTypes", InventoryType.getAllType());
         return "inventory/inventory_detail";
     }
 

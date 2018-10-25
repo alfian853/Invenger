@@ -111,4 +111,11 @@ public class UserController {
     public RequestResponse removeUser(@PathVariable("id") Integer id){
         return userService.deleteUser(id);
     }
+
+    @GetMapping("/user/detail/{id}")
+    public String getUserDetail(Model model, @PathVariable("id") Integer id){
+        model.addAttribute("user", userService.getById(id));
+//        model.addAttribute("itemTypes", InventoryType.getAllType());
+        return "user/user_detail";
+    }
 }

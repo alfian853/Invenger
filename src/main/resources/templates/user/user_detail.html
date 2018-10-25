@@ -1,0 +1,258 @@
+<div class="modal-body" xmlns:th="http://www.w3.org/1999/xhtml">
+    <form id="user-detail-form" action="#" method="POST" enctype="multipart/form-data" class="row">
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-12">
+                    <img id="img-dropzone-temp" class="d-block img-fluid mx-auto rounded"
+                         th:src="@{/profile/pict/{link}(link=${user.pictureName})}" style="height: 350px;width:350px;">
+                </div>
+            </div>
+            <div class="row" style="margin-left: 10px">
+                <div class="col-md-12">
+                    <div class="btn-group">
+                        <label>Change picture</label>
+                        <input type="file" name="pict" value="" id="upload-img-btn" class="btn btn-primary my-2"
+                               onchange="update(this);">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6" style="padding-left: 0px">
+            <div class="row my-2">
+                <div class="col-md-5">
+                    <label>Username* :</label>
+                </div>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" name="name" th:value="${user.username}" class="form-control"
+                               placeholder="Username" onchange="update(this);">
+                    </div>
+                </div>
+            </div>
+            <div class="row my-2">
+                <div class="col-md-5">
+                    <label>User Email* :</label>
+                </div>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" name="name" th:value="${user.email}" class="form-control"
+                               placeholder="User Email" onchange="update(this);">
+                    </div>
+                </div>
+            </div>
+            <div class="row my-2">
+                <div class="col-md-5">
+                    <label>Password* :</label>
+                </div>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" name="name" th:value="${user.password}" class="form-control"
+                               placeholder="Password" onchange="update(this);">
+                    </div>
+                </div>
+            </div>
+            <div class="row my-2">
+                <div class="col-md-5">
+                    <label>Telp* :</label>
+                </div>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" name="name" th:value="${user.telp}" class="form-control"
+                               placeholder="Telp" onchange="update(this);">
+                    </div>
+                </div>
+            </div>
+            <div class="row my-2">
+                <div class="col-md-5">
+                    <label>Position* :</label>
+                </div>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <select id="user-detail-position" class="btn-outline-primary form-input" style="width: 100%;"
+                                th:name="position_id" onchange="update(this);">
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row my-2">
+                <div class="col-md-5">
+                    <label>Role* :</label>
+                </div>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <select id="user-detail-role" class="btn-outline-primary form-input" style="width: 100%;"
+                                th:name="role_id" onchange="update(this);">
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button id='user-detail-save-btn' data-izimodal-zindex="20000" data-izimodal-preventclose="" type="button" class="btn btn-primary">Save changes</button>
+    <button id="user-detail-close-btn" type="button" class="btn btn-secondary">Close</button>
+</div>
+
+<!--/*
+Documentation
+
+        list of global variable usage
+        [
+            tableAccess => global access for dataTables, initialize in user_list.html,
+            listPositiion => list of all Positiion, initialize in user_list.html
+        ]
+*/-->
+<script>
+    var user_id = '[[${user.id}]]';
+    var listOfField = {
+        'username' : '[[${user.username}]]',
+        'email' : '[[${user.email}]]',
+        'password' : '[[${user.password}]]',
+        'telp' : '[[${user.telp}]]',
+        'position_id' : '[[${user.position.id}]]',
+        'role_id' : '[[${user.role.id}]]',
+        'pict' : ''
+    };
+
+    var upload_file = null;
+
+    function update(field){
+        var attr = $(field).attr('name');
+        if( $(field).val() !== listOfField[attr] ){
+            $(field).notify('Click to cancel change',{
+                position : 'left',
+                autoHide : false,
+                clickToHide: false,
+                className : 'warn'
+            });
+            $(field).prev().click(function () {
+                $('.notifyjs-wrapper').remove();
+                $(field).val(listOfField[attr]);
+            });
+
+        }
+    }
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content')
+        }
+    });
+
+    $(document).ready(function() {
+
+        for(var key in listPosition){
+            if(key == '[[${user.position.id}]]'){
+                $('#user-detail-position').append(
+                    '<option selected=\"selected\" value=\"'+key+'\" >'+listPosition[key]+'</option>'
+                );
+            }
+            else{
+                $('#user-detail-position').append(
+                    '<option value=\"'+key+'\" >'+listPosition[key]+'</option>'
+                );
+            }
+        }
+        for(var key in listRole){
+            if(key == '[[${user.role.id}]]'){
+                $('#user-detail-role').append(
+                    '<option selected=\"selected\" value=\"'+key+'\" >'+listRole[key]+'</option>'
+                );
+            }
+            else{
+                $('#user-detail-role').append(
+                    '<option value=\"'+key+'\" >'+listRole[key]+'</option>'
+                );
+            }
+        }
+
+
+
+        $('#user-detail-save-btn').click(function () {
+            var changedData = {};
+            for(var fieldName in listOfField){
+                var currentVal = $('#user-detail-form [name=\"'+fieldName+'\"]').val();
+
+                if(listOfField[fieldName] != currentVal){
+                   changedData[fieldName] = currentVal;
+                }
+            }
+
+            iziToast.question({
+                timeout: 20000,
+                close: true,
+                overlay: true,
+                displayMode: 'once',
+                id: 'question',
+                zindex: 99999,
+                title: 'Hey',
+                message: 'Are you sure for update this user data?',
+                position: 'center',
+                buttons: [
+                    ['<button><b>YES</b></button>', function (instance, toast) {
+                        instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+                        var form = new FormData();
+                        form.append('id',user_id);
+
+                        for(var field in changedData){
+                            if(field !== 'pict'){
+                                form.append(field, changedData[field]);
+                                console.log('append '+field+' to '+changedData[field]);
+                            }
+                            else{
+                                form.append('pict',
+                                    $('#user-detail-form [name=\"pict\"]')[0].files[0]);
+
+                            }
+                        }
+
+                        $.ajax({
+                            type: "POST",
+                            url: "[[@{/user/edit}]]",
+                            data: form,
+                            success: function(data){
+                                console.log(data);
+                                for(var field in changedData){
+                                    if(field === 'Positiion_id'){
+                                        tableAccess.getColByRowId(user_id,'Positiion').text(
+                                            listPositiion[changedData[field]]
+                                        );
+                                    }
+                                    else{
+                                        var target = tableAccess.getColByRowId(user_id,field);
+                                        console.log(target);
+                                        console.log(tableAccess);
+                                        if(target != null){
+                                            target.text(changedData[field]);
+                                        }
+                                    }
+                                }
+                            },
+                            cache: false,
+                            contentType: false,
+                            processData: false
+                        });
+                        toastMessage('success','Update Success','.');
+                        $('.iziModal-button-close').click();
+
+                    }, true],
+                    ['<button>NO</button>', function (instance, toast) {
+
+                        instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+
+                    }]
+                ]
+            });// end iziToast
+
+
+
+
+        });// end click listener
+
+
+        $('#user-detail-close-btn').click(function () {
+           $('.iziModal-button-close').click();
+        });
+
+    });
+</script>

@@ -54,6 +54,10 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
+    public User getById(Integer id){
+        return userRepository.findUserById(id);
+    }
+
     public UserCreateResponse createUser(UserCreateRequest request){
         UserCreateResponse response = new UserCreateResponse();
 
