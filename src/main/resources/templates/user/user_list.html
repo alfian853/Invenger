@@ -142,6 +142,17 @@
                         <input class="form-input" type="password" th:field="*{password}">
                     </div>
                     <div class="form-group">
+                        <label class="form-label">Photo</label>
+                        <div class="needsclick mx-4 dropzone" id="uploadFile">
+                            <div class="dz-message needsclick" name="user-pict">
+                                Please Upload jpg, jpeg or png file only
+                                <br> Drop the file here or click here for select file
+                                <i class="fa fa-paper-plane-o ml-1"></i>
+                                <br/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label class="form-label">Telp</label><br>
                         <input class="form-input" th:field="*{telp}">
                     </div>
@@ -171,8 +182,9 @@
     </div>
 
     <script>
-
+        Dropzone.autoDiscover = false;
         $(document).ready(function() {
+            var file_upload = null;
 
             $('#create-user-modal').iziModal({
                 title : 'New User',
@@ -193,11 +205,35 @@
                 }
             });
 
+            // var createItemDZ = new Dropzone('#uploadFile',{
+            var uploadFileDZ = null;
+            Dropzone.options.uploadFile = {
+                headers : { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } ,
+                maxFiles : 1,
+                autoProcessQueue : false,
+                url : "#",
+                init : function() {
+                    uploadFileDZ = this;
+                    var prevFile = null;
+                    uploadFileDZ.processQueue();
+                    this.on("addedfile", function(file) {
+                        if(file_upload != null){
+                            this.removeFile(file_upload);
+                        }
+                        file_upload = file;
+                        file.previewElement.addEventListener("click", function() {
+                            uploadFileDZ.hiddenFileInput.click();
+                        });
+                    });
+                }
+            };
 
+            Dropzone.discover();
 
             $('form#create-user-form').submit(function(e){
                 e.preventDefault();
                 var form = new FormData(this);
+                form.append("photo_file",file_upload);
                 $.ajax({
                     type: "POST",
                     url: "[[@{/user/create}]]",
@@ -218,6 +254,7 @@
 
 						toastMessage('success','Success','New user added to table');
 						$('#create-user-modal').iziModal('close');
+						uploadFileDZ.removeFile(file_upload);
                     },
                     cache: false,
                     contentType: false,
