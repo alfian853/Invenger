@@ -181,12 +181,14 @@ Documentation
                         let id = items[i]['id'];
                         let qty = parseInt(items[i]['quantity']);
 
-                        let col = window.tableAccess.getColByRowId(id,'quantity');
-                        let tmp = parseInt(col.text());
-                        col.text(tmp - qty);
-                        console.log('edit =>'+col.text());
-                        toastMessage('success','Success','');
+                        let col = window.tableAccess.getColByRowId(id,'quantity')
+                        let old_val = parseInt(col.text());
+                        window.tableAccess.setColValueByRowId(id,'quantity', old_val - qty );
                     }
+                    toastMessage('success','Success',response['message']);
+                }
+                else{
+                    toastMessage('error','Error',response['message']);
                 }
                 $('.iziModal-button-close').click();
             }

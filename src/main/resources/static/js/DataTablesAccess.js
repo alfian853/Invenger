@@ -28,6 +28,15 @@ class DTAccess{
         this.datatables.rows(this.row_prefix+id).remove().draw();
     }
 
+    setColValueByRowId(id,col_name,new_value){
+        let col = this.getColByRowId(id,col_name);
+
+        let target = this.datatables.cell(col);
+        console.log('hehe '+id+' '+col_name+' '+new_value);
+        console.log(col.html());
+        target.data(new_value).draw();
+    }
+
     addData(id,data,columns_name){
         if(columns_name.length > this.column_len){
             throw "columns name count can't be greater than "+this.column_len

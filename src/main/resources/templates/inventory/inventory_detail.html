@@ -204,13 +204,11 @@ Documentation
 
                         for(var field in changedData){
                             if(field !== 'pict'){
-                                form.append(field, changedData[field]);
-                                console.log('append '+field+' to '+changedData[field]);
+                                form.append(field, changedData[field])
                             }
                             else{
                                 form.append('pict',
                                     $('#inventory-detail-form [name=\"pict\"]')[0].files[0]);
-
                             }
                         }
 
@@ -220,19 +218,16 @@ Documentation
                             data: form,
                             success: function(data){
                                 console.log(data);
-                                for(var field in changedData){
+                                for(let field in changedData){
                                     if(field === 'category_id'){
-                                        tableAccess.getColByRowId(inventory_id,'category').text(
+                                        window.tableAccess.setColValueByRowId(inventory_id, 'category',
                                             listCategory[changedData[field]]
                                         );
                                     }
                                     else{
-                                        var target = tableAccess.getColByRowId(inventory_id,field);
-                                        console.log(target);
-                                        console.log(tableAccess);
-                                        if(target != null){
-                                            target.text(changedData[field]);
-                                        }
+                                        window.tableAccess.setColValueByRowId(inventory_id, field,
+                                            changedData[field]
+                                        );
                                     }
                                 }
                             },
@@ -251,7 +246,6 @@ Documentation
                     }]
                 ]
             });// end iziToast
-
 
 
 
