@@ -3,17 +3,17 @@
 	  th:replace="~{masterLayout :: layout(~{::title}, ~{::content}, ~{::headContent})}">
 <head>
 	<headContent>
-	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.1.0/material.min.css">
-	<link rel="stylesheet" href="http://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
 	<link rel="stylesheet" type="text/css" th:href="@{/css/table.css}">
 	<link rel="stylesheet" type="text/css" th:href="@{/css/modal.css}">
+	<link rel="stylesheet" href="http://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
 
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.js"></script>
 
     <script src="http://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/css/iziModal.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/js/iziModal.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/js/iziModal.min.js"></script>
+
 	<script th:inline = "javascript">
 		$(document).ready(function(){
 			$('#itemsTable').DataTable( {
@@ -25,12 +25,8 @@
 				]
 			} );
 		});
+		/*[- will be initilize in the next script below -]*/
 		var listCategory = {};
-        /*[# th:each="category : ${categories}"]*/
-
-        listCategory["[(${category.id})]"]=[[${category.name}]];
-
-        /*[/]*/
     </script>
 	<title>Table</title>
 
@@ -84,10 +80,9 @@
 
 		<button class="btn" id="categoryBtn">Category</button>
 		<button class="btn" id="itemBtn">Item</button>
+        <button class="btn" id="assignItemBtn">assign item to user</button>
 
-
-
-		<div class="user-text">Tables</div>
+		<div class="user-text">Inventory</div>
 		<div style="padding: 30px;">
 			<table id="itemsTable" class="display" style="width:100%;">
 				<thead>
@@ -102,14 +97,14 @@
 				</thead>
 				<tbody id="items-table-body">
 				<th:block th:each="inventory : ${inventories}">
-					<tr th:id="|row-${inventory.id}|">
+					<!--<tr th:id="|row-${inventory.id}|" th:item_id="${inventory.id}">-->
+					<tr th:item_id="${inventory.id}">
 						<td col="name" th:text="${inventory.name}"></td>
 						<td col="price" th:text="${inventory.price}"></td>
 						<td col="quantity" th:text="${inventory.quantity}"></td>
 						<td col="category" th:text="${inventory.category.name}"></td>
 						<td col="type" th:text="${inventory.type}"></td>
 						<td>
-							<!--<form method="post" th:action="@{/inventory/delete?id={id}(id=${inventory.id})}">-->
 							<button type="submit" th:onclick="|loadDetail(${inventory.id})|">Detail</button>
 						</td>
 					</tr>
@@ -181,7 +176,7 @@
                 <div class="form-group">
                     <label class="form-label">Item Category</label><br>
                     <select class="form-input" style="width: 100%;" name="category_id">
-                        <th:block id="new-item-ctg" th:each="category : ${categories}">
+                        <th:block th:each="category : ${categories}">
                             <option th:value="${category.id}" th:text="${category.name}">Option i</option>
                         </th:block>
                     </select>
@@ -207,7 +202,7 @@
 
 	<div id="inventory-detail-modal"></div>
 
-
+    <div id="assign-item-modal"></div>
 
 
     <script>
@@ -224,8 +219,8 @@
                 history: false,
                 onOpening : function (modal) {
                     modal.startLoading();
-                    $.get('/inventory/detail/'+idCategory,function (data) {
-                        $('#inventory-detail-modal .iziModal-content').html(data);
+                    $.get('/inventory/detail/'+idCategory,function (html) {
+                        $('#inventory-detail-modal .iziModal-content').html(html);
                         modal.stopLoading();
                         $('.dropdown-toggle').dropdown();
                     }).fail(function (file,response) {
@@ -245,6 +240,39 @@
 
         $(document).ready(function() {
             var file_upload = null;
+            var uploadFileDZ = null;
+
+            // init listCategory
+            $('select[name=\"category_id\"] option').each(function () {
+				listCategory[$(this).val()] = $(this).text();
+            });
+
+			$('#assignItemBtn').click(function () {
+			    console.log('clicked');
+				$('#assign-item-modal').iziModal({
+					title : 'Assign Item to User',
+					width : screen.width*0.6,
+					height : screen.height,
+					closeButton : true,
+					fullScreen : true,
+					history : false,
+					onOpening : function (modal) {
+						modal.startLoading();
+						$.get('/lendment/assign-form',function (html) {
+                            $('#assign-item-modal .iziModal-content').html(html);
+                            modal.stopLoading();
+                        }).fail(function () {
+                            modal.stopLoading();
+                            toastMessage('error','Failed','Something wrong :(');
+                            $('.iziModal-button-close').click();
+                        });
+                    }
+				});
+
+                $('#assign-item-modal').iziModal('open');
+
+            });
+
 
             $('#create-item-modal').iziModal({
                 title : 'Create Item',
@@ -277,8 +305,7 @@
                     'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content')
                 }
             });
-            // var createItemDZ = new Dropzone('#uploadFile',{
-            var uploadFileDZ = null;
+
             Dropzone.options.uploadFile = {
                 headers : { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } ,
                 maxFiles : 1,
@@ -311,19 +338,17 @@
                     url: "[[@{/inventory/create}]]",
                     data: form,
                     success: function(response){
-						$('#items-table-body').append('<tr id=\"row-'+response['inventory_id']+'\"/tr>');
-						$('#row-'+response['inventory_id']).append('<td col=\"name\">'+form.get('name')+'</td>');
-						$('#row-'+response['inventory_id']).append('<td col=\"price\">'+form.get('price')+'</td>');
-						$('#row-'+response['inventory_id']).append('<td col=\"quantity\">'+form.get('quantity')+'</td>');
-						$('#row-'+response['inventory_id']).append('<td col=\"category\">'+
-							listCategory[form.get('category_id')]+'</td>');
-						$('#row-'+response['inventory_id']).append('<td col=\"type\">'+form.get('name')+'</td>');
-						$('#row-'+response['inventory_id']).append(
-						    '<td>' +
-								'<button type=\"submit\" onclick=loadDetail('+response['inventory_id']+') >Detail</button>'
-						);
-
-						toastMessage('success','Success','New item added to table');
+                        console.log(response['inventory_id']);
+						var target = $('#itemsTable').DataTable();
+						target.row.add([
+                            form.get('name'),
+							form.get('price'),
+							form.get('quantity'),
+                            listCategory[form.get('category_id')],
+							form.get('type'),
+                            '<button type=\"submit\" onclick=loadDetail('+response['inventory_id']+') >Detail</button>'
+						]).draw();
+                        toastMessage('success','Success','New item added to table');
 						$('#create-item-modal').iziModal('close');
                         uploadFileDZ.removeFile(file_upload);
 

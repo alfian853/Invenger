@@ -1,0 +1,168 @@
+<div style="margin-top :40px;padding:20px;" xmlns:th="http://www.w3.org/1999/xhtml">
+    <div class="row">
+        <div class="col-5">
+            <label>Employee name : </label>
+        </div>
+        <div class="col-7">
+            <select id="AI-users-select" style="width: 70%">
+                <th:block th:each="user : ${users}">
+                    <option th:value="${user.id}" th:text="${user.username}"></option>
+                </th:block>
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-5">
+            <label>Select items : </label>
+        </div>
+        <div class="col-md-5">
+            <select id="AI-item-select" style="width: 70%">
+                <option></option>
+                <th:block th:each="item : ${inventories}">
+                    <option th:value="${item.id}" th:text="${item.name}" th:qty="${item.quantity}"
+                    th:ctg="${item.category.name}"></option>
+                </th:block>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button id="assign-item-add" type="button" class="btn btn-secondary">
+                <i class="fas fa-plus"></i>
+            </button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4">
+            <label>Category</label>
+        </div>
+        <div class="col-4">
+            <label>Name</label>
+        </div>
+        <div class="col-4">
+            <label>Quantity</label>
+        </div>
+    </div>
+    <div class="row" id="selected-items">
+        <!--example item-->
+        <div class="row" item_id="0">
+            <div class="col-4">
+                <input type="text" name="name" disabled="disabled" value="namabarang">
+            </div>
+            <div class="col-4">
+                <input type="text" name="category" disabled="disabled" value="/parent/child">
+            </div>
+            <div class="col-2">
+                <input type="text" name="quantity" value="3" max="10">
+            </div>
+            <div class="col-2">
+                <button type="button" class="btn btn-secondary" onclick="removeItem('+id+')">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button id="item-assign-submit" class="btn btn-primary">Assign</button>
+        <button id="item-assign-cancel" class="btn btn-primary">Cancel</button>
+    </div>
+</div>
+
+<script>
+
+    var isSelected = {};
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content')
+        }
+    });
+
+    function removeItem(id){
+        $('#selected-items div[item-id=\"'+id+'\"]').remove();
+        isSelected[id]=false;
+    }
+
+    $('#AI-item-select').select2({
+        selectOnClose : false,
+        placeholder : 'please select item'
+    });
+
+    $('#AI-users-select').select2({
+        selectOnClose : false,
+        placeholder : 'please select item'
+    });
+
+    $('#assign-item-add').click(function () {
+        var id = $('#AI-item-select').val();
+        console.log(id);
+        if(id == '' || isSelected[id] === true){
+            return;
+        }
+        isSelected[id] = true;
+        var row = $('#AI-item-select').find('option[value='+id+']');
+        var ctg = row.attr('ctg');
+        var qty = row.attr('qty');
+        var name = row.text();
+        $('#selected-items').append(
+            '<div class="row selected-item-row" item_id="'+id+'">' +
+            '   <div class="col-4">' +
+            '       <input type="text" name="category" disabled="disabled" value="'+ctg+'">' +
+            '   </div>' +
+            '   <div class="col-4">' +
+            '       <input type="text" name="name" disabled="disabled" value="'+name+'\">' +
+            '   </div>' +
+            '   <div class="col-2">' +
+            '       <input type="text" name="quantity" value="3" max="'+qty+'">' +
+            '   </div>' +
+            '   <div class="col-2">' +
+            '       <button type="button" class="btn btn-secondary" onclick="removeItem('+id+')">' +
+            '           <i class="fas fa-minus"></i>' +
+            '       </button>' +
+            '   </div>' +
+            '</div>'
+        );
+    });
+
+    $('#item-assign-cancel').click(function () {
+        $('.iziModal-button-close').click();
+    });
+
+    $('#item-assign-submit').click(function () {
+       var data = {};
+       data['user_id'] = $('#AI-users-select').val();
+       var items = [];
+        var valid = true;
+       $('#selected-items > .row').each(function () {
+
+           var item = {};
+           item['id'] = $(this).attr('item_id');
+           item['quantity'] = $(this).find('[name=\"quantity\"]').val();
+           if(item['quantity'] === '' || item['quantity'] == null){
+               $(this).find('[name=\"quantity\"]').notify('Required',{
+                   position : 'right',
+                   className : 'warn'
+               });
+               valid = false;
+               return;
+           }
+           items.push(item);
+       });
+       if(!valid){
+           return;
+       }
+       data['items'] = items;
+       console.log(data);
+        $.ajax({
+            type: "POST",
+            url: "[[@{/lendment/assign-to-user}]]",
+            data: JSON.stringify(data),
+            contentType : "application/json; charset=utf-8",
+            success: function(data){
+                console.log(data);
+            }
+        });
+
+
+    });
+
+
+</script>
