@@ -36,7 +36,14 @@ public class LendmentController {
     @PostMapping("lendment/create")
     @ResponseBody
     public RequestResponse assignItemToUser(@Valid @RequestBody LendmentCreateRequest request){
-        return lendmentService.createLendment(request);
+        try {
+            return lendmentService.createLendment(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+            RequestResponse response = new RequestResponse();
+            response.setStatusToFailed();
+            return response;
+        }
     }
 
 }

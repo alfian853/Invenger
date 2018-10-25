@@ -12,6 +12,8 @@ import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
 import com.sun.xml.internal.ws.api.message.ExceptionHasMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -28,43 +30,37 @@ public class LendmentService {
     @Autowired
     InventoryRepository inventoryRepository;
 
-    public RequestResponse createLendment(LendmentCreateRequest request){
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public RequestResponse createLendment(LendmentCreateRequest request) throws Exception {
         RequestResponse response = new RequestResponse();
-        try{
-            Lendment lendment = new Lendment();
-            lendment.setUser( userRepository.getOne(request.getUserId()) );
+        Lendment lendment = new Lendment();
+        lendment.setUser( userRepository.getOne(request.getUserId()) );
 
-            List<LendmentDetails> detailsList = new LinkedList<>();
+        List<LendmentDetails> detailsList = new LinkedList<>();
 
-            int itemSize = request.getItems().size();
-            for(int i = 0;i < itemSize; ++i){
-                Inventory inventory = inventoryRepository.findInventoryById( request.getChildIdAt(i) );
-                if(request.getChildQuantityAt(i) > inventory.getQuantity()){
-                    throw new Exception();
-                }
-                detailsList.add(
-                  LendmentDetails.builder()
-                          .inventory(
-                            inventory
-                          )
-                          .lendment(lendment)
-                          .quantity(request.getChildQuantityAt(i))
-                          .build()
-                );
+        int itemSize = request.getItems().size();
+        for(int i = 0;i < itemSize; ++i){
+            Inventory inventory = inventoryRepository.findInventoryById( request.getChildIdAt(i) );
+            if(request.getChildQuantityAt(i) > inventory.getQuantity()){
+                throw new Exception();
             }
-
-            lendment.setLendment_details(detailsList);
-
-            lendmentRepository.save(lendment);
-            response.setStatusToSuccess();
-            return response;
+            inventory.setQuantity(inventory.getQuantity() - request.getChildQuantityAt(i) );
+            detailsList.add(
+              LendmentDetails.builder()
+                      .inventory(
+                        inventory
+                      )
+                      .lendment(lendment)
+                      .quantity(request.getChildQuantityAt(i))
+                      .build()
+            );
         }
-        catch (Exception e){
-            e.printStackTrace();
-            response.setStatusToFailed();
-            return response;
-        }
 
+        lendment.setLendment_details(detailsList);
+
+        lendmentRepository.save(lendment);
+        response.setStatusToSuccess();
+        return response;
 
     }
 
