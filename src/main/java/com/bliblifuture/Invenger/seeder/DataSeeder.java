@@ -1,14 +1,14 @@
 package com.bliblifuture.Invenger.seeder;
 
+import com.bliblifuture.Invenger.model.Category;
 import com.bliblifuture.Invenger.model.Position;
 import com.bliblifuture.Invenger.model.Role;
 import com.bliblifuture.Invenger.model.User;
 import com.bliblifuture.Invenger.repository.PositionRepository;
 import com.bliblifuture.Invenger.repository.RoleRepository;
 import com.bliblifuture.Invenger.repository.UserRepository;
+import com.bliblifuture.Invenger.repository.category.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -29,13 +29,33 @@ public class DataSeeder {
     @Autowired
     PositionRepository positionRepository;
 
+    @Autowired
+    CategoryRepository categoryRepository;
+
     @EventListener
     public void initSeeder(ContextRefreshedEvent event){
         postionSeeder();
         roleSeeder();
         adminSeeder();
+        userSeeder();
+
+        categorySeeder();
+
     }
 
+    void categorySeeder(){
+
+        Category category = categoryRepository.findCategoryByName("/all");
+
+        if(category == null){
+            category = Category.builder()
+                    .name("/all")
+                    .build();
+
+            categoryRepository.save(category);
+        }
+
+    }
 
     void postionSeeder(){
 
@@ -44,9 +64,18 @@ public class DataSeeder {
             position = new Position();
             position.setDescription("manage invenger");
             position.setName("inventory system admin");
+            positionRepository.save(position);
         }
 
-        positionRepository.save(position);
+        position = positionRepository.findByName("junior software engineer");
+
+        if(position == null){
+            position = new Position();
+            position.setDescription("basic user");
+            position.setName("junior software engineer");
+            positionRepository.save(position);
+        }
+
     }
 
     void roleSeeder(){
@@ -75,4 +104,19 @@ public class DataSeeder {
             userRepository.save(admin);
         }
     }
+
+    void userSeeder(){
+        User user = userRepository.findByUsername("basic");
+        if(user == null){
+            user = new User();
+            user.setUsername("basic");
+            user.setEmail("basic@future.com");
+            user.setTelp("+1111111111");
+            user.setRole(roleRepository.findByName("ROLE_USER"));
+            user.setPassword(new BCryptPasswordEncoder().encode("basic"));
+            user.setPosition(positionRepository.findByName("junior software engineer"));
+            userRepository.save(user);
+        }
+    }
+
 }

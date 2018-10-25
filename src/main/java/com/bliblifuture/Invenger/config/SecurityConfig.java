@@ -58,7 +58,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/login").permitAll()
+                .antMatchers("/login","/inventory/edit","**").permitAll()
                 .antMatchers(
                         "/profile",
                         "/profile/upload-pict").hasAnyRole("ADMIN","USER")
@@ -79,7 +79,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // .logout().logoutUrl("/logout").logoutSuccessUrl("/login")
                 .and()
                 .csrf();
-
     }
 
     private AuthenticationFailureHandler loginFailureHandler() {
