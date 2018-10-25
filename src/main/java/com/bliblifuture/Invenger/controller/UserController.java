@@ -3,6 +3,7 @@ package com.bliblifuture.Invenger.controller;
 import com.bliblifuture.Invenger.Utils.MyUtils;
 import com.bliblifuture.Invenger.model.User;
 import com.bliblifuture.Invenger.request.formRequest.UserCreateRequest;
+import com.bliblifuture.Invenger.request.formRequest.UserEditRequest;
 import com.bliblifuture.Invenger.request.jsonRequest.ProfileRequest;
 import com.bliblifuture.Invenger.response.jsonResponse.*;
 import com.bliblifuture.Invenger.service.PositionService;
@@ -92,5 +93,16 @@ public class UserController {
     @ResponseBody
     public UserCreateResponse addNewUser(@Valid @ModelAttribute UserCreateRequest request){
         return userService.createUser(request);
+    }
+    @PostMapping("/user/edit")
+    @ResponseBody
+    public RequestResponse editUser(@Valid @ModelAttribute UserEditRequest request){
+        try {
+            return userService.updateUser(request);
+        } catch (Exception e) {
+            RequestResponse response = new RequestResponse();
+            response.setStatusToFailed();
+            return response;
+        }
     }
 }

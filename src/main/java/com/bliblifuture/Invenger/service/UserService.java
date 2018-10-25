@@ -10,6 +10,7 @@ import com.bliblifuture.Invenger.repository.PositionRepository;
 import com.bliblifuture.Invenger.repository.RoleRepository;
 import com.bliblifuture.Invenger.repository.UserRepository;
 import com.bliblifuture.Invenger.request.formRequest.UserCreateRequest;
+import com.bliblifuture.Invenger.request.formRequest.UserEditRequest;
 import com.bliblifuture.Invenger.request.jsonRequest.ProfileRequest;
 import com.bliblifuture.Invenger.response.jsonResponse.FormFieldResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
@@ -23,6 +24,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
@@ -88,6 +91,56 @@ public class UserService implements UserDetailsService {
             response.setUser_id(newUser.getId());
         }
 
+        return response;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public RequestResponse updateUser(UserEditRequest request){
+
+        User user = userRepository.getOne(request.getId());
+        System.out.println(request);
+        RequestResponse response = new RequestResponse();
+        response.setStatusToSuccess();
+
+        if(request.getUsername() != null){
+            user.setUsername(request.getUsername());
+        }
+        if(request.getEmail() != null){
+            user.setEmail(request.getEmail());
+        }
+        if(request.getPassword() != null){
+            user.setPassword(myUtils.getBcryptHash(request.getPassword()));
+        }
+        if(request.getTelp() != null){
+            user.setTelp(request.getTelp());
+        }
+        if(request.getPosition_id() != null){
+            Position position = positionRepository.getOne(request.getPosition_id());
+            user.setPosition(position);
+        }
+        if(request.getRole_id() != null){
+            Role role = roleRepository.getOne(request.getRole_id());
+            user.setRole(role);
+        }
+        if(request.getPict() != null){
+
+            String newFileName = myUtils.getRandomFileName(request.getPict());
+
+            if(fileStorageService.storeFile(request.getPict(),newFileName,
+                    FileStorageService.PathCategory.PROFILE_PICT) ){
+
+                String oldFileName = user.getPictureName();
+                fileStorageService.deleteFile(oldFileName, FileStorageService.PathCategory.PROFILE_PICT);
+                user.setPictureName(newFileName);
+            }
+            else {
+                response.setStatusToFailed();
+                response.setMessage("Internal server error");
+            }
+
+        }
+
+        userRepository.save(user);
         return response;
     }
 
