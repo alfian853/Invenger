@@ -1,8 +1,9 @@
 package com.bliblifuture.Invenger.controller;
 
-import com.bliblifuture.Invenger.repository.InventoryRepository;
-import com.bliblifuture.Invenger.request.jsonRequest.AssignItemsToUserRequest;
+import com.bliblifuture.Invenger.request.jsonRequest.LendmentCreateRequest;
+import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.Invenger.service.InventoryService;
+import com.bliblifuture.Invenger.service.LendmentService;
 import com.bliblifuture.Invenger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,8 +13,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.validation.Valid;
+
 @Controller
 public class LendmentController {
+
+    @Autowired
+    LendmentService lendmentService;
 
     @Autowired
     UserService userService;
@@ -21,18 +27,16 @@ public class LendmentController {
     @Autowired
     InventoryService inventoryService;
 
-    @GetMapping("lendment/assign-form")
+    @GetMapping("lendment/create")
     public String getAssignItemForm(Model model){
         model.addAttribute("users",userService.getAll());
-        model.addAttribute("inventories",inventoryService.getAll());
-        return "lendment/assign_item_to_user";
+        return "/lendment/lendment_create";
     }
 
-    @PostMapping("lendment/assign-to-user")
+    @PostMapping("lendment/create")
     @ResponseBody
-    public Object assignItemToUser(@RequestBody AssignItemsToUserRequest request){
-        System.out.println(request);
-        return true;
+    public RequestResponse assignItemToUser(@Valid @RequestBody LendmentCreateRequest request){
+        return lendmentService.createLendment(request);
     }
 
 }

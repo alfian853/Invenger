@@ -17,9 +17,10 @@ import java.util.Date;
 @Entity
 @Table(name = "lendments_detail")
 public class LendmentDetails implements Serializable {
-    int quantity;
 
-    boolean isReturn;
+    Integer quantity;
+
+    boolean isReturn = false;
 
     @Nullable
     Date return_date;
