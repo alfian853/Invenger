@@ -144,6 +144,13 @@ public class UserService implements UserDetailsService {
         return response;
     }
 
+    public RequestResponse deleteUser(Integer id){
+        RequestResponse response = new RequestResponse();
+        userRepository.deleteById(id);
+        response.setStatusToSuccess();
+        return response;
+    }
+
     public User getSessionUser(){
         if(SecurityContextHolder.getContext().getAuthentication() == null){
             return null;

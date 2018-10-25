@@ -105,4 +105,10 @@ public class UserController {
             return response;
         }
     }
+
+    @PostMapping("/user/delete/{id}")
+    @ResponseBody
+    public RequestResponse removeUser(@PathVariable("id") Integer id){
+        return userService.deleteUser(id);
+    }
 }
