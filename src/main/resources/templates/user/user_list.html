@@ -178,11 +178,11 @@
             var file_upload = null;
             var uploadFileDZ = null;
             $('select[name=\"position_id\"] option').each(function () {
-				listPosition[$(this).val()] = $(this).text();
+                listPosition[$(this).val()] = $(this).text();
             });
 
             $('select[name=\"role_id\"] option').each(function () {
-				listRole[$(this).val()] = $(this).text();
+                listRole[$(this).val()] = $(this).text();
             });
 
             $('#create-user-modal').iziModal({
@@ -205,7 +205,6 @@
             });
 
             // var createItemDZ = new Dropzone('#uploadFile',{
-            var uploadFileDZ = null;
             Dropzone.options.uploadFile = {
                 headers : { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } ,
                 maxFiles : 1,
@@ -232,7 +231,7 @@
             $('form#create-user-form').submit(function(e){
                 e.preventDefault();
                 var form = new FormData(this);
-                form.append("photo_file",file_upload);
+                form.append("profile_photo",file_upload);
                 $.ajax({
                     type: "POST",
                     url: "[[@{/user/create}]]",
