@@ -18,7 +18,7 @@
             var tableAccess = null;
             $(document).ready(function(){
                 var datatables = $('#itemsTable').DataTable();
-                tableAccess = new DTAccess(datatables,'usr-',7);
+                tableAccess = new DTAccess(datatables,'usr-',6);
             });
             var listPosition = {};
             var listRole = {};
@@ -47,7 +47,6 @@
                 <tr>
                     <th>Username</th>
                     <th>Email</th>
-                    <th>Password</th>
                     <th>Telp</th>
                     <th>Position</th>
                     <th>Role</th>
@@ -59,7 +58,6 @@
                     <tr th:id="|usr-${user.id}|">
                         <td col="username" th:text="${user.username}"></td>
                         <td col="email" th:text="${user.email}"></td>
-                        <td col="password" th:text="${user.password}"></td>
                         <td col="telp" th:text="${user.telp}"></td>
                         <td col="position" th:text="${user.position.name}"></td>
                         <td col="role" th:text="${user.role.name}"></td>
@@ -73,7 +71,6 @@
                 <tr>
                     <th>Username</th>
                     <th>Email</th>
-                    <th>Password</th>
                     <th>Telp</th>
                     <th>Position</th>
                     <th>Role</th>
@@ -93,10 +90,6 @@
                     <div class="form-group">
                         <label class="form-label">User Email</label><br>
                         <input class="form-input" th:field="*{email}">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">User Password</label><br>
-                        <input class="form-input" type="password" th:field="*{password}">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Photo</label>
@@ -243,7 +236,6 @@
                             [
                                 form.get('username'),
                                 form.get('email'),
-                                form.get('password'),
                                 form.get('telp'),
                                 listPosition[form.get('position_id')],
                                 listRole[form.get('role_id')],
