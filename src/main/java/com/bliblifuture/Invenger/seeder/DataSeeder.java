@@ -110,7 +110,7 @@ public class DataSeeder {
         if(user == null){
             user = new User();
             user.setUsername("basic");
-            user.setEmail("basic@future.com");
+            user.setEmail("basics@future.com");
             user.setTelp("+1111111111");
             user.setRole(roleRepository.findByName("ROLE_USER"));
             user.setPassword(new BCryptPasswordEncoder().encode("basic"));

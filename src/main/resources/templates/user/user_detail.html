@@ -24,7 +24,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="input-group">
-                        <input type="text" name="name" th:value="${user.username}" class="form-control"
+                        <input type="text" name="username" th:value="${user.username}" class="form-control"
                                placeholder="Username" onchange="update(this);">
                     </div>
                 </div>
@@ -35,7 +35,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="input-group">
-                        <input type="text" name="name" th:value="${user.email}" class="form-control"
+                        <input type="text" name="email" th:value="${user.email}" class="form-control"
                                placeholder="User Email" onchange="update(this);">
                     </div>
                 </div>
@@ -46,7 +46,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="input-group">
-                        <input type="text" name="name" th:value="${user.password}" class="form-control"
+                        <input type="text" name="password" th:value="${user.password}" class="form-control"
                                placeholder="Password" onchange="update(this);">
                     </div>
                 </div>
@@ -57,7 +57,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="input-group">
-                        <input type="text" name="name" th:value="${user.telp}" class="form-control"
+                        <input type="text" name="telp" th:value="${user.telp}" class="form-control"
                                placeholder="Telp" onchange="update(this);">
                     </div>
                 </div>
@@ -100,7 +100,7 @@ Documentation
         list of global variable usage
         [
             tableAccess => global access for dataTables, initialize in user_list.html,
-            listPositiion => list of all Positiion, initialize in user_list.html
+            listPosition => list of all Position, initialize in user_list.html
         ]
 */-->
 <script>
@@ -212,19 +212,28 @@ Documentation
                             data: form,
                             success: function(data){
                                 console.log(data);
-                                for(var field in changedData){
-                                    if(field === 'Positiion_id'){
-                                        tableAccess.getColByRowId(user_id,'Positiion').text(
-                                            listPositiion[changedData[field]]
+                                for(let field in changedData){
+                                    if(field === 'position_id'){
+                                        window.tableAccess.setColValueByRowId(user_id, 'position',
+                                            listPosition[changedData[field]]
                                         );
                                     }
                                     else{
-                                        var target = tableAccess.getColByRowId(user_id,field);
-                                        console.log(target);
-                                        console.log(tableAccess);
-                                        if(target != null){
-                                            target.text(changedData[field]);
-                                        }
+                                        window.tableAccess.setColValueByRowId(user_id, field,
+                                            changedData[field]
+                                        );
+                                    }
+                                }
+                                for(let field in changedData){
+                                    if(field === 'role_id'){
+                                        window.tableAccess.setColValueByRowId(user_id, 'role',
+                                            listRole[changedData[field]]
+                                        );
+                                    }
+                                    else{
+                                        window.tableAccess.setColValueByRowId(user_id, field,
+                                            changedData[field]
+                                        );
                                     }
                                 }
                             },
@@ -243,16 +252,9 @@ Documentation
                     }]
                 ]
             });
-
-
-
-
         });
-
-
         $('#user-detail-close-btn').click(function () {
            $('.iziModal-button-close').click();
         });
-
     });
 </script>
