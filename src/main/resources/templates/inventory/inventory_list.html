@@ -77,20 +77,13 @@
                             <button class="submit" type="submit">
                                 <i class="fas fa-print"></i>
                             </button>
+                            <button class="submit" style="background-color: #BB281A;" type="submit">
+                                <i class="fas fa-trash"></i>
+                            </button>
                         </td>
                     </tr>
                 </th:block>
                 </tbody>
-                <tfoot>
-                <tr>
-                    <th>Name</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Description</th>
-                    <th>Category</th>
-                    <th>Action</th>
-                </tr>
-                </tfoot>
             </table>
         </div>
     </div>
@@ -318,7 +311,7 @@
                                 form.get('quantity'),
                                 listCategory[form.get('category_id')],
                                 form.get('type'),
-                                '<button class="submit" type=\"submit\" onclick=loadDetail('+response['inventory_id']+') >Item Detail</button><button class="submit" type=\"submit\"  ><i class=\"fas fa-archive\"></i></button><button class="submit" type=\"submit\"  ><i class=\"fas fa-print\"></i></button>'
+                                '<button class="submit" type=\"submit\" onclick=loadDetail('+response['inventory_id']+') >Item Detail</button><button class=\"submit\" type=\"submit\"  ><i class=\"fas fa-archive\"></i></button><button class=\"submit\" type=\"submit\"  ><i class=\"fas fa-print\"></i></button><button class=\"submit\" style=\"background-color: #BB281A;\" type=\"submit\"  ><i class=\"fas fa-trash\"></i></button>'
                             ],
                             [
                                 'name',
