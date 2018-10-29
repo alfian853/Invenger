@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.springframework.org/schema/data/jaxb"
-	  th:replace="~{masterLayout :: layout(~{::title}, ~{::content}, ~{::headContent})}">
+      th:replace="~{masterLayout :: layout(~{::title}, ~{::content}, ~{::headContent})}">
 <head>
-	<headContent>
-	<link rel="stylesheet" type="text/css" th:href="@{/css/table.css}">
-	<link rel="stylesheet" type="text/css" th:href="@{/css/modal.css}">
-	<link rel="stylesheet" href="http://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+    <headContent>
+        <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/css/modal.css}">
+        <link rel="stylesheet" href="http://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
 
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.css">
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.js"></script>
 
-    <script src="http://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/css/iziModal.min.css">
-	<script src="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/js/iziModal.min.js"></script>
-	<script th:src="@{/js/DataTablesAccess.js}"></script>
+        <script src="http://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/css/iziModal.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/js/iziModal.min.js"></script>
+        <script th:src="@{/js/DataTablesAccess.js}"></script>
 
 
-	<script th:inline = "javascript">
+        <script th:inline = "javascript">
         var tableAccess = null;
 		$(document).ready(function(){
 
@@ -28,71 +28,77 @@
 		/*[- will be initilize in the next script below -]*/
 		var listCategory = {};
     </script>
-	<title>Table</title>
+        <title>Table</title>
 
-	</headContent>
+    </headContent>
 </head>
 <body>
 <content>
-	<!--for ajax request    -->
+    <!--for ajax request    -->
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 
     <div th:replace="sidebar :: left_sidebar"></div>
 
-	<div id="content">
+    <div id="content">
 
         <div th:replace="navbar :: navbar"></div>
+        <div class="user-text">Inventory</div>
+        <div style="margin-left: 22px;">
+            <button class="btn" id="categoryBtn">Category</button>
+            <button class="btn" id="itemBtn">Item</button>
+            <button class="btn" id="assignItemBtn">Assign Item to User</button>
+        </div>
+        <div style="padding: 30px;">
+            <table id="itemsTable" class="display" style="width:100%;">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Category</th>
+                    <th>Type</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody id="items-table-body">
+                <th:block th:each="inventory : ${inventories}">
+                    <tr th:id="|item-${inventory.id}|">
+                        <td col="name" th:text="${inventory.name}"></td>
+                        <td col="price" th:text="${inventory.price}"></td>
+                        <td col="quantity" th:text="${inventory.quantity}"></td>
+                        <td col="category" th:text="${inventory.category.name}"></td>
+                        <td col="type" th:text="${inventory.type}"></td>
+                        <td>
+                            <button class="submit" type="submit" th:onclick="|loadDetail(${inventory.id})|">Item Detail</button>
+                            <button class="submit" type="submit">
+                                <i class="fas fa-archive"></i>
+                            </button>
+                            <button class="submit" type="submit">
+                                <i class="fas fa-print"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </th:block>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Action</th>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
 
-		<button class="btn" id="categoryBtn">Category</button>
-		<button class="btn" id="itemBtn">Item</button>
-        <button class="btn" id="assignItemBtn">assign item to user</button>
 
-		<div class="user-text">Inventory</div>
-		<div style="padding: 30px;">
-			<table id="itemsTable" class="display" style="width:100%;">
-				<thead>
-					<tr>
-						<th>Name</th>
-						<th>Price</th>
-						<th>Quantity</th>
-						<th>Category</th>
-						<th>Type</th>
-						<th>Action</th>
-					</tr>
-				</thead>
-				<tbody id="items-table-body">
-				<th:block th:each="inventory : ${inventories}">
-					<tr th:id="|item-${inventory.id}|">
-						<td col="name" th:text="${inventory.name}"></td>
-						<td col="price" th:text="${inventory.price}"></td>
-						<td col="quantity" th:text="${inventory.quantity}"></td>
-						<td col="category" th:text="${inventory.category.name}"></td>
-						<td col="type" th:text="${inventory.type}"></td>
-						<td>
-							<button type="submit" th:onclick="|loadDetail(${inventory.id})|">Detail</button>
-						</td>
-					</tr>
-				</th:block>
-				</tbody>
-				<tfoot>
-					<tr>
-						<th>Name</th>
-						<th>Price</th>
-						<th>Quantity</th>
-						<th>Description</th>
-						<th>Category</th>
-						<th>Action</th>
-					</tr>
-				</tfoot>
-			</table>
-		</div>
-	</div>
-
-
-	<div id="categoryModal">
+    <div id="categoryModal">
         <div class="modal-body">
-            <form>
+            <form id="create-category-form">
                 <div class="form-group">
                     <label class="form-label">Category Name</label><br>
                     <input id="ctg-new-name" class="form-input" style="width: 100%;" type="text" name="">
@@ -106,11 +112,11 @@
                     </select>
                 </div>
                 <div class="form-action">
-                    <div id="submit-new-ctg" class="submit">Add Category</div>
+                    <button id="submit-new-ctg" class="submit">Add Category</button>
                 </div>
             </form>
         </div>
-	</div>
+    </div>
 
     <div id="create-item-modal">
         <div class="modal-body">
@@ -165,7 +171,7 @@
         </div>
     </div>
 
-	<div id="inventory-detail-modal"></div>
+    <div id="inventory-detail-modal"></div>
 
     <div id="assign-item-modal"></div>
 
@@ -176,7 +182,7 @@
         function loadDetail(idCategory){
 
             $('#inventory-detail-modal').iziModal({
-                title : 'invetory detail',
+                title : 'Inventory Detail',
                 width : screen.width*0.9,
                 height : screen.height*0.9,
                 closeButton : true,
@@ -312,7 +318,7 @@
                                 form.get('quantity'),
                                 listCategory[form.get('category_id')],
                                 form.get('type'),
-                                '<button type=\"submit\" onclick=loadDetail('+response['inventory_id']+') >Detail</button>'
+                                '<button class="submit" type=\"submit\" onclick=loadDetail('+response['inventory_id']+') >Item Detail</button><button class="submit" type=\"submit\"  ><i class=\"fas fa-archive\"></i></button><button class="submit" type=\"submit\"  ><i class=\"fas fa-print\"></i></button>'
                             ],
                             [
                                 'name',
@@ -335,7 +341,8 @@
 
             });
 
-            $('#submit-new-ctg').click(function () {
+            $('form#create-category-form').submit(function (e) {
+                e.preventDefault();
                 $.ajax({
                     url: "[[@{/items/category/create}]]",
                     type: 'POST',
