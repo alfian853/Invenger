@@ -124,7 +124,7 @@ public class itemCategoryServiceTest {
         response.addCategoryData(2,"one/"+CATEGORY_NEWNAME);
         response.addCategoryData(3,"one/three");
         response.addCategoryData(4,"one/"+CATEGORY_NEWNAME+"/four");
-
+        response.setStatusToSuccess();
         return response;
     }
 

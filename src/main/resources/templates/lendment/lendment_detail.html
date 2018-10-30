@@ -1,0 +1,39 @@
+<div class="modal-body" xmlns:th="http://www.w3.org/1999/xhtml">
+    <table id="lendmentDetails" class="display" style="width:100%;">
+    <thead>
+    <tr>
+        <th>inventory name</th>
+        <th>quantity</th>
+        <th>returned</th>
+        <th>returnedDate</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <th:block th:each="detail : ${lendment_detail}">
+        <tr th:id="|item-${detail.inventoryId}|">
+            <td col="item-name" th:text="${detail.inventoryName}"></td>
+            <td col="is-returned" th:text="${detail.isReturned}"></td>
+            <td col="quantity" th:text="${detail.quantity}"></td>
+            <td col="return-date" th:text="${detail.returnDate}"></td>
+            <td col="return-date" th:text="${detail.returnDate}"></td>
+        </tr>
+    </th:block>
+    </tbody>
+    </table>
+</div>
+
+
+<script>
+
+    $('#lendmentDetails').DataTable({
+        select : {
+            style: 'multi'
+        }
+    });
+
+
+
+
+
+</script>

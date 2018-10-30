@@ -1,17 +1,17 @@
 package com.bliblifuture.Invenger.controller;
 
+import com.bliblifuture.Invenger.model.lendment.LendmentStatus;
 import com.bliblifuture.Invenger.request.jsonRequest.LendmentCreateRequest;
+import com.bliblifuture.Invenger.request.jsonRequest.TesRequest;
 import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
+import com.bliblifuture.Invenger.response.viewDto.LendmentDetailDTO;
 import com.bliblifuture.Invenger.service.InventoryService;
 import com.bliblifuture.Invenger.service.LendmentService;
 import com.bliblifuture.Invenger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -45,5 +45,20 @@ public class LendmentController {
             return response;
         }
     }
+
+    @GetMapping("lendment/all")
+    public String getLendmentTable(Model model){
+        model.addAttribute("lendments",lendmentService.getAll());
+        model.addAttribute("user",userService.getProfile());
+        return "lendment/lendment_list";
+    }
+
+    @GetMapping("lendment/detail/{id}")
+    public String getLendment(@PathVariable("id") Integer id,Model model){
+        model.addAttribute("lendment_detail",
+                lendmentService.getLendmentDetailById(id));
+        return "lendment/lendment_detail";
+    }
+
 
 }

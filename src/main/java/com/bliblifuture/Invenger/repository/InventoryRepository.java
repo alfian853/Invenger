@@ -1,7 +1,7 @@
 package com.bliblifuture.Invenger.repository;
 
 
-import com.bliblifuture.Invenger.model.Inventory;
+import com.bliblifuture.Invenger.model.inventory.Inventory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
