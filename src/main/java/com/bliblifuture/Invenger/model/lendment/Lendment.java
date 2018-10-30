@@ -1,6 +1,8 @@
-package com.bliblifuture.Invenger.model;
+package com.bliblifuture.Invenger.model.lendment;
 
 
+import com.bliblifuture.Invenger.model.AuditModel;
+import com.bliblifuture.Invenger.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "lendments")
-public class Lendment extends AuditModel{
+public class Lendment extends AuditModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -26,5 +28,9 @@ public class Lendment extends AuditModel{
     User user;
     
     @OneToMany(mappedBy = "lendment", cascade = CascadeType.ALL)
-    List<LendmentDetails> lendment_details;
+    List<LendmentDetail> lendment_details;
+
+    //based on enum: LendmentStatus
+    String status;
+
 }

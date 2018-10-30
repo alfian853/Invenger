@@ -1,5 +1,7 @@
-package com.bliblifuture.Invenger.model;
+package com.bliblifuture.Invenger.model.inventory;
 
+import com.bliblifuture.Invenger.model.AuditModel;
+import com.bliblifuture.Invenger.model.Category;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -13,7 +15,7 @@ import javax.persistence.*;
 @Entity
 @DynamicUpdate
 @Table(name = "inventories")
-public class Inventory extends AuditModel{
+public class Inventory extends AuditModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

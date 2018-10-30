@@ -1,4 +1,4 @@
-package com.bliblifuture.Invenger.model;
+package com.bliblifuture.Invenger.model.inventory;
 
 import java.util.Arrays;
 import java.util.List;

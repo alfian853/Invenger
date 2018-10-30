@@ -1,6 +1,6 @@
 package com.bliblifuture.Invenger.controller;
 
-import com.bliblifuture.Invenger.model.InventoryType;
+import com.bliblifuture.Invenger.model.inventory.InventoryType;
 import com.bliblifuture.Invenger.request.formRequest.InventoryCreateRequest;
 import com.bliblifuture.Invenger.request.formRequest.InventoryEditRequest;
 import com.bliblifuture.Invenger.response.jsonResponse.InventoryCreateResponse;
@@ -29,7 +29,7 @@ public class InventoryController {
     UserService userService;
 
     @GetMapping("/inventory/all")
-    public String getTablePage(Model model){
+    public String getInventoryTable(Model model){
         model.addAttribute("inventories", inventoryService.getAll());
         model.addAttribute("user",userService.getProfile());
         model.addAttribute("categories",itemCategoryService.getAllItemCategory());

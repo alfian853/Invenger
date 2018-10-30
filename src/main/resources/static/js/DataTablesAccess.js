@@ -32,8 +32,6 @@ class DTAccess{
         let col = this.getColByRowId(id,col_name);
 
         let target = this.datatables.cell(col);
-        console.log('hehe '+id+' '+col_name+' '+new_value);
-        console.log(col.html());
         target.data(new_value).draw();
     }
 

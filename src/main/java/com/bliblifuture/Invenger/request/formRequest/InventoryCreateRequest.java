@@ -1,6 +1,6 @@
 package com.bliblifuture.Invenger.request.formRequest;
 
-import com.bliblifuture.Invenger.model.InventoryType;
+import com.bliblifuture.Invenger.model.inventory.InventoryType;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 

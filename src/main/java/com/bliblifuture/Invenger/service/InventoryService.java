@@ -1,7 +1,7 @@
 package com.bliblifuture.Invenger.service;
 
 import com.bliblifuture.Invenger.Utils.MyUtils;
-import com.bliblifuture.Invenger.model.Inventory;
+import com.bliblifuture.Invenger.model.inventory.Inventory;
 import com.bliblifuture.Invenger.model.Category;
 import com.bliblifuture.Invenger.repository.InventoryRepository;
 import com.bliblifuture.Invenger.repository.category.CategoryRepository;

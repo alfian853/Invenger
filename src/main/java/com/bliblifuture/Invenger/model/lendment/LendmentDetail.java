@@ -1,5 +1,6 @@
-package com.bliblifuture.Invenger.model;
+package com.bliblifuture.Invenger.model.lendment;
 
+import com.bliblifuture.Invenger.model.inventory.Inventory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,21 +17,25 @@ import java.util.Date;
 @AllArgsConstructor
 @Entity
 @Table(name = "lendments_detail")
-public class LendmentDetails implements Serializable {
+public class LendmentDetail implements Serializable {
+
+    @EmbeddedId
+    LendmentDetailIdentity cmpId;
 
     Integer quantity;
 
-    boolean isReturn = false;
+    boolean isReturned = false;
 
     @Nullable
-    Date return_date;
+    @Column(name = "return_date")
+    Date returnDate;
 
-    @Id
+    @MapsId("lendment_id")
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "lendment_id",referencedColumnName = "id",nullable = false)
     Lendment lendment;
 
-    @Id
+    @MapsId("inventory_id")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "inventory_id", nullable = false)
     Inventory inventory;

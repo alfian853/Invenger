@@ -28,7 +28,7 @@
 		/*[- will be initilize in the next script below -]*/
 		var listCategory = {};
     </script>
-        <title>Table</title>
+	<title>Inventory</title>
 
     </headContent>
 </head>
@@ -70,7 +70,7 @@
                         <td col="category" th:text="${inventory.category.name}"></td>
                         <td col="type" th:text="${inventory.type}"></td>
                         <td>
-                            <button class="submit" type="submit" th:onclick="|loadDetail(${inventory.id})|">Item Detail</button>
+                            <button class="submit" type="submit" th:onclick="|loadInventoryDetail(${inventory.id})|">Item Detail</button>
                             <button class="submit" type="submit">
                                 <i class="fas fa-archive"></i>
                             </button>
@@ -172,7 +172,7 @@
     <script>
         Dropzone.autoDiscover = false;
 
-        function loadDetail(idCategory){
+        function loadInventoryDetail(idInventory){
 
             $('#inventory-detail-modal').iziModal({
                 title : 'Inventory Detail',
@@ -183,7 +183,7 @@
                 history: false,
                 onOpening : function (modal) {
                     modal.startLoading();
-                    $.get('/inventory/detail/'+idCategory,function (html) {
+                    $.get('/inventory/detail/'+idInventory,function (html) {
                         $('#inventory-detail-modal .iziModal-content').html(html);
                         modal.stopLoading();
                         $('.dropdown-toggle').dropdown();
@@ -311,7 +311,7 @@
                                 form.get('quantity'),
                                 listCategory[form.get('category_id')],
                                 form.get('type'),
-                                '<button class="submit" type=\"submit\" onclick=loadDetail('+response['inventory_id']+') >Item Detail</button><button class=\"submit\" type=\"submit\"  ><i class=\"fas fa-archive\"></i></button><button class=\"submit\" type=\"submit\"  ><i class=\"fas fa-print\"></i></button><button class=\"submit\" style=\"background-color: #BB281A;\" type=\"submit\"  ><i class=\"fas fa-trash\"></i></button>'
+                                '<button class="submit" type=\"submit\" onclick=loadInventoryDetail('+response['inventory_id']+') >Item Detail</button><button class=\"submit\" type=\"submit\"  ><i class=\"fas fa-archive\"></i></button><button class=\"submit\" type=\"submit\"  ><i class=\"fas fa-print\"></i></button><button class=\"submit\" style=\"background-color: #BB281A;\" type=\"submit\"  ><i class=\"fas fa-trash\"></i></button>'
                             ],
                             [
                                 'name',
