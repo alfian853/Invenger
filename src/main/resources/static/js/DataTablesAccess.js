@@ -50,4 +50,20 @@ class DTAccess{
         }
     }
 
+    getSelectedData(){
+        this.datatables.rows({selected:true}).data();
+    }
+
+    deselectAll(){
+        this.datatables.rows({selected:true}).deselect();
+    }
+
+    enableSelection(){
+        this.datatables.select.style('multi');
+    }
+
+    disableSelection(){
+        this.datatables.select.style('api');
+    }
+
 }

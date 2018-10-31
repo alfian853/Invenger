@@ -19,6 +19,8 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/css/iziModal.min.css">
         <script src="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/js/iziModal.min.js"></script>
 
+        <script th:src="@{/js/DataTablesAccess.js}"></script>
+
         <script th:inline = "javascript">
             $(document).ready(function(){
                 $('#lendmentsTable').DataTable();
@@ -73,7 +75,7 @@
 
 
         function loadLendmentDetail(id) {
-            console.log(id);
+
             $('#lendment-detail-modal').iziModal({
                 title : 'Lendment Detail',
                 width : screen.width*0.9,
@@ -86,7 +88,6 @@
                     $.get('/lendment/detail/'+id,function (html) {
                         $('#lendment-detail-modal .iziModal-content').html(html);
                         modal.stopLoading();
-                        $('.dropdown-toggle').dropdown();
                     }).fail(function (file,response) {
                         modal.stopLoading();
                         toastMessage('error','Failed','Something wrong :(');
@@ -100,8 +101,6 @@
             });
             $('#lendment-detail-modal').iziModal('open');
         }
-
-
     </script>
 </content>
 </body>

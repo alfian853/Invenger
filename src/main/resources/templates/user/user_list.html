@@ -150,7 +150,6 @@
                     $.get('/user/detail/'+idCategory,function (html) {
                         $('#user-detail-modal .iziModal-content').html(html);
                         modal.stopLoading();
-                        $('.dropdown-toggle').dropdown();
                     }).fail(function (file,response) {
                         modal.stopLoading();
                         toastMessage('error','Failed','Something wrong :(');

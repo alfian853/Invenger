@@ -22,7 +22,7 @@
 
 			var datatables = $('#itemsTable').DataTable();
 
-			tableAccess = new DTAccess(datatables,'item-',6);
+			tableAccess = new DTAccess(datatables,'item-',7);
 
 		});
 		/*[- will be initilize in the next script below -]*/
@@ -53,6 +53,7 @@
             <table id="itemsTable" class="display" style="width:100%;">
                 <thead>
                 <tr>
+                    <th>Id</th>
                     <th>Name</th>
                     <th>Price</th>
                     <th>Quantity</th>
@@ -64,6 +65,7 @@
                 <tbody id="items-table-body">
                 <th:block th:each="inventory : ${inventories}">
                     <tr th:id="|item-${inventory.id}|">
+                        <td col="id" th:text="${inventory.id}"></td>
                         <td col="name" th:text="${inventory.name}"></td>
                         <td col="price" th:text="${inventory.price}"></td>
                         <td col="quantity" th:text="${inventory.quantity}"></td>
@@ -186,7 +188,6 @@
                     $.get('/inventory/detail/'+idInventory,function (html) {
                         $('#inventory-detail-modal .iziModal-content').html(html);
                         modal.stopLoading();
-                        $('.dropdown-toggle').dropdown();
                     }).fail(function (file,response) {
                         modal.stopLoading();
                         toastMessage('error','Failed','Something wrong :(');
@@ -302,10 +303,10 @@
                     url: "[[@{/inventory/create}]]",
                     data: form,
                     success: function(response){
-                        console.log(response['inventory_id']);
+                        // console.log(response['inventory_id']);
                         tableAccess.addData(
                             response['inventory_id'],
-                            [
+                            [   response['inventory_id'],
                                 form.get('name'),
                                 form.get('price'),
                                 form.get('quantity'),
@@ -314,6 +315,7 @@
                                 '<button class="submit" type=\"submit\" onclick=loadInventoryDetail('+response['inventory_id']+') >Item Detail</button><button class=\"submit\" type=\"submit\"  ><i class=\"fas fa-archive\"></i></button><button class=\"submit\" type=\"submit\"  ><i class=\"fas fa-print\"></i></button><button class=\"submit\" style=\"background-color: #BB281A;\" type=\"submit\"  ><i class=\"fas fa-trash\"></i></button>'
                             ],
                             [
+                                'id',
                                 'name',
                                 'price',
                                 'quantity',
