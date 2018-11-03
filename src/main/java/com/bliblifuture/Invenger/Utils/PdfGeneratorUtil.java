@@ -39,6 +39,7 @@ public class PdfGeneratorUtil {
             renderer.layout();
             renderer.createPDF(outputStream, false);
             renderer.finishPDF();
+            System.out.println(outputFile);
             System.out.println("PDF created successfully");
         }
         finally {

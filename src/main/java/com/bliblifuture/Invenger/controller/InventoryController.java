@@ -1,5 +1,6 @@
 package com.bliblifuture.Invenger.controller;
 
+import com.bliblifuture.Invenger.Utils.PdfGeneratorUtil;
 import com.bliblifuture.Invenger.model.inventory.InventoryType;
 import com.bliblifuture.Invenger.request.formRequest.InventoryCreateRequest;
 import com.bliblifuture.Invenger.request.formRequest.InventoryEditRequest;
@@ -14,6 +15,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Controller
@@ -27,6 +30,17 @@ public class InventoryController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    PdfGeneratorUtil pdfGeneratorUtil;
+
+    @RequestMapping("/inventory/print")
+    public String printPdf() throws Exception{
+        Map<String,String> data = new HashMap<>();
+        data.put("myName","Nuzha");
+        pdfGeneratorUtil.createPdf("greeting", data);
+        return "/greeting";
+    }
 
     @GetMapping("/inventory/all")
     public String getInventoryTable(Model model){
