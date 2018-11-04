@@ -10,6 +10,8 @@ import com.bliblifuture.Invenger.repository.LendmentDetailRepository;
 import com.bliblifuture.Invenger.repository.LendmentRepository;
 import com.bliblifuture.Invenger.repository.UserRepository;
 import com.bliblifuture.Invenger.request.jsonRequest.LendmentCreateRequest;
+import com.bliblifuture.Invenger.request.jsonRequest.LendmentReturnRequest;
+import com.bliblifuture.Invenger.response.jsonResponse.LendmentReturnResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.Invenger.response.viewDto.LendmentDTO;
 import com.bliblifuture.Invenger.response.viewDto.LendmentDetailDTO;
@@ -19,6 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -88,6 +94,32 @@ public class LendmentService {
         return mapper.toLendmentDetailDtoList(
                 lendmentDetailRepository.findAllByLendmentId(id)
         );
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public RequestResponse returnInventory(LendmentReturnRequest request) throws Exception{
+
+        LendmentReturnResponse response = new LendmentReturnResponse();
+
+        LocalDateTime localTime = LocalDateTime.now(ZoneId.of("GMT+7"));
+        Date date = Date.from(localTime.atZone(ZoneId.systemDefault()).toInstant());
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
+        for(Integer item_id : request.getInventoriesId()){
+            LendmentDetail detail = lendmentDetailRepository.getOne(
+                    new LendmentDetailIdentity(request.getLendmentId(), item_id)
+            );
+            if(detail.isReturned()){
+                throw new Exception();
+            }
+            detail.setReturnDate(date);
+            detail.setReturned(true);
+            lendmentDetailRepository.save(detail);
+        }
+        response.setReturnDate(format.format(date));
+        response.setStatusToSuccess();
+        return response;
     }
 
 

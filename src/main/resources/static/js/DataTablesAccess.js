@@ -25,7 +25,7 @@ class DTAccess{
     }
 
     removeRowById(id){
-        this.datatables.rows(this.row_prefix+id).remove().draw();
+        this.datatables.row('#'+this.row_prefix+id).remove().draw();
     }
 
     setColValueByRowId(id,col_name,new_value){
@@ -51,7 +51,7 @@ class DTAccess{
     }
 
     getSelectedData(){
-        this.datatables.rows({selected:true}).data();
+        return this.datatables.rows({selected:true}).data();
     }
 
     deselectAll(){
@@ -64,6 +64,10 @@ class DTAccess{
 
     disableSelection(){
         this.datatables.select.style('api');
+    }
+
+    deselectRowById(id){
+        this.datatables.row('#'+this.row_prefix+id).deselect();
     }
 
 }

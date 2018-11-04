@@ -1,39 +1,145 @@
 <div class="modal-body" xmlns:th="http://www.w3.org/1999/xhtml">
-    <table id="lendmentDetails" class="display" style="width:100%;">
+    <input type="hidden" name="lendment_id" th:value="${lendment_id}">
+    <table id="lendmentDetail-table" class="display" style="width:100%;">
     <thead>
     <tr>
-        <th>inventory name</th>
-        <th>quantity</th>
-        <th>returned</th>
-        <th>returnedDate</th>
-        <th>Action</th>
+        <th></th>
+        <th>Inventory Id</th>
+        <th>Inventory Name</th>
+        <th>Quantity</th>
+        <th>Returned</th>
+        <th>Returned Date</th>
     </tr>
     </thead>
     <tbody>
     <th:block th:each="detail : ${lendment_detail}">
-        <tr th:id="|item-${detail.inventoryId}|">
-            <td col="item-name" th:text="${detail.inventoryName}"></td>
-            <td col="is-returned" th:text="${detail.isReturned}"></td>
+        <tr th:id="|l-item-${detail.inventoryId}|">
+            <td></td>
+            <td col="inventory-id" th:text="${detail.inventoryId}"></td>
+            <td col="inventory-name" th:text="${detail.inventoryName}"></td>
             <td col="quantity" th:text="${detail.quantity}"></td>
-            <td col="return-date" th:text="${detail.returnDate}"></td>
+            <td col="is-returned" th:text="${detail.isReturned}"></td>
             <td col="return-date" th:text="${detail.returnDate}"></td>
         </tr>
     </th:block>
     </tbody>
     </table>
+    <button id="l-return-items" class="submit" style="background-color: #BB281A;" type="submit">return inventory</button>
+</div>
+<div class="modal-footer">
+    <button id="lendment-detail-close-btn" type="button" class="btn btn-secondary">Close</button>
 </div>
 
 
 <script>
+    $(document).ready(function() {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content')
+            }
+        });
+        let table = $('#lendmentDetail-table').DataTable({
+            columnDefs :[{
+                orderable: false,
+                className: 'select-checkbox',
+                targets:   0
+            }],
+            select : {
+                style: 'multi'
+            }
+        });
 
-    $('#lendmentDetails').DataTable({
-        select : {
-            style: 'multi'
-        }
+        // init checkbox
+        $('#lendmentDetail-table tr').each(function () {
+            let selected = $(this).find('td[col=\"is-returned\"]');
+            let isReturned = selected.text();
+            if(isReturned == 'true'){
+                $(this).children().first().removeClass('select-checkbox');
+            }
+        });
+
+        let lTableAccess = new DTAccess(table,'l-item-',6);
+
+        $('#l-return-items').click(function () {
+            var tmp = lTableAccess.getSelectedData();
+            let inventories_id = [];
+
+            let len = tmp.length;
+            for(let i=0 ; i<len; i++){
+                inventories_id.push(parseInt(tmp[i][1]));
+            }
+            console.log(tmp);
+            console.log(len);
+
+            let data = {"lendment_id":"[[${lendment_id}]]","inventories_id" : inventories_id};
+
+            iziToast.question({
+                timeout: 20000,
+                close: true,
+                overlay: true,
+                displayMode: 'once',
+                id: 'question',
+                zindex: 99999,
+                title: 'Hey',
+                message: 'Are you sure for update this inventory data?',
+                position: 'center',
+                buttons: [
+                    ['<button><b>YES</b></button>', function (instance, toast) {
+                        instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+
+                        $.ajax({
+                            type: "POST",
+                            url: "[[@{/lendment/return}]]",
+                            data: JSON.stringify(data),
+                            contentType : "application/json; charset=utf-8",
+                            success: function(response){
+                                console.log(response);
+                                if(response['status'] === 'success'){
+                                    toastMessage('success','Success',response['message']);
+                                    for(let i=0 ; i<len; i++){
+                                        lTableAccess.setColValueByRowId(inventories_id[i],'is-returned',true);
+                                        lTableAccess.setColValueByRowId(inventories_id[i],'return-date',response['return_date']);
+                                        let target = lTableAccess.getRowById(inventories_id[i]);
+                                        target.children().first().removeClass('select-checkbox');
+                                        target.removeClass('selected');
+                                    }
+                                    lTableAccess.deselectAll();
+                                }
+                                else{
+                                    toastMessage('error','Error','Something wrong :(');
+                                }
+                            },
+                            cache: false,
+                            processData: false
+                        });
+
+                    }, true],
+                    ['<button>NO</button>', function (instance, toast) {
+
+                        instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+
+                    }]
+                ]
+            });// end iziToast
+
+        });
+
+        $('#lendment-detail-close-btn').click(function () {
+            $('.iziModal-button-close').click();
+        });
+
+        $('#lendmentDetail-table tr').click(function (e) {
+            let isReturned = $(this).find('td[col=\"is-returned\"]').text();
+            if(isReturned == 'true'){
+                e.preventDefault();
+                return false;
+            }
+        });
+
+
+
+
     });
-
-
-
 
 
 </script>

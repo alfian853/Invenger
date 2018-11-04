@@ -21,4 +21,5 @@ public interface LendmentMapper {
     List<LendmentDetailDTO> toLendmentDetailDtoList(List<LendmentDetail> lendmentDetails);
 
 
+
 }

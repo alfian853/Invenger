@@ -1,10 +1,8 @@
 package com.bliblifuture.Invenger.controller;
 
-import com.bliblifuture.Invenger.model.lendment.LendmentStatus;
 import com.bliblifuture.Invenger.request.jsonRequest.LendmentCreateRequest;
-import com.bliblifuture.Invenger.request.jsonRequest.TesRequest;
+import com.bliblifuture.Invenger.request.jsonRequest.LendmentReturnRequest;
 import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
-import com.bliblifuture.Invenger.response.viewDto.LendmentDetailDTO;
 import com.bliblifuture.Invenger.service.InventoryService;
 import com.bliblifuture.Invenger.service.LendmentService;
 import com.bliblifuture.Invenger.service.UserService;
@@ -57,7 +55,22 @@ public class LendmentController {
     public String getLendment(@PathVariable("id") Integer id,Model model){
         model.addAttribute("lendment_detail",
                 lendmentService.getLendmentDetailById(id));
+        model.addAttribute("lendment_id",id);
         return "lendment/lendment_detail";
+    }
+
+    @PostMapping("lendment/return")
+    @ResponseBody
+    public RequestResponse returnInventory(@Valid @RequestBody LendmentReturnRequest request){
+        System.out.println(request);
+        try {
+            return lendmentService.returnInventory(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+            RequestResponse response = new RequestResponse();
+            response.setStatusToFailed();
+            return response;
+        }
     }
 
 
