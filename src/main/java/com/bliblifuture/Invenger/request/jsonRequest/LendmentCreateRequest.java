@@ -4,7 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Range;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -16,7 +19,7 @@ public class LendmentCreateRequest {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    static class Item{
+    public static class Item{
         @NotNull
         Integer id;
 
@@ -29,6 +32,7 @@ public class LendmentCreateRequest {
     @JsonProperty("user_id")
     Integer userId;
 
+    @Valid
     @NotEmpty
     List<Item> items;
 
