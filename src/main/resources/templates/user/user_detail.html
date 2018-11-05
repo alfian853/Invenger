@@ -111,7 +111,7 @@ Documentation
         'password' : '[[${user.password}]]',
         'telp' : '[[${user.telp}]]',
         'position_id' : '[[${user.position.id}]]',
-        'role_id' : '[[${user.role.id}]]',
+        'role_id' : '[[${user.role}]]',
         'pict' : ''
     };
 
@@ -154,7 +154,7 @@ Documentation
             }
         }
         for(var key in listRole){
-            if(key == '[[${user.role.id}]]'){
+            if(key == '[[${user.role}]]'){
                 $('#user-detail-role').append(
                     '<option selected=\"selected\" value=\"'+key+'\" >'+listRole[key]+'</option>'
                 );
@@ -186,7 +186,7 @@ Documentation
                 id: 'question',
                 zindex: 99999,
                 title: 'Hey',
-                message: 'Are you sure for update this user data?',
+                message: 'Are you sure to update this user data?',
                 position: 'center',
                 buttons: [
                     ['<button><b>YES</b></button>', function (instance, toast) {

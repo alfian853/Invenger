@@ -4,10 +4,9 @@ import com.bliblifuture.Invenger.Utils.MyUtils;
 import com.bliblifuture.Invenger.annotation.imp.PasswordValdator;
 import com.bliblifuture.Invenger.annotation.imp.PhoneValidator;
 import com.bliblifuture.Invenger.model.Position;
-import com.bliblifuture.Invenger.model.Role;
-import com.bliblifuture.Invenger.model.User;
+import com.bliblifuture.Invenger.model.user.User;
+import com.bliblifuture.Invenger.model.user.RoleType;
 import com.bliblifuture.Invenger.repository.PositionRepository;
-import com.bliblifuture.Invenger.repository.RoleRepository;
 import com.bliblifuture.Invenger.repository.UserRepository;
 import com.bliblifuture.Invenger.request.formRequest.UserCreateRequest;
 import com.bliblifuture.Invenger.request.formRequest.UserEditRequest;
@@ -19,7 +18,6 @@ import com.bliblifuture.Invenger.response.jsonResponse.UserCreateResponse;
 import com.bliblifuture.Invenger.response.viewDto.ProfileDTO;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -37,9 +35,6 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     UserRepository userRepository;
-
-    @Autowired
-    RoleRepository roleRepository;
 
     @Autowired
     FileStorageService fileStorageService;
@@ -67,9 +62,6 @@ public class UserService implements UserDetailsService {
         Position newPosition = new Position();
         newPosition.setId(request.getPosition_id());
 
-        Role newRole = new Role();
-        newRole.setId(request.getRole_id());
-
         User newUser = new User();
         newUser.setUsername(request.getUsername());
         newUser.setEmail(request.getEmail());
@@ -77,7 +69,7 @@ public class UserService implements UserDetailsService {
         newUser.setTelp(request.getTelp());
         newUser.setPictureName(imgName);
         newUser.setPosition(newPosition);
-        newUser.setRole(newRole);
+        newUser.setRole(RoleType.ROLE_ADMIN.toString());
 
         if(fileStorageService.storeFile(
                 request.getProfile_photo(),
@@ -123,8 +115,8 @@ public class UserService implements UserDetailsService {
             user.setPosition(position);
         }
         if(request.getRole_id() != null){
-            Role role = roleRepository.getOne(request.getRole_id());
-            user.setRole(role);
+//            Role role = roleRepository.getOne(request.getRole_id());
+//            user.setRole(role);
         }
         if(request.getPict() != null){
 
@@ -177,16 +169,18 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
+    public boolean currentUserIsAdmin(){
+        boolean isAdmin = RoleType.isEqual(RoleType.ROLE_ADMIN, this.getSessionUser().getRole());
+        return isAdmin;
+    }
 
     public ProfileDTO getProfile(){
         User user = this.getSessionUser();
         Position position = user.getPosition();
         try {
             position.getName();
-//            myUtils.log("Sudah init");
         }
         catch (Exception e){
-//            myUtils.log("Belum init");
             position = positionRepository.findUserPosition(user.getId());
             user.setPosition(position);
         }

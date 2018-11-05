@@ -23,7 +23,7 @@ public interface CategoryRepository extends JpaRepository<Category,Integer>, Cat
     @Query("select c from Category c where c.parent.id = :parent_id")
     List<Category> findAllByParentId(@Param("parent_id") Integer id);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("update Category c set c.name = :new_name where c.id = :id")
     void updateNameById(@Param("id") Integer id,@Param("new_name") String newName);
 

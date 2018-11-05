@@ -2,7 +2,7 @@ package com.bliblifuture.Invenger.service_test;
 
 
 import com.bliblifuture.Invenger.model.Position;
-import com.bliblifuture.Invenger.model.User;
+import com.bliblifuture.Invenger.model.user.User;
 import com.bliblifuture.Invenger.repository.PositionRepository;
 import com.bliblifuture.Invenger.repository.UserRepository;
 import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;

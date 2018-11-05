@@ -60,7 +60,7 @@
                         <td col="email" th:text="${user.email}"></td>
                         <td col="telp" th:text="${user.telp}"></td>
                         <td col="position" th:text="${user.position.name}"></td>
-                        <td col="role" th:text="${user.role.name}"></td>
+                        <td col="role" th:text="${user.role}"></td>
                         <td>
                             <button type="submit" th:onclick="|loadDetail(${user.id})|">More</button>
                         </td>
@@ -118,7 +118,7 @@
                         <label class="form-label">Role</label>
                         <select class="form-input" style="width: 100%;" name="role_id">
                             <th:block th:each="role : ${roles}">
-                                <option th:value="${role.id}" th:text="${role.name}">Option i</option>
+                                <option th:value="${role}" th:text="${role}">Option i</option>
                             </th:block>
                         </select>
                     </div>

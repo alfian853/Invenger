@@ -1,13 +1,13 @@
 package com.bliblifuture.Invenger.controller;
 
 import com.bliblifuture.Invenger.Utils.MyUtils;
-import com.bliblifuture.Invenger.model.User;
+import com.bliblifuture.Invenger.model.user.User;
+import com.bliblifuture.Invenger.model.user.RoleType;
 import com.bliblifuture.Invenger.request.formRequest.UserCreateRequest;
 import com.bliblifuture.Invenger.request.formRequest.UserEditRequest;
 import com.bliblifuture.Invenger.request.jsonRequest.ProfileRequest;
 import com.bliblifuture.Invenger.response.jsonResponse.*;
 import com.bliblifuture.Invenger.service.PositionService;
-import com.bliblifuture.Invenger.service.RoleService;
 import com.bliblifuture.Invenger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,9 +25,6 @@ public class UserController {
 
     @Autowired
     UserService userService;
-
-    @Autowired
-    RoleService roleService;
 
     @Autowired
     PositionService positionService;
@@ -83,7 +80,7 @@ public class UserController {
     public String getUserTablePage(Model model){
         model.addAttribute("users", userService.getAll());
         model.addAttribute("user",userService.getProfile());
-        model.addAttribute("roles", roleService.getAllRole());
+        model.addAttribute("roles", RoleType.values());
         model.addAttribute("positions", positionService.getAllPosition());
         model.addAttribute("createUserForm", new UserCreateRequest());
         return "user/user_list";

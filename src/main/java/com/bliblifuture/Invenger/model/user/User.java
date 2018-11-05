@@ -1,14 +1,9 @@
-package com.bliblifuture.Invenger.model;
+package com.bliblifuture.Invenger.model.user;
 
 import com.bliblifuture.Invenger.annotation.PhoneConstraint;
-import com.fasterxml.jackson.annotation.*;
+import com.bliblifuture.Invenger.model.AuditModel;
+import com.bliblifuture.Invenger.model.Position;
 import lombok.*;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import org.hibernate.annotations.Proxy;
-import org.springframework.jmx.export.annotation.ManagedResource;
-import org.springframework.lang.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,6 +25,7 @@ public class User extends AuditModel implements UserDetails {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
+    @Column(unique = true)
     private String username;
 
     @Column(unique = true)
@@ -51,9 +47,7 @@ public class User extends AuditModel implements UserDetails {
     @JoinColumn(name="superior_id", referencedColumnName = "id")
     private User superior;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "role_id",referencedColumnName = "id")
-    private Role role;
+    private String role;
 
 
     private boolean enabled = true;
@@ -65,7 +59,7 @@ public class User extends AuditModel implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
 
-        grantedAuthorities.add(new SimpleGrantedAuthority(getRole().getName()));
+        grantedAuthorities.add( new SimpleGrantedAuthority(getRole()) );
         return grantedAuthorities;
     }
 

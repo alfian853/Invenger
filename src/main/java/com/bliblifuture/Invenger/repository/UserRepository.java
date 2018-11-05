@@ -1,6 +1,6 @@
 package com.bliblifuture.Invenger.repository;
 
-import com.bliblifuture.Invenger.model.User;
+import com.bliblifuture.Invenger.model.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -15,9 +15,6 @@ public interface UserRepository extends JpaRepository<User,Integer> {
 
     @Query("select u from User u JOIN FETCH u.position")
     List<User> findAllWithPosition();
-
-    @Query("select u from User u JOIN FETCH u.role JOIN FETCH u.position")
-    List<User> findAllWithRoleAndPosition();
 
 }
 
