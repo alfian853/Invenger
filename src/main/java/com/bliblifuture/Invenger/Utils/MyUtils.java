@@ -1,15 +1,12 @@
 package com.bliblifuture.Invenger.Utils;
 
-import com.bliblifuture.Invenger.model.User;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.security.Principal;
 import java.util.UUID;
 
 @Component

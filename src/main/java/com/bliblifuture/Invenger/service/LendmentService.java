@@ -5,12 +5,15 @@ import com.bliblifuture.Invenger.model.inventory.Inventory;
 import com.bliblifuture.Invenger.model.lendment.Lendment;
 import com.bliblifuture.Invenger.model.lendment.LendmentDetail;
 import com.bliblifuture.Invenger.model.lendment.LendmentDetailIdentity;
+import com.bliblifuture.Invenger.model.lendment.LendmentStatus;
 import com.bliblifuture.Invenger.repository.InventoryRepository;
 import com.bliblifuture.Invenger.repository.LendmentDetailRepository;
 import com.bliblifuture.Invenger.repository.LendmentRepository;
 import com.bliblifuture.Invenger.repository.UserRepository;
+import com.bliblifuture.Invenger.request.jsonRequest.LendmentHandOverRequest;
 import com.bliblifuture.Invenger.request.jsonRequest.LendmentCreateRequest;
 import com.bliblifuture.Invenger.request.jsonRequest.LendmentReturnRequest;
+import com.bliblifuture.Invenger.response.jsonResponse.HandOverResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.LendmentReturnResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.Invenger.response.viewDto.LendmentDTO;
@@ -43,14 +46,22 @@ public class LendmentService {
     @Autowired
     InventoryRepository inventoryRepository;
 
+    @Autowired
+    UserService userService;
+
     private final LendmentMapper mapper = Mappers.getMapper(LendmentMapper.class);
 
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public RequestResponse createLendment(LendmentCreateRequest request) throws Exception {
         RequestResponse response = new RequestResponse();
-        Lendment lendment = new Lendment();
-        lendment.setUser( userRepository.getOne(request.getUserId()) );
+        Lendment lendment = Lendment
+                .builder()
+                .user( userRepository.getOne(request.getUserId()) )
+                .status(LendmentStatus.WaitingForApproval.getDesc())
+                .notReturnedCount(request.getItems().size())
+                .build();
+
         lendmentRepository.save(lendment);
 
         List<LendmentDetail> detailsList = new LinkedList<>();
@@ -85,15 +96,29 @@ public class LendmentService {
         return mapper.toLendmentDtoList(lendmentRepository.findAll());
     }
 
+    public List<LendmentDTO> getAllByUser(){
+        return mapper.toLendmentDtoList(lendmentRepository.findAllByUserId(userService.getSessionUser().getId()) );
+    }
+
     public LendmentDTO getById(Integer id){
         return mapper.toLendmentDTO(lendmentRepository.findById(id).get());
     }
 
     public List<LendmentDetailDTO> getLendmentDetailById(Integer id){
-
         return mapper.toLendmentDetailDtoList(
                 lendmentDetailRepository.findAllByLendmentId(id)
         );
+    }
+
+    public List<LendmentDTO> getAllLendmentRequest(){
+
+        return mapper.toLendmentDtoList(
+                lendmentRepository.findAllBySuperiorIdAndStatus(
+                        userService.getSessionUser().getId(),
+                        LendmentStatus.WaitingForApproval.getDesc()
+                )
+        );
+
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -105,6 +130,14 @@ public class LendmentService {
         Date date = Date.from(localTime.atZone(ZoneId.systemDefault()).toInstant());
 
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
+        Lendment lendment = lendmentRepository.findLendmentById(request.getLendmentId());
+        lendment.setNotReturnedCount(lendment.getNotReturnedCount() - request.getInventoriesId().size());
+        if(lendment.getNotReturnedCount() <= 0){
+            lendment.setStatus(LendmentStatus.Finished.getDesc());
+        }
+
+        lendmentRepository.save(lendment);
 
         for(Integer item_id : request.getInventoriesId()){
             LendmentDetail detail = lendmentDetailRepository.getOne(
@@ -122,5 +155,37 @@ public class LendmentService {
         return response;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public RequestResponse approveLendmentRequest(Integer id) throws Exception {
+        Lendment lendment = lendmentRepository.findLendmentById(id);
+        if(!lendment.getStatus().equals(LendmentStatus.WaitingForApproval.getDesc())){
+            throw new Exception();
+        }
 
+        lendment.setStatus(LendmentStatus.WaitingForPickUp.getDesc());
+        lendmentRepository.save(lendment);
+
+        RequestResponse response = new RequestResponse();
+        response.setStatusToSuccess();
+
+        return response;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public HandOverResponse handOverOrderItems(Integer id) throws Exception {
+        Lendment lendment = lendmentRepository.findLendmentById(id);
+        if(!lendment.getStatus().equals(LendmentStatus.WaitingForPickUp.getDesc())){
+            throw new Exception();
+        }
+
+        lendment.setStatus(LendmentStatus.InLending.getDesc());
+        lendmentRepository.save(lendment);
+
+        HandOverResponse response = new HandOverResponse();
+        response.setStatusToSuccess();
+        response.setLendmentStatus(LendmentStatus.InLending.getDesc());
+
+        return response;
+
+    }
 }

@@ -1,0 +1,44 @@
+<div class="modal-body" xmlns:th="http://www.w3.org/1999/xhtml">
+    <input type="hidden" name="lendment_id" th:value="${lendment_id}">
+    <table id="lendmentDetail-table" class="display" style="width:100%;">
+    <thead>
+    <tr>
+        <th>Inventory Id</th>
+        <th>Inventory Name</th>
+        <th>Quantity</th>
+        <th>Returned</th>
+        <th>Returned Date</th>
+    </tr>
+    </thead>
+    <tbody>
+    <th:block th:each="detail : ${lendment_detail}">
+        <tr th:id="|l-item-${detail.inventoryId}|">
+            <td col="inventory-id" th:text="${detail.inventoryId}"></td>
+            <td col="inventory-name" th:text="${detail.inventoryName}"></td>
+            <td col="quantity" th:text="${detail.quantity}"></td>
+            <td col="is-returned" th:text="${detail.isReturned}"></td>
+            <td col="return-date" th:text="${detail.returnDate}"></td>
+        </tr>
+    </th:block>
+    </tbody>
+    </table>
+</div>
+<div class="modal-footer">
+    <button id="lendment-detail-close-btn" type="button" class="btn btn-secondary">Close</button>
+</div>
+
+
+<script>
+    $(document).ready(function() {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content')
+            }
+        });
+        let table = $('#lendmentDetail-table').DataTable();
+
+        $('#lendment-detail-close-btn').click(function () {
+            $('.iziModal-button-close').click();
+        });
+    });
+</script>

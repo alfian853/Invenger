@@ -2,10 +2,9 @@ package com.bliblifuture.Invenger.seeder;
 
 import com.bliblifuture.Invenger.model.Category;
 import com.bliblifuture.Invenger.model.Position;
-import com.bliblifuture.Invenger.model.Role;
-import com.bliblifuture.Invenger.model.User;
+import com.bliblifuture.Invenger.model.user.User;
+import com.bliblifuture.Invenger.model.user.RoleType;
 import com.bliblifuture.Invenger.repository.PositionRepository;
-import com.bliblifuture.Invenger.repository.RoleRepository;
 import com.bliblifuture.Invenger.repository.UserRepository;
 import com.bliblifuture.Invenger.repository.category.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,14 +13,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Component
 public class DataSeeder {
-
-
-    @Autowired
-    RoleRepository roleRepository;
 
     @Autowired
     UserRepository userRepository;
@@ -35,7 +28,6 @@ public class DataSeeder {
     @EventListener
     public void initSeeder(ContextRefreshedEvent event){
         postionSeeder();
-        roleSeeder();
         adminSeeder();
         userSeeder();
 
@@ -78,19 +70,6 @@ public class DataSeeder {
 
     }
 
-    void roleSeeder(){
-        List<Role> roleList = roleRepository.findAll();
-
-        if(roleList.isEmpty()){
-            Role role = new Role();
-            role.setName("ROLE_ADMIN");
-            roleRepository.save(role);
-            role = new Role();
-            role.setName("ROLE_USER");
-            roleRepository.save(role);
-        }
-    }
-
     void adminSeeder(){
         User admin = userRepository.findByUsername("root");
         if(admin == null){
@@ -98,7 +77,7 @@ public class DataSeeder {
             admin.setUsername("root");
             admin.setEmail("root@future.com");
             admin.setTelp("+123456789");
-            admin.setRole(roleRepository.findByName("ROLE_ADMIN"));
+            admin.setRole(RoleType.ROLE_ADMIN.toString());
             admin.setPassword(new BCryptPasswordEncoder().encode("root"));
             admin.setPosition(positionRepository.findByName("inventory system admin"));
             userRepository.save(admin);
@@ -112,7 +91,7 @@ public class DataSeeder {
             user.setUsername("basic");
             user.setEmail("basics@future.com");
             user.setTelp("+1111111111");
-            user.setRole(roleRepository.findByName("ROLE_USER"));
+            user.setRole(RoleType.ROLE_USER.toString());
             user.setPassword(new BCryptPasswordEncoder().encode("basic"));
             user.setPosition(positionRepository.findByName("junior software engineer"));
             userRepository.save(user);

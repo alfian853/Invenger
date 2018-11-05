@@ -3,7 +3,7 @@
       th:replace="~{masterLayout :: layout(~{::title}, ~{::content}, ~{::headContent})}">
 <head>
     <meta charset="UTF-8">
-    <title>Lendments</title>
+    <title>Lendment Requests</title>
     <headcontent>
         <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}">
         <link rel="stylesheet" type="text/css" th:href="@{/css/modal.css}">
@@ -22,8 +22,11 @@
         <script th:src="@{/js/DataTablesAccess.js}"></script>
 
         <script th:inline = "javascript">
+            var tableAccess = null;
+
             $(document).ready(function(){
-                $('#lendmentsTable').DataTable();
+                var datatables = $('#lendmentsTable').DataTable();
+                tableAccess = new DTAccess(datatables,'request-',5);
             });
         </script>
 
@@ -40,27 +43,27 @@
 
     <div id="content">
         <div th:replace="navbar :: navbar"></div>
-        <div class="user-text">Lendment</div>
+        <div class="user-text">Lendment Requests</div>
         <div style="padding: 30px;">
             <table id="lendmentsTable" class="display" style="width:100%;">
                 <thead>
                 <tr>
                     <th>Lendment Id</th>
                     <th>Username</th>
-                    <th>Order date</th>
+                    <th>Request date</th>
                     <th>Status</th>
                     <th>Action</th>
                 </tr>
                 </thead>
                 <tbody>
                 <th:block th:each="lendment : ${lendments}">
-                    <tr th:id="|order-${lendment.id}|">
+                    <tr th:id="|request-${lendment.id}|">
                         <td col="id" th:text="${lendment.id}"></td>
                         <td col="username" th:text="${lendment.username}"></td>
                         <td col="order-date" th:text="${lendment.orderDate}"></td>
                         <td col="status" th:text="${lendment.status}"></td>
                         <td>
-                            <button type="submit" th:onclick="|loadLendmentDetail(${lendment.id})|">Detail</button>
+                            <button type="submit" th:onclick="|approve(${lendment.id})|">Approve</button>
                         </td>
                     </tr>
                 </th:block>
@@ -73,34 +76,55 @@
 
     <script>
 
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content')
+            }
+        });
 
-        function loadLendmentDetail(id) {
+        function approve(id) {
 
-            $('#lendment-detail-modal').iziModal({
-                title : 'Lendment Detail',
-                width : screen.width*0.9,
-                height : screen.height*0.9,
-                closeButton : true,
-                fullScreen : true,
-                history: false,
-                onOpening : function (modal) {
-                    modal.startLoading();
-                    $.get('/lendment/detail/'+id,function (html) {
-                        $('#lendment-detail-modal .iziModal-content').html(html);
-                        modal.stopLoading();
-                    }).fail(function (file,response) {
-                        modal.stopLoading();
-                        toastMessage('error','Failed','Something wrong :(');
-                        $('.iziModal-button-close').click();
-                    });
-                },
-                onClosed : function (modal) {
-                    $('#lendment-detail-modal').iziModal('destroy');
-                }
+            iziToast.question({
+                timeout: 20000,
+                close: true,
+                overlay: true,
+                displayMode: 'once',
+                id: 'question',
+                zindex: 99999,
+                title: 'Hey',
+                message: 'Are you sure to approve this lendment request?',
+                position: 'center',
+                buttons: [
+                    ['<button><b>YES</b></button>', function (instance, toast) {
+                        instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
 
-            });
-            $('#lendment-detail-modal').iziModal('open');
+                        $.ajax({
+                            type: "POST",
+                            url: "/lendment/approve/"+id,
+                            success: function(response){
+                                if(response['status'] === 'success'){
+                                    tableAccess.removeRowById(id);
+                                    console.log(tableAccess.getAll());
+                                    toastMessage('success','Success','Request approved');
+                                }
+                                else{
+                                    toastMessage('error','Error','Something wrong :(');
+                                }
+                            },
+                            cache: false,
+                            processData: false
+                        });
+
+                    }, true],
+                    ['<button>NO</button>', function (instance, toast) {
+
+                        instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+
+                    }]
+                ]
+            });// end iziToast
         }
+
     </script>
 </content>
 </body>

@@ -32,7 +32,6 @@ public class LendmentDetail implements Serializable {
 
     @Nullable
     @Column(name = "return_date")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     Date returnDate;
 
     @JsonIgnore

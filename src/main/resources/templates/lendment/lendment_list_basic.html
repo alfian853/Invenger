@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.springframework.org/schema/data/jaxb"
+      th:replace="~{masterLayout :: layout(~{::title}, ~{::content}, ~{::headContent})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Lendments</title>
+    <headcontent>
+        <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/css/modal.css}">
+
+        <link rel="stylesheet" href="https://cdn.datatables.net/select/1.2.7/css/select.dataTables.min.css">
+        <link rel="stylesheet" href="http://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.js"></script>
+
+        <script src="http://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/select/1.2.7/js/dataTables.select.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/css/iziModal.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/js/iziModal.min.js"></script>
+
+        <script th:src="@{/js/DataTablesAccess.js}"></script>
+
+        <script th:inline = "javascript">
+            $(document).ready(function(){
+                $('#lendmentsTable').DataTable();
+            });
+        </script>
+
+    </headcontent>
+</head>
+
+<body>
+<content>
+    <!--for ajax request    -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+    <div th:replace="sidebar :: left_sidebar"></div>
+
+    <div id="content">
+        <div th:replace="navbar :: navbar"></div>
+        <div class="user-text">Lendment</div>
+        <div style="padding: 30px;">
+            <table id="lendmentsTable" class="display" style="width:100%;">
+                <thead>
+                <tr>
+                    <th>Lendment Id</th>
+                    <th>Username</th>
+                    <th>Order date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <th:block th:each="lendment : ${lendments}">
+                    <tr th:id="|order-${lendment.id}|">
+                        <td col="id" th:text="${lendment.id}"></td>
+                        <td col="username" th:text="${lendment.username}"></td>
+                        <td col="order-date" th:text="${lendment.orderDate}"></td>
+                        <td col="status" th:text="${lendment.status}"></td>
+                        <td>
+                            <button type="submit" th:onclick="|loadLendmentDetail(${lendment.id})|">Detail</button>
+                            <th:block th:switch="${lendment.status}">
+                                <th:block th:case="${status.get('WaitingForPickUp')}">
+                                    <button class="btn btn-warning btn-sm" th:onclick="|doHandOver(this,${lendment.id})|">Picked Up</button>
+                                </th:block>
+                            </th:block>
+                        </td>
+                    </tr>
+                </th:block>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="lendment-detail-modal"></div>
+
+    <script>
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content')
+            }
+        });
+
+        function loadLendmentDetail(id) {
+
+            $('#lendment-detail-modal').iziModal({
+                title : 'Lendment Detail',
+                width : screen.width*0.9,
+                height : screen.height*0.9,
+                closeButton : true,
+                fullScreen : true,
+                history: false,
+                onOpening : function (modal) {
+                    modal.startLoading();
+                    $.get('/lendment/detail/'+id,function (html) {
+                        $('#lendment-detail-modal .iziModal-content').html(html);
+                        modal.stopLoading();
+                    }).fail(function (file,response) {
+                        modal.stopLoading();
+                        toastMessage('error','Failed','Something wrong :(');
+                        $('.iziModal-button-close').click();
+                    });
+                },
+                onClosed : function (modal) {
+                    $('#lendment-detail-modal').iziModal('destroy');
+                }
+
+            });
+            $('#lendment-detail-modal').iziModal('open');
+        }
+
+    </script>
+</content>
+</body>
+</html>
