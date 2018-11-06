@@ -1,0 +1,111 @@
+<div class="modal-body" xmlns:th="http://www.w3.org/1999/xhtml">
+    <form id="inventory-detail-form" action="#" method="POST" enctype="multipart/form-data" class="row">
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-12">
+                    <img id="img-dropzone-temp" class="d-block img-fluid mx-auto rounded"
+                         th:src="@{/inventory/pict/{link}(link=${inventory.image})}" style="height: 350px;width:350px;">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6" style="padding-left: 0px">
+            <div class="row my-2">
+                <div class="col-md-5">
+                    <label>Name* :</label>
+                </div>
+                <div class="col-md-6">
+                        <div class="input-group">
+                            <input type="text" th:value="${inventory.name}" class="form-control" disabled>
+                        </div>
+                </div>
+            </div>
+            <div class="row my-2">
+                <div class="col-md-5">
+                    <label>Inventory Type :</label>
+                </div>
+                <div class="col-md-6">
+                    <div class="btn-group">
+                        <input type="text" th:value="${inventory.type}" class="form-control" disabled>
+                    </div>
+                </div>
+            </div>
+            <div class="row my-2">
+                <div class="col-md-5">
+                    <label>Category :</label>
+                </div>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input id="item-detail-ctg" type="text" class="form-control" disabled>
+                    </div>
+                </div>
+            </div>
+            <div class="row my-2">
+                <div class="col-md-5">
+                    <label>Price :</label>
+                </div>
+                <div class="col-md-6">
+                    <form class="form-inline">
+                        <div class="input-group">
+                            <input type="number" name="price" th:value="${inventory.price}" class="form-control" disabled>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="row my-2">
+                <div class="col-md-5">
+                    <label>Quantity :</label>
+                </div>
+                <div class="col-md-6">
+                    <input class="form-control" placeholder="Quantity" type="number"
+                           name="quantity" th:value="${inventory.quantity}" disabled>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <label>Description :</label>
+                </div>
+                <div class="col-md-9">
+                    <textarea class="form-control" id="Textarea" rows="3" placeholder="Type here"
+                              name="description" th:text="${inventory.description}" disabled></textarea>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button id="item-detail-close-btn" type="button" class="btn btn-secondary">Close</button>
+</div>
+
+<!--/*
+Documentation
+
+        list of global variable usage
+        [
+            listCategory => list of all category, initialize in inventory_list_admin.html
+        ]
+*/-->
+<script>
+    var inventory_id = '[[${inventory.id}]]';
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content')
+        }
+    });
+
+    $(document).ready(function() {
+
+        for(var key in listCategory){
+            if(key == '[[${inventory.category.id}]]'){
+                $('#item-detail-ctg').val(listCategory[key]);
+                break;
+            }
+
+        }
+
+        $('#item-detail-close-btn').click(function () {
+           $('.iziModal-button-close').click();
+        });
+
+    });
+</script>

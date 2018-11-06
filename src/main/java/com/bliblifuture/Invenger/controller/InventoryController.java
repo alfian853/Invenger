@@ -49,7 +49,13 @@ public class InventoryController {
         model.addAttribute("categories",itemCategoryService.getAllItemCategory());
         model.addAttribute("itemTypes", InventoryType.getAllType());
         model.addAttribute("createItemForm",new InventoryCreateRequest());
-        return "inventory/inventory_list";
+
+        if(userService.currentUserIsAdmin()){
+            return "inventory/inventory_list_admin";
+        }
+        else{
+            return "inventory/inventory_list_basic";
+        }
     }
 
     @PostMapping("/inventory/create")
@@ -80,7 +86,11 @@ public class InventoryController {
     public String getInventoryDetail(Model model, @PathVariable("id") Integer id){
         model.addAttribute("inventory", inventoryService.getById(id));
         model.addAttribute("itemTypes", InventoryType.getAllType());
-        return "inventory/inventory_detail";
-    }
+        if(userService.currentUserIsAdmin()){
+            return "inventory/inventory_detail_admin";
+        }
+        else{
+            return "inventory/inventory_detail_basic";
+        }    }
 
 }
