@@ -1,22 +1,17 @@
-<div id="sidebar" th:fragment="left_sidebar" xmlns:th="http://www.w3.org/1999/xhtml">
+<div id="sidebar" th:fragment="left_sidebar" xmlns:th="http://www.w3.org/1999/xhtml"
+	 xmlns:sec="http://www.w3.org/1999/xhtml">
 	<div id="top">
 		<div id="invenger-text">INVENGER</div><i onclick="myFunction()" id="bars" class="fa fa-bars"></i>
 	</div>
 	<div id="element">MENUS</div>
-	<a class="icon" href="">
-		<i class="fa fa-cloud"></i><div class="text">Options</div>
+	<a class="icon sidebar-selected" href="/inventory/all">
+		<i class="fa fa-cloud"></i><div class="text">Inventories</div>
 	</a>
-	<a class="icon" id="selected" href="">
-		<i class="fa fa-cloud"></i><div class="text">Options</div>
+	<a class="icon" href="/lendment/all">
+		<i class="fa fa-cloud"></i><div class="text">Lendments</div>
 	</a>
-	<a class="icon" href="">
-		<i class="fa fa-cloud"></i><div class="text">Options</div>
-	</a>
-	<a class="icon" href="">
-		<i class="fa fa-cloud"></i><div class="text">Options</div>
-	</a>
-	<a class="icon" href="">
-		<i class="fa fa-cloud"></i><div class="text">Options</div>
+	<a class="icon" href="/user/all" sec:authorize="hasRole('ADMIN')">
+		<i class="fa fa-cloud"></i><div class="text">Users</div>
 	</a>
 	<script>
         function myFunction(){
