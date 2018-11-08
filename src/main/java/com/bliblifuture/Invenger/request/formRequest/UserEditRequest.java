@@ -1,5 +1,6 @@
 package com.bliblifuture.Invenger.request.formRequest;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -9,6 +10,9 @@ public class UserEditRequest {
     Integer id;
 
     String username;
+
+    @JsonProperty("full_name")
+    String fullName;
 
     String email;
 

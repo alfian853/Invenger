@@ -42,6 +42,7 @@ public class DataSeeder {
         if(category == null){
             category = Category.builder()
                     .name("/all")
+                    .level(0)
                     .build();
 
             categoryRepository.save(category);
@@ -75,6 +76,7 @@ public class DataSeeder {
         if(admin == null){
             admin = new User();
             admin.setUsername("root");
+            admin.setFullName("root");
             admin.setEmail("root@future.com");
             admin.setTelp("+123456789");
             admin.setRole(RoleType.ROLE_ADMIN.toString());
@@ -89,6 +91,7 @@ public class DataSeeder {
         if(user == null){
             user = new User();
             user.setUsername("basic");
+            user.setFullName("biasa saja");
             user.setEmail("basics@future.com");
             user.setTelp("+1111111111");
             user.setRole(RoleType.ROLE_USER.toString());
