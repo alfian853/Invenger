@@ -45,8 +45,7 @@ public class InventoryController {
     @GetMapping("/inventory/all")
     public String getInventoryTable(Model model){
         model.addAttribute("inventories", inventoryService.getAll());
-        model.addAttribute("user",userService.getProfile());
-        model.addAttribute("categories",itemCategoryService.getAllItemCategory());
+        model.addAttribute("categories",itemCategoryService.getAllItemCategory(false));
         model.addAttribute("itemTypes", InventoryType.getAllType());
         model.addAttribute("createItemForm",new InventoryCreateRequest());
 
@@ -91,6 +90,7 @@ public class InventoryController {
         }
         else{
             return "inventory/inventory_detail_basic";
-        }    }
+        }
+    }
 
 }

@@ -2,7 +2,6 @@ package com.bliblifuture.Invenger.controller;
 
 import com.bliblifuture.Invenger.model.lendment.LendmentStatus;
 import com.bliblifuture.Invenger.request.jsonRequest.LendmentCreateRequest;
-import com.bliblifuture.Invenger.request.jsonRequest.LendmentHandOverRequest;
 import com.bliblifuture.Invenger.request.jsonRequest.LendmentReturnRequest;
 import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.Invenger.service.InventoryService;
@@ -12,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
 import javax.validation.Valid;
 
 @Controller
@@ -48,7 +48,6 @@ public class LendmentController {
     @GetMapping("lendment/all")
     public String getLendmentTable(Model model){
 
-        model.addAttribute("user",userService.getProfile());
         model.addAttribute("status",LendmentStatus.getMap());
       if(userService.currentUserIsAdmin()){
           model.addAttribute("lendments",lendmentService.getAll());
@@ -63,7 +62,6 @@ public class LendmentController {
 
     @GetMapping("lendment/requests")
     public String getLendmentQueueTable(Model model){
-        model.addAttribute("user",userService.getProfile());
         model.addAttribute("status",LendmentStatus.getMap());
         model.addAttribute("lendments",lendmentService.getAllLendmentRequest());
 
