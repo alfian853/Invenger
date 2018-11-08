@@ -46,8 +46,8 @@
                 </div>
                 <div class="col-md-6">
                     <div class="input-group">
-                        <input type="text" name="password" th:value="${user.password}" class="form-control"
-                               placeholder="Password" onchange="update(this);">
+                        <input type="text" name="password" value="" class="form-control"
+                               placeholder="Type new password" onchange="update(this);">
                     </div>
                 </div>
             </div>
@@ -74,18 +74,6 @@
                     </div>
                 </div>
             </div>
-            <div class="row my-2">
-                <div class="col-md-5">
-                    <label>Role* :</label>
-                </div>
-                <div class="col-md-6">
-                    <div class="input-group">
-                        <select id="user-detail-role" class="btn-outline-primary form-input" style="width: 100%;"
-                                th:name="role_id" onchange="update(this);">
-                        </select>
-                    </div>
-                </div>
-            </div>
         </div>
     </form>
 </div>
@@ -108,10 +96,9 @@ Documentation
     var listOfField = {
         'username' : '[[${user.username}]]',
         'email' : '[[${user.email}]]',
-        'password' : '[[${user.password}]]',
+        'password' : '',
         'telp' : '[[${user.telp}]]',
         'position_id' : '[[${user.position.id}]]',
-        'role_id' : '[[${user.role}]]',
         'pict' : ''
     };
 
@@ -153,19 +140,6 @@ Documentation
                 );
             }
         }
-        for(var key in listRole){
-            if(key == '[[${user.role}]]'){
-                $('#user-detail-role').append(
-                    '<option selected=\"selected\" value=\"'+key+'\" >'+listRole[key]+'</option>'
-                );
-            }
-            else{
-                $('#user-detail-role').append(
-                    '<option value=\"'+key+'\" >'+listRole[key]+'</option>'
-                );
-            }
-        }
-
 
 
         $('#user-detail-save-btn').click(function () {
@@ -225,16 +199,9 @@ Documentation
                                     }
                                 }
                                 for(let field in changedData){
-                                    if(field === 'role_id'){
-                                        window.tableAccess.setColValueByRowId(user_id, 'role',
-                                            listRole[changedData[field]]
-                                        );
-                                    }
-                                    else{
-                                        window.tableAccess.setColValueByRowId(user_id, field,
-                                            changedData[field]
-                                        );
-                                    }
+                                    window.tableAccess.setColValueByRowId(user_id, field,
+                                        changedData[field]
+                                    );
                                 }
                             },
                             cache: false,
