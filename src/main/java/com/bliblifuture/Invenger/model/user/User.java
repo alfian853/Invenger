@@ -9,6 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -30,6 +31,9 @@ public class User extends AuditModel implements UserDetails {
 
     @Column(unique = true)
     private String email;
+
+    @Column(nullable = false)
+    private String fullName;
 
     @PhoneConstraint
     private String telp;

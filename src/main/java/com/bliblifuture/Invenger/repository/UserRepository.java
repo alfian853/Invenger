@@ -13,8 +13,8 @@ public interface UserRepository extends JpaRepository<User,Integer> {
     User findByUsername(String username);
     User findByEmail(String email);
 
-    @Query("select u from User u JOIN FETCH u.position")
-    List<User> findAllWithPosition();
+    @Query("select u from User u LEFT JOIN FETCH u.position LEFT JOIN FETCH u.superior")
+    List<User> findAllFetched();
 
 }
 

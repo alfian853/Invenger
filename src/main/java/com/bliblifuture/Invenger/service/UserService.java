@@ -1,5 +1,6 @@
 package com.bliblifuture.Invenger.service;
 
+import com.bliblifuture.Invenger.ModelMapper.user.UserMapper;
 import com.bliblifuture.Invenger.Utils.MyUtils;
 import com.bliblifuture.Invenger.annotation.imp.PasswordValdator;
 import com.bliblifuture.Invenger.annotation.imp.PhoneValidator;
@@ -16,7 +17,9 @@ import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.UploadProfilePictResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.UserCreateResponse;
 import com.bliblifuture.Invenger.response.viewDto.ProfileDTO;
+import com.bliblifuture.Invenger.response.viewDto.UserDTO;
 import org.apache.commons.io.FilenameUtils;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -30,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
 @Service
 public class UserService implements UserDetailsService {
 
@@ -45,8 +49,15 @@ public class UserService implements UserDetailsService {
     @Autowired
     MyUtils myUtils;
 
-    public List<User> getAll(){
-        return userRepository.findAll();
+    private final UserMapper mapper = Mappers.getMapper(UserMapper.class);
+
+
+//    public List<User> getAll(){
+//        return userRepository.findAll();
+//    }
+
+    public List<UserDTO> getAll(){
+        return mapper.toUserDtoList(userRepository.findAllFetched());
     }
 
     public User getById(Integer id){
@@ -55,6 +66,7 @@ public class UserService implements UserDetailsService {
 
     public UserCreateResponse createUser(UserCreateRequest request){
         UserCreateResponse response = new UserCreateResponse();
+        response.setStatusToSuccess();
 
         String imgName = UUID.randomUUID().toString().replace("-","")+
                 "."+ FilenameUtils.getExtension(request.getProfile_photo().getOriginalFilename());
@@ -63,27 +75,28 @@ public class UserService implements UserDetailsService {
         newPosition.setId(request.getPosition_id());
 
         User newUser = new User();
+        newUser.setFullName(request.getFullName());
         newUser.setUsername(request.getUsername());
         newUser.setEmail(request.getEmail());
         newUser.setPassword(myUtils.getBcryptHash(request.getPassword()));
         newUser.setTelp(request.getTelp());
         newUser.setPictureName(imgName);
         newUser.setPosition(newPosition);
-        newUser.setRole(RoleType.ROLE_ADMIN.toString());
+        newUser.setRole(RoleType.ROLE_USER.toString());
+        newUser.setSuperior(userRepository.getOne(request.getSuperior_id()));
 
-        if(fileStorageService.storeFile(
-                request.getProfile_photo(),
-                imgName,
-                FileStorageService.PathCategory.PROFILE_PICT)
-        ) {
-            userRepository.save(newUser);
-            response.setStatusToSuccess();
-        }
-        else{
-            response.setStatusToFailed();
+        if(request.getProfile_photo() != null){
+            if(!fileStorageService.storeFile(
+                    request.getProfile_photo(),
+                    imgName,
+                    FileStorageService.PathCategory.PROFILE_PICT)
+            ) {
+                response.setStatusToFailed();
+            }
         }
 
         if(response.getStatus().equals("success")){
+            userRepository.save(newUser);
             response.setUser_id(newUser.getId());
         }
 
@@ -114,10 +127,7 @@ public class UserService implements UserDetailsService {
             Position position = positionRepository.getOne(request.getPosition_id());
             user.setPosition(position);
         }
-        if(request.getRole_id() != null){
-//            Role role = roleRepository.getOne(request.getRole_id());
-//            user.setRole(role);
-        }
+
         if(request.getPict() != null){
 
             String newFileName = myUtils.getRandomFileName(request.getPict());
@@ -134,6 +144,9 @@ public class UserService implements UserDetailsService {
                 response.setMessage("Internal server error");
             }
 
+        }
+        else{
+            user.setPictureName("default-pict.png");
         }
 
         userRepository.save(user);
@@ -217,7 +230,7 @@ public class UserService implements UserDetailsService {
             }
             formResponses.put("new-telp",formResponse);
         }
-//
+
         while(!request.getOldPwd().equals("") ){
 
             String newPassword = request.getNewPwd1();

@@ -1,7 +1,7 @@
 <div th:fragment="navbar" xmlns:th="http://www.w3.org/1999/xhtml">
     <div class="navbar">
         <div id="dropdown" onclick="dropDown()">
-            <div style="padding-left: 32px; padding-right: 8px; border-left: 1px solid rgba(24, 28, 33, 0.04);" th:object="${user}" th:text="*{name}"></div>
+            <div style="padding-left: 32px; padding-right: 8px; border-left: 1px solid rgba(24, 28, 33, 0.04);" th:object="${#authentication.getPrincipal()}" th:text="*{username}"></div>
             <div class="circle"></div>
             <i style="padding-left: 8px; padding-right: 8px;" class="fa fa-angle-down"></i>
         </div>

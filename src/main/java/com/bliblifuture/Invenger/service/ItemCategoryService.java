@@ -1,6 +1,7 @@
 package com.bliblifuture.Invenger.service;
 
-
+import com.bliblifuture.Invenger.ModelMapper.category.CategoryMapper;
+import com.bliblifuture.Invenger.ModelMapper.category.CategoryMapperImpl;
 import com.bliblifuture.Invenger.model.Category;
 import com.bliblifuture.Invenger.repository.category.CategoryRepository;
 import com.bliblifuture.Invenger.repository.category.CategoryWithChildId;
@@ -9,6 +10,7 @@ import com.bliblifuture.Invenger.request.jsonRequest.CategoryEditRequest;
 import com.bliblifuture.Invenger.response.jsonResponse.CategoryCreateResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.CategoryEditResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
+import com.bliblifuture.Invenger.response.viewDto.CategoryDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -25,6 +27,8 @@ public class ItemCategoryService {
     protected CategoryRepository categoryRepository;
 
     private List<CategoryWithChildId> categories;
+
+    final private CategoryMapper mapper = new CategoryMapperImpl();
 
     // Get category index in categories by category id using Binary Search algorithm
     private int getCategoryIndex(int id){
@@ -68,27 +72,82 @@ public class ItemCategoryService {
         if(request.getNewName().contains("/")){
             response.setStatusToFailed();
             response.setMessage("category name can't be contain '/' character");
+            return response;
         }
 
-        categories = categoryRepository.getCategoryParentWithChildIdOrderById();
 
+        categories = categoryRepository.getCategoryParentWithChildIdOrderById();
         int currentIndex = getCategoryIndex(request.getId());
         CategoryWithChildId current = categories.get(currentIndex);
         int oldNameLength = current.getName().length();
-        for(int i = oldNameLength-1; i >= 0; --i){
-            if( current.getName().charAt(i) == '/' ){
-                current.setName( current.getName().substring(0,i+1) + request.getNewName() );
-                categoryRepository.updateNameById(current.getId(),current.getName());
-                break;
+
+
+        // check is value changed?
+        if(current.getName().substring(current.getName().length()-request.getNewName().length())
+                .equals(request.getNewName()) &&
+                current.getParentId().equals(request.getNewParentId()) ){
+            response.setStatusToSuccess();
+            response.setMessage("no data changed");
+            return response;
+        }
+
+        // check is parent change request valid?
+        CategoryWithChildId parent = categories.get(
+                getCategoryIndex( request.getNewParentId() )
+        );
+        if(!current.getParentId().equals(request.getNewParentId())){
+            CategoryWithChildId tmp = CategoryWithChildId.builder()
+                    .id(parent.getId())
+                    .parentId(parent.getParentId())
+                    .build();
+
+            boolean isCircular = false;
+            while (true){
+                try{
+                    tmp = categories.get(
+                            getCategoryIndex(tmp.getParentId())
+                    );
+
+                    if(tmp.getId().equals(current.getId())){
+                        isCircular = true;
+                        break;
+                    }
+                }
+                catch (Exception e){
+                    break;
+                }
+            }
+
+            if(isCircular){
+                response.setStatusToFailed();
+                response.setMessage("can't assign child as new parent");
+                return response;
             }
         }
+
+
+        //parent id changed
+        if( request.getNewParentId() != null && !current.getParentId().equals(request.getNewParentId()) ){
+            current.setParentId(parent.getId());
+            current.setName(parent.getName()+"/"+request.getNewName());
+        }
+        else{//parent id not changed
+            for(int i = oldNameLength-1; i >= 0; --i){
+                if( current.getName().charAt(i) == '/' ){
+                    current.setName( current.getName().substring(0,i+1) + request.getNewName() );
+                    categoryRepository.updateNameById(current.getId(),current.getName());
+                    break;
+                }
+            }
+        }
+
 
         for(Integer childId: current.getChildsId()){
             updateCategoryUtil(childId,current.getName(),oldNameLength);
         }
 
         for(CategoryWithChildId element : categories){
-            response.addCategoryData(element.getId(),element.getName());
+            response.addCategoryData(element.getId(),element.getName(), element.getParentId());
         }
         response.setStatusToSuccess();
         return response;
@@ -109,7 +168,6 @@ public class ItemCategoryService {
         Category newCategory = new Category();
         newCategory.setParent(parent);
         newCategory.setName(parent.getName()+"/"+request.getName());
-
         categoryRepository.save(newCategory);
         response.setStatusToSuccess();
         response.setCategory(newCategory);
@@ -130,8 +188,13 @@ public class ItemCategoryService {
         }
     }
 
-    public List<Category> getAllItemCategory(){
-        return categoryRepository.findAll();
+    public List<CategoryDTO> getAllItemCategory(boolean fetchParent){
+        if(fetchParent){
+            return mapper.toCategoryDtoList(categoryRepository.findAllFetched());
+        }
+        else{
+            return mapper.toCategoryDtoList(categoryRepository.findAll());
+        }
     }
 
 }

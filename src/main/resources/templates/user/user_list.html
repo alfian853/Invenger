@@ -24,9 +24,8 @@
                 tableAccess = new DTAccess(datatables,'usr-',6);
             });
             var listPosition = {};
-            var listRole = {};
         </script>
-        <title>Table</title>
+        <title>Users</title>
 
     </headContent>
 </head>
@@ -50,28 +49,41 @@
             <table id="itemsTable" class="display" style="width:100%;">
                 <thead>
                 <tr>
+                    <th>Id</th>
                     <th>Username</th>
                     <th>Email</th>
                     <th>Telp</th>
                     <th>Position</th>
-                    <th>Role</th>
+                    <th>Superior</th>
                     <th>Action</th>
                 </tr>
                 </thead>
                 <tbody id="users-table-body" style="font-size: 15px;">
                 <th:block th:each="user : ${users}">
                     <tr th:id="|usr-${user.id}|">
+                        <td col="user-id" th:text="${user.id}"></td>
                         <td col="username" th:text="${user.username}"></td>
                         <td col="email" th:text="${user.email}"></td>
                         <td col="telp" th:text="${user.telp}"></td>
-                        <td col="position" th:text="${user.position.name}"></td>
-                        <td col="role" th:text="${user.role}"></td>
-                        <td>
+                        <td col="position" th:text="${user.position}"></td>
+                        <td col="superior" th:text="${user.superior}"></td>
+                        <td col="action">
                             <button type="submit" th:onclick="|loadDetail(${user.id})|">More</button>
                         </td>
                     </tr>
                 </th:block>
                 </tbody>
+                <tfoot>
+                <tr>
+                    <th>Id</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Telp</th>
+                    <th>Position</th>
+                    <th>Superior</th>
+                    <th>Action</th>
+                </tr>
+                </tfoot>
             </table>
         </div>
 
@@ -79,15 +91,42 @@
             <div class="modal-body">
                 <form id="create-user-form" action="#" method="POST" enctype="multipart/form-data" th:object="${createUserForm}">
                     <div class="form-group">
-                        <label class="form-label">Username *</label><br>
+                        <label class="form-label">Full name *</label>
+                        <input class="form-input" th:field="*{fullName}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Username *</label>
                         <input class="form-input" th:field="*{username}">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">User Email</label><br>
+                        <label class="form-label">Email *</label>
                         <input class="form-input" th:field="*{email}">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Photo</label>
+                        <label class="form-label">Telp *</label>
+                        <input class="form-input" th:field="*{telp}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password *</label>
+                        <input class="form-input" type="text" th:field="*{password}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Superior *</label>
+                        <select style="width: 100%;" name="superior_id">
+                            <option></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Position *</label>
+                        <select class="form-input" style="width: 100%;" name="position_id">
+                            <th:block th:each="position : ${positions}">
+                                <option th:value="${position.id}" th:text="${position.name}">Option i</option>
+                            </th:block>
+                        </select>
+
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Photo *</label>
                         <div class="needsclick mx-4 dropzone" id="uploadFile">
                             <div class="dz-message needsclick" name="user-pict">
                                 Please Upload jpg, jpeg or png file only
@@ -96,26 +135,6 @@
                                 <br/>
                             </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Telp</label><br>
-                        <input class="form-input" th:field="*{telp}">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Position</label>
-                        <select class="form-input" style="width: 100%;" name="position_id">
-                            <th:block th:each="position : ${positions}">
-                                <option th:value="${position.id}" th:text="${position.name}">Option i</option>
-                            </th:block>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Role</label>
-                        <select class="form-input" style="width: 100%;" name="role_id">
-                            <th:block th:each="role : ${roles}">
-                                <option th:value="${role}" th:text="${role}">Option i</option>
-                            </th:block>
-                        </select>
                     </div>
                     <div class="form-action">
                         <button class="submit" id="add-user-submit">Add User</button>
@@ -130,6 +149,12 @@
 
     <script>
         Dropzone.autoDiscover = false;
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content')
+            }
+        });
 
         function loadDetail(idCategory){
 
@@ -184,12 +209,19 @@
                 }
 
             });
-
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content')
-                }
+            //init user as superior
+            let res = tableAccess.getAll();
+            let select_superior = $('#create-user-form select[name=\"superior_id\"]');
+            select_superior.select2({
+                selectOnClose : false,
+                placeholder : 'please select superior'
             });
+
+            for(let i = 0; i < res.length; i++){
+                select_superior.append(
+                    '<option value=\"'+res[i][0]+'\">'+res[i][1]+'</option>'
+                );
+            }
 
             // var createItemDZ = new Dropzone('#uploadFile',{
             Dropzone.options.uploadFile = {
@@ -218,46 +250,62 @@
             $('form#create-user-form').submit(function(e){
                 e.preventDefault();
                 var form = new FormData(this);
-                form.append("profile_photo",file_upload);
+                if(file_upload != null){
+                    form.append("profile_photo",file_upload);
+                }
                 $.ajax({
                     type: "POST",
                     url: "[[@{/user/create}]]",
                     data: form,
                     success: function(response){
-                        console.log(response['user_id']);
                         tableAccess.addData(
                             response['user_id'],
                             [
+                                response['user_id'],
                                 form.get('username'),
                                 form.get('email'),
                                 form.get('telp'),
                                 listPosition[form.get('position_id')],
-                                listRole[form.get('role_id')],
                                 '<button type=\"submit\" onclick=loadDetail('+response['user_id']+') >More</button>'
                             ],
                             [
+                                'user-id',
                                 'username',
                                 'email',
-                                'password',
                                 'telp',
                                 'position',
-                                'role'
+                                'action'
                             ]
                         );
                         toastMessage('success','Success','New user added to table');
                         $('#create-user-modal').iziModal('close');
                         uploadFileDZ.removeFile(file_upload);
                     },
+                    error : function(response){
+                        let errors = response['responseJSON']['errors'];
+                        let len = errors.length;
+                        let errorsData = {};
+
+                        for(let i = 0; i < len; i++){
+                            $('#create-user-form [name=\"'+errors[i]['field']+'\"]').prev('label')
+                                .after('<span class=\"error-field\">'+errors[i]['defaultMessage']+'</span>');
+                        }
+                    },
                     cache: false,
                     contentType: false,
                     processData: false
-                });
+                }).fail(function (e) {
+                    toastMessage('error','Error',e);
+                });;
 
             });
 
             $("#userBtn").click(function(){
                 $('#create-user-modal').iziModal('open');
             });
+
+
+
 
         });
 
