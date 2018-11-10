@@ -10,7 +10,7 @@ import java.util.List;
 
 @Builder
 @Data
-public class CategoryWithChildId {
+public class CategoryWithChildId implements Cloneable{
 
     private Integer id;
     private String name;
@@ -21,10 +21,10 @@ public class CategoryWithChildId {
     @JsonIgnore
     private List<Integer> childsId;
 
-    public CategoryWithChildId(Integer id, String name, Integer parendId, List<Integer> childsId) {
+    public CategoryWithChildId(Integer id, String name, Integer parentId, List<Integer> childsId) {
         this.id = id;
         this.name = name;
-        this.parentId = parendId;
+        this.parentId = parentId;
         this.childsId = childsId;
     }
 }
