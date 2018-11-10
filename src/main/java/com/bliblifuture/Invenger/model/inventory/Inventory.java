@@ -21,8 +21,8 @@ public class Inventory extends AuditModel {
     @GeneratedValue(strategy = GenerationType.AUTO)
     Integer id;
 
-    String image,//image url
-            name;
+    String image;//image filename
+    String name;
 
     int quantity;
 
@@ -36,7 +36,6 @@ public class Inventory extends AuditModel {
     @Column(columnDefinition = "text")
     String description;
 
-    @Enumerated(EnumType.STRING)
-    InventoryType type;
+    String type;
 
 }

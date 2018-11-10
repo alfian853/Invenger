@@ -18,6 +18,7 @@ public class InventoryCreateRequest {
     @NotNull
     Integer category_id;
 
+    @NotNull
     Integer quantity;
 
     Integer price;

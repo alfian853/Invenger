@@ -115,7 +115,7 @@ Documentation
     var listOfField = {
         'name' : '[[${inventory.name}]]',
         'type' : '[[${inventory.type}]]',
-        'category_id' : '[[${inventory.category.id}]]',
+        'category_id' : '[[${inventory.category_id}]]',
         'price' : '[[${inventory.price}]]',
         'quantity' : '[[${inventory.quantity}]]',
         'description' : '[[${inventory.description}]]',
@@ -149,7 +149,7 @@ Documentation
     $(document).ready(function() {
 
         for(var key in listCategory){
-            if(key == '[[${inventory.category.id}]]'){
+            if(key == '[[${inventory.category_id}]]'){
                 $('#item-detail-category').append(
                     '<option selected=\"selected\" value=\"'+key+'\" >'+listCategory[key]+'</option>'
                 );

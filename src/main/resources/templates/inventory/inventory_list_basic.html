@@ -65,7 +65,7 @@
                         <td col="name" th:text="${inventory.name}"></td>
                         <td col="price" th:text="${inventory.price}"></td>
                         <td col="quantity" th:text="${inventory.quantity}"></td>
-                        <td col="category" th:text="${inventory.category.name}"></td>
+                        <td col="category" th:text="${inventory.category}"></td>
                         <td col="type" th:text="${inventory.type}"></td>
                         <td>
                             <button class="submit" type="submit" th:onclick="|loadInventoryDetail(${inventory.id})|">Item Detail</button>

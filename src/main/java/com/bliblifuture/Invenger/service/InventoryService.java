@@ -1,5 +1,8 @@
 package com.bliblifuture.Invenger.service;
 
+import com.bliblifuture.Invenger.ModelMapper.inventory.InventoryMapper;
+import com.bliblifuture.Invenger.ModelMapper.inventory.InventoryMapperImpl;
+import com.bliblifuture.Invenger.ModelMapper.lendment.LendmentMapper;
 import com.bliblifuture.Invenger.Utils.MyUtils;
 import com.bliblifuture.Invenger.model.inventory.Inventory;
 import com.bliblifuture.Invenger.model.Category;
@@ -9,7 +12,9 @@ import com.bliblifuture.Invenger.request.formRequest.InventoryCreateRequest;
 import com.bliblifuture.Invenger.request.formRequest.InventoryEditRequest;
 import com.bliblifuture.Invenger.response.jsonResponse.InventoryCreateResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
+import com.bliblifuture.Invenger.response.viewDto.InventoryDTO;
 import org.apache.commons.io.FilenameUtils;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -36,13 +41,16 @@ public class InventoryService {
     @Autowired
     MyUtils myUtils;
 
+    private final InventoryMapper mapper = Mappers.getMapper(InventoryMapper.class);
 
-    public List<Inventory> getAll(){
-        return inventoryRepository.findAll();
+
+
+    public List<InventoryDTO> getAll(){
+        return mapper.toInventoryDtoList(inventoryRepository.findAll());
     }
 
-    public Inventory getById(Integer id){
-        return inventoryRepository.findInventoryById(id);
+    public InventoryDTO getById(Integer id){
+        return mapper.toInventoryDto(inventoryRepository.findInventoryById(id));
     }
 
     public InventoryCreateResponse createInventory(InventoryCreateRequest request){
@@ -61,7 +69,7 @@ public class InventoryService {
         newInventory.setImage(imgName);
         newInventory.setDescription(request.getDescription());
         newInventory.setCategory(newCategory);
-        newInventory.setType(request.getType());
+        newInventory.setType(request.getType().toString());
 
         if(fileStorageService.storeFile(
                 request.getPhoto_file(),
@@ -103,7 +111,7 @@ public class InventoryService {
             inventory.setDescription(request.getDescription());
         }
         if(request.getType() != null){
-            inventory.setType(request.getType());
+            inventory.setType(request.getType().toString());
         }
         if(request.getCategory_id() != null){
             Category category = categoryRepository.getOne(request.getCategory_id());
