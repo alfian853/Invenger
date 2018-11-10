@@ -5,12 +5,15 @@
     <headContent>
         <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}">
         <link rel="stylesheet" type="text/css" th:href="@{/css/modal.css}">
-        <link rel="stylesheet" href="http://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.foundation.min.css">
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.4.3/css/foundation.min.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.js"></script>
 
-        <script src="http://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+        <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.10.19/js/dataTables.foundation.min.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/css/iziModal.min.css">
         <script src="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/js/iziModal.min.js"></script>
         <script th:src="@{/js/DataTablesAccess.js}"></script>
@@ -49,7 +52,7 @@
             <button class="btn" id="itemBtn">Item</button>
             <button class="btn" id="assignItemBtn">Assign Item to User</button>
         </div>
-        <div style="padding: 30px;">
+        <div style="padding: 50px;">
             <table id="itemsTable" class="display" style="width:100%;">
                 <thead>
                 <tr>
@@ -62,7 +65,7 @@
                     <th>Action</th>
                 </tr>
                 </thead>
-                <tbody id="items-table-body">
+                <tbody id="items-table-body" style="font-size: 15px;">
                 <th:block th:each="inventory : ${inventories}">
                     <tr th:id="|item-${inventory.id}|">
                         <td col="id" th:text="${inventory.id}"></td>

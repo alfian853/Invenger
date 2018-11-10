@@ -18,11 +18,12 @@ public class FileStorageService {
     private final String BASE_PATH = "src/main/resources";
     private final String USER_PROFILE_PATH = BASE_PATH+"/profile-pict/";
     public enum PathCategory{
-        PROFILE_PICT,INVENTORY_PICT
+        PROFILE_PICT,INVENTORY_PICT,PDF
     }
     private final HashMap<PathCategory,String> path = new HashMap<PathCategory,String>(){{
       put(PathCategory.PROFILE_PICT,BASE_PATH+"/profile-pict/");
       put(PathCategory.INVENTORY_PICT,BASE_PATH+"/inventory-pict/");
+      put(PathCategory.PDF,BASE_PATH+"/inventory-pdf/");
     }};
 
     public boolean storeFile(MultipartFile file, String fileName, PathCategory pathCategory){
