@@ -42,7 +42,6 @@ public class DataSeeder {
         if(category == null){
             category = Category.builder()
                     .name("/all")
-                    .level(0)
                     .build();
 
             categoryRepository.save(category);

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.springframework.org/schema/data/jaxb"
+      th:replace="~{masterLayout :: layout(~{::title}, ~{::content}, ~{::headContent})}">
+<head>
+    <headContent>
+        <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/css/modal.css}">
+        <link rel="stylesheet" href="http://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.js"></script>
+
+        <script src="http://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/css/iziModal.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/js/iziModal.min.js"></script>
+        <script th:src="@{/js/DataTablesAccess.js}"></script>
+
+    <title>Categories</title>
+    </headContent>
+</head>
+<body>
+<content>
+    <!--for ajax request    -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+    <div th:replace="sidebar :: left_sidebar"></div>
+
+    <div id="content">
+
+        <div th:replace="navbar :: navbar"></div>
+        <div class="user-text">Categories</div>
+
+        <div style="padding: 30px;">
+            <table id="itemsTable" class="display" style="width:100%;">
+                <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody id="items-table-body">
+                <th:block th:each="category : ${categories}">
+                    <tr th:id="|ctg-${category.id}|" th:parent_id="${category.parent_id}">
+                        <td col="id" th:text="${category.id}"></td>
+                        <td col="name" th:text="${category.name}"></td>
+                        <td>
+                            <th:block th:if="${category.parent_id != null}">
+                                <button class="submit" type="submit" th:onclick="|editCategory(${category.id})|">Edit</button>
+                                <button class="submit" style="background-color: #BB281A;" type="submit">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </th:block>
+                        </td>
+                    </tr>
+                </th:block>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Action</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+
+    <div id="editModal">
+        <div class="modal-body">
+            <input name="id" type="hidden">
+            <div class="form-group">
+                <label class="form-label">Category Name</label>
+                <input name="name" class="form-input" style="width: 100%;" type="text">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Parent</label>
+                <select name="parent_id" class="form-input" style="width: 100%;"></select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button id="edit-close-btn" type="button" class="btn btn-outline-primary">Close</button>
+            <button id="submit-edit" type="button" class="btn btn-primary">update</button>
+        </div>
+    </div>
+
+    <script>
+
+        Dropzone.autoDiscover = false;
+        let select2Superior = null;
+        let tableAccess = null;
+        let select_superior = null;
+
+        function getRealName(name) {
+
+            let len = name.length;
+            for(let i = len-1; i > -1; i--){
+                if(name[i] == '/'){
+                    return name.substr(i+1);
+                }
+            }
+
+        }
+
+        function editCategory(id){
+
+            let target = $('#editModal');
+            target.iziModal({
+                title : 'Edit',
+                width : screen.width*0.2,
+                height : screen.height*0.4,
+                closeButton : true,
+                fullScreen : true,
+                history: false,
+                onOpening : function (modal) {
+                    $('#edit-close-btn').click(function () {
+                        console.log('asd');
+                        $('.iziModal-button-close').click();
+                    });
+
+                    $('#submit-edit').click(function () {
+                        let source = $('#editModal');
+                        var data = {
+                            'id' : id,
+                            'new_name' : source.find('input[name=\"name\"]').val(),
+                            'new_parent_id' : source.find('select[name=\"parent_id\"]').val()
+                        };
+
+                        $.ajax({
+                            type : 'POST',
+                            url: '/category/edit',
+                            data : JSON.stringify(data),
+                            contentType : "application/json; charset=utf-8",
+                            success : function (response) {
+
+                                if(response['status'] == 'success'){
+                                    let categories = response['categories'];
+                                    let len = categories.length;
+                                    for(let i=0; i < len; i++){
+                                        tableAccess.setColValueByRowId(categories[i]['id'],'name',categories[i]['name']);
+                                        tableAccess.getRowById(categories[i]['id']).attr('parent_id',categories[i]['parent_id']);
+                                    }
+                                }
+                                else{
+                                    toastMessage('error','Error','Something Wrong :(');
+                                }
+                                $('.iziModal-button-close').click();
+                            },
+                            error : function () {
+                                toastMessage('error','Error','Something Wrong :(');
+                                $('.iziModal-button-close').click();
+                            }
+                        });
+
+
+                    });
+
+                },
+                onClosed : function (modal) {
+                    select_superior.html('');
+                    select_superior.select2('destroy');
+                    target.iziModal('destroy');
+                }
+
+            });
+
+            target.find('input[name=\"name\"]').val(
+                this.getRealName(tableAccess.getColByRowId(id,'name').text())
+            );
+
+            select_superior = $('#editModal select[name=\"parent_id\"]');
+
+            let res = tableAccess.getAll();
+            let len = res.length;
+
+            for(let i = 0; i < len; i++){
+                select_superior.append(
+                    '<option value=\"'+res[i][0]+'\">'+res[i][1]+'</option>'
+                );
+            }
+
+            let par_id = tableAccess.getRowById(id).attr('parent_id');
+
+            $('#editModal select[name=\"parent_id\"] option').each(function () {
+               let tmp = $(this).val();
+               if(par_id == tmp){
+                   $(this).attr('selected','selected');
+               }
+               else{
+                   $(this).removeAttr('selected');
+               }
+            });
+            // redraw
+            select2Superior = select_superior.select2({
+                selectOnClose : false
+            });
+            target.iziModal('open');
+        }
+
+        function deleteCategory(id){
+
+        }
+
+
+        $(document).ready(function() {
+            tableAccess = new DTAccess($('#itemsTable').DataTable(),'ctg-',3);
+
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content')
+                }
+            });
+
+        });
+
+	</script>
+</content>
+</body>
+</html> 
