@@ -4,7 +4,7 @@ import com.bliblifuture.Invenger.ModelMapper.user.UserMapper;
 import com.bliblifuture.Invenger.Utils.MyUtils;
 import com.bliblifuture.Invenger.annotation.imp.PasswordValdator;
 import com.bliblifuture.Invenger.annotation.imp.PhoneValidator;
-import com.bliblifuture.Invenger.model.Position;
+import com.bliblifuture.Invenger.model.user.Position;
 import com.bliblifuture.Invenger.model.user.User;
 import com.bliblifuture.Invenger.model.user.RoleType;
 import com.bliblifuture.Invenger.repository.PositionRepository;

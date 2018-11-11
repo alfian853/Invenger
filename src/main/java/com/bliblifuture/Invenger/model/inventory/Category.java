@@ -1,10 +1,9 @@
-package com.bliblifuture.Invenger.model;
+package com.bliblifuture.Invenger.model.inventory;
 
 
 import com.bliblifuture.Invenger.Utils.PostgreArrayType;
 import com.bliblifuture.Invenger.repository.category.CategoryWithChildId;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;

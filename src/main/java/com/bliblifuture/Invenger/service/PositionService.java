@@ -1,6 +1,6 @@
 package com.bliblifuture.Invenger.service;
 
-import com.bliblifuture.Invenger.model.Position;
+import com.bliblifuture.Invenger.model.user.Position;
 import com.bliblifuture.Invenger.repository.PositionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

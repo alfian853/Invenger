@@ -1,7 +1,7 @@
 package com.bliblifuture.Invenger.seeder;
 
-import com.bliblifuture.Invenger.model.Category;
-import com.bliblifuture.Invenger.model.Position;
+import com.bliblifuture.Invenger.model.inventory.Category;
+import com.bliblifuture.Invenger.model.user.Position;
 import com.bliblifuture.Invenger.model.user.User;
 import com.bliblifuture.Invenger.model.user.RoleType;
 import com.bliblifuture.Invenger.repository.PositionRepository;

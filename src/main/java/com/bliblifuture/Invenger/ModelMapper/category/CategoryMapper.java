@@ -1,6 +1,6 @@
 package com.bliblifuture.Invenger.ModelMapper.category;
 
-import com.bliblifuture.Invenger.model.Category;
+import com.bliblifuture.Invenger.model.inventory.Category;
 import com.bliblifuture.Invenger.response.viewDto.CategoryDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
