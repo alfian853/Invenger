@@ -10,7 +10,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.4.3/css/foundation.min.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.js"></script>
-        
+
         <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/1.10.19/js/dataTables.foundation.min.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/css/iziModal.min.css">
@@ -51,7 +51,7 @@
                             <th:block th:if="${category.parent_id != null}">
                                 <button class="submit" type="submit" id="categoryButton">Add</button>
                                 <button class="submit" type="submit" th:onclick="|editCategory(${category.id})|">Edit</button>
-                                <button class="submit" style="background-color: #BB281A;" type="submit">
+                                <button class="submit" type="submit" th:onclick="|deleteCategory(${category.id})|" style="background-color: #BB281A;">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </th:block>
@@ -224,7 +224,19 @@
         }
 
         function deleteCategory(id){
-
+            $.ajax({
+                type : "POST",
+                url : '/category/delete',
+                contentType: "application/json",
+                dataType: 'json',
+                data: {id : id},
+                success: function (response) {
+                    toastMessage('success', 'Success', 'Category removed');
+                },
+                error: function () {
+                    toastMessage('error','Error','Something Wrong :(');
+                }
+            });
         }
 
         $(document).ready(function() {
@@ -250,6 +262,7 @@
 
             $('form#create-category-form').submit(function (e) {
                 e.preventDefault();
+                var form = new FormData(this);
                 $.ajax({
                     url: "[[@{/category/create}]]",
                     type: 'POST',
@@ -267,7 +280,7 @@
                             response['category_id'],
                             [   response['category_id'],
                                 form.get('name'),
-                                '<button class="submit" type="submit" id="categoryButton">Add</button><button class="submit" type="submit" th:onclick="|editCategory(${category.id})|">Edit</button><button class="submit" style="background-color: #BB281A;" type="submit"><i class="fas fa-trash"></i></button>'
+                                '<button class="submit" type="submit" th:onclick="|addCategory(${category.id})|">Add</button><button class="submit" type="submit" th:onclick="|editCategory(${category.id})|">Edit</button><button class="submit" style="background-color: #BB281A;" type="submit"><i class="fas fa-trash"></i></button>'
                             ],
                             [
                                 'id',
