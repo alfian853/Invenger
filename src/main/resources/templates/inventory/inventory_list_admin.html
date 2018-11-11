@@ -79,9 +79,11 @@
                             <button class="submit" type="submit">
                                 <i class="fas fa-archive"></i>
                             </button>
-                            <button class="submit" type="submit">
-                                <i class="fas fa-print"></i>
-                            </button>
+                            <a target="_blank" th:href="${'/inventory/detail/' + inventory.id + '/download'}">
+                                <button class="submit" type="submit">
+                                    <i class="fas fa-print"></i>
+                                </button>
+                            </a>
                             <button class="submit" style="background-color: #BB281A;" type="submit">
                                 <i class="fas fa-trash"></i>
                             </button>
@@ -176,7 +178,6 @@
 
     <script>
         Dropzone.autoDiscover = false;
-
         function loadInventoryDetail(idInventory){
 
             $('#inventory-detail-modal').iziModal({

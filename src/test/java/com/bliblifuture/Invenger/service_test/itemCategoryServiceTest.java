@@ -1,5 +1,5 @@
 package com.bliblifuture.Invenger.service_test;
-import com.bliblifuture.Invenger.model.Category;
+import com.bliblifuture.Invenger.model.inventory.Category;
 import com.bliblifuture.Invenger.repository.category.CategoryRepository;
 import com.bliblifuture.Invenger.repository.category.CategoryWithChildId;
 import com.bliblifuture.Invenger.request.jsonRequest.CategoryCreateRequest;
