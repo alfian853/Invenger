@@ -5,17 +5,20 @@
     <headContent>
         <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}">
         <link rel="stylesheet" type="text/css" th:href="@{/css/modal.css}">
-        <link rel="stylesheet" href="http://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.foundation.min.css">
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.4.3/css/foundation.min.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.js"></script>
 
-        <script src="http://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+        <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.10.19/js/dataTables.foundation.min.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/css/iziModal.min.css">
         <script src="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/js/iziModal.min.js"></script>
         <script th:src="@{/js/DataTablesAccess.js}"></script>
 
-    <title>Categories</title>
+        <title>Categories</title>
     </headContent>
 </head>
 <body>
@@ -47,6 +50,7 @@
                         <td col="name" th:text="${category.name}"></td>
                         <td>
                             <th:block th:if="${category.parent_id != null}">
+                                <button class="submit" type="submit" id="categoryButton">Add</button>
                                 <button class="submit" type="submit" th:onclick="|editCategory(${category.id})|">Edit</button>
                                 <button class="submit" style="background-color: #BB281A;" type="submit">
                                     <i class="fas fa-trash"></i>
@@ -57,11 +61,11 @@
                 </th:block>
                 </tbody>
                 <tfoot>
-                    <tr>
-                        <th>Id</th>
-                        <th>Name</th>
-                        <th>Action</th>
-                    </tr>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Action</th>
+                </tr>
                 </tfoot>
             </table>
         </div>
@@ -83,6 +87,27 @@
         <div class="modal-footer">
             <button id="edit-close-btn" type="button" class="btn btn-outline-primary">Close</button>
             <button id="submit-edit" type="button" class="btn btn-primary">update</button>
+        </div>
+    </div>
+    <div id="categoryModal">
+        <div class="modal-body">
+            <form id="create-category-form">
+                <div class="form-group">
+                    <label class="form-label">Category Name</label><br>
+                    <input id="ctg-new-name" class="form-input" style="width: 100%;" type="text" name="">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category Parent</label><br>
+                    <select id="select-parent-ctg" class="form-input" style="width: 100%;">
+                        <th:block th:each="category : ${categories}">
+                            <option th:value="${category.id}" th:text="${category.name}">Option i</option>
+                        </th:block>
+                    </select>
+                </div>
+                <div class="form-action">
+                    <button id="submit-new-ctg" class="submit">Add Category</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -203,9 +228,20 @@
 
         }
 
-
         $(document).ready(function() {
             tableAccess = new DTAccess($('#itemsTable').DataTable(),'ctg-',3);
+
+            $('#categoryModal').iziModal({
+                title : 'Create Item Category',
+                width : screen.width*0.2,
+                height : screen.height*0.9,
+                closeButton : true,
+                fullScreen : true,
+                history: false,
+                onClosed : function (modal) {
+                    $('#categoryModal form')[0].reset();
+                }
+            });
 
             $.ajaxSetup({
                 headers: {
@@ -213,9 +249,53 @@
                 }
             });
 
+            $('form#create-category-form').submit(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: "[[@{/category/create}]]",
+                    type: 'POST',
+                    contentType : "application/json; charset=utf-8",
+                    data : JSON.stringify({
+                        "name": $('#ctg-new-name').val(),
+                        "parent_id": $('#select-parent-ctg').val()
+                    }),
+                    success: function (response) {
+                        $('#select-parent-ctg').append(
+                            '<option value="'+response["new-category"]["id"]+'">'+
+                            response['new-category']['name']+'</option>'
+                        );
+                        tableAccess.addData(
+                            response['category_id'],
+                            [   response['category_id'],
+                                form.get('name'),
+                                form.get('parent_id'),
+                                '<button class="submit" type="submit" id="categoryButton">Add</button><button class="submit" type="submit" th:onclick="|editCategory(${category.id})|">Edit</button><button class="submit" style="background-color: #BB281A;" type="submit"><i class="fas fa-trash"></i></button>'
+                            ],
+                            [
+                                'id',
+                                'name',
+                                'parent_id'
+                            ]
+                        );
+                        toastMessage('success', 'Success', 'New category added');
+                        listCategory[response['new-category']['id']] = response['new-category']['name'];
+                        $('#categoryModal').iziModal('close');
+                    }
+                }).fail(function (xhr, error, thrownError) {
+                    toastMessage('error', 'Error', 'Something wrong');
+                });
+            });
+
+            $("#categoryButton").click(function(){
+                $("#categoryModal").iziModal('open');
+            });
+            $("#close0").click(function(){
+                $("#categoryModal").hide();
+            });
+
         });
 
-	</script>
+    </script>
 </content>
 </body>
 </html> 
