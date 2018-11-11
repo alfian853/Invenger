@@ -267,13 +267,11 @@
                             response['category_id'],
                             [   response['category_id'],
                                 form.get('name'),
-                                form.get('parent_id'),
                                 '<button class="submit" type="submit" id="categoryButton">Add</button><button class="submit" type="submit" th:onclick="|editCategory(${category.id})|">Edit</button><button class="submit" style="background-color: #BB281A;" type="submit"><i class="fas fa-trash"></i></button>'
                             ],
                             [
                                 'id',
                                 'name',
-                                'parent_id'
                             ]
                         );
                         toastMessage('success', 'Success', 'New category added');
