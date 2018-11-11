@@ -1,22 +1,21 @@
 package com.bliblifuture.Invenger.controller;
 
-import com.bliblifuture.Invenger.Utils.PdfGeneratorUtil;
 import com.bliblifuture.Invenger.model.inventory.InventoryType;
 import com.bliblifuture.Invenger.request.formRequest.InventoryCreateRequest;
 import com.bliblifuture.Invenger.request.formRequest.InventoryEditRequest;
 import com.bliblifuture.Invenger.response.jsonResponse.InventoryCreateResponse;
+import com.bliblifuture.Invenger.response.jsonResponse.InventoryDocDownloadResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.Invenger.service.InventoryService;
 import com.bliblifuture.Invenger.service.ItemCategoryService;
 import com.bliblifuture.Invenger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.Map;
 
 
 @Controller
@@ -30,17 +29,6 @@ public class InventoryController {
 
     @Autowired
     UserService userService;
-
-    @Autowired
-    PdfGeneratorUtil pdfGeneratorUtil;
-
-    @RequestMapping("/inventory/print")
-    public String printPdf() throws Exception{
-        Map<String,String> data = new HashMap<>();
-        data.put("myName","Nuzha");
-        pdfGeneratorUtil.createPdf("greeting", data);
-        return "/greeting";
-    }
 
     @GetMapping("/inventory/all")
     public String getInventoryTable(Model model){
@@ -92,5 +80,18 @@ public class InventoryController {
             return "inventory/inventory_detail_basic";
         }
     }
+
+    @GetMapping("/inventory/detail/{id}/download")
+    public String downloadInventoryDocument(@PathVariable("id") Integer id) {
+        InventoryDocDownloadResponse response = inventoryService.downloadItemDetail(id);
+        if(response.isSuccess()){
+            return "redirect:"+response.getInventoryDocUrl();
+        }
+        else{
+            return "";
+        }
+
+    }
+
 
 }

@@ -1,18 +1,20 @@
 package com.bliblifuture.Invenger.service;
 
 import com.bliblifuture.Invenger.ModelMapper.inventory.InventoryMapper;
-import com.bliblifuture.Invenger.ModelMapper.inventory.InventoryMapperImpl;
-import com.bliblifuture.Invenger.ModelMapper.lendment.LendmentMapper;
 import com.bliblifuture.Invenger.Utils.MyUtils;
 import com.bliblifuture.Invenger.model.inventory.Inventory;
-import com.bliblifuture.Invenger.model.Category;
+import com.bliblifuture.Invenger.model.inventory.Category;
+import com.bliblifuture.Invenger.model.inventory.InventoryDocument;
+import com.bliblifuture.Invenger.repository.InventoryDocRepository;
 import com.bliblifuture.Invenger.repository.InventoryRepository;
 import com.bliblifuture.Invenger.repository.category.CategoryRepository;
 import com.bliblifuture.Invenger.request.formRequest.InventoryCreateRequest;
 import com.bliblifuture.Invenger.request.formRequest.InventoryEditRequest;
 import com.bliblifuture.Invenger.response.jsonResponse.InventoryCreateResponse;
+import com.bliblifuture.Invenger.response.jsonResponse.InventoryDocDownloadResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.Invenger.response.viewDto.InventoryDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FilenameUtils;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,12 +24,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
 public class InventoryService {
-
-
 
     @Autowired
     InventoryRepository inventoryRepository;
@@ -39,10 +40,14 @@ public class InventoryService {
     CategoryRepository categoryRepository;
 
     @Autowired
+    InventoryDocRepository inventoryDocRepository;
+
+    @Autowired
     MyUtils myUtils;
 
-    private final InventoryMapper mapper = Mappers.getMapper(InventoryMapper.class);
+    private final static String PDF_TEMPLATE = "inventory/pdf_template";
 
+    private final InventoryMapper mapper = Mappers.getMapper(InventoryMapper.class);
 
 
     public List<InventoryDTO> getAll(){
@@ -94,7 +99,6 @@ public class InventoryService {
     public RequestResponse updateInventory(InventoryEditRequest request){
 
         Inventory inventory = inventoryRepository.getOne(request.getId());
-        System.out.println(request);
         RequestResponse response = new RequestResponse();
         response.setStatusToSuccess();
 
@@ -116,7 +120,6 @@ public class InventoryService {
         if(request.getCategory_id() != null){
             Category category = categoryRepository.getOne(request.getCategory_id());
             inventory.setCategory(category);
-            System.out.println("heheee");
         }
         if(request.getPict() != null){
 
@@ -146,6 +149,62 @@ public class InventoryService {
         inventoryRepository.deleteById(id);
         response.setStatusToSuccess();
         return response;
+    }
+
+    public InventoryDocDownloadResponse downloadItemDetail(Integer id){
+
+        InventoryDocDownloadResponse response = new InventoryDocDownloadResponse();
+
+        Inventory inventory = inventoryRepository.findInventoryById(id);
+        InventoryDocument doc = inventory.getDocument();
+
+        if(doc == null || !doc.getInventoryLastUpdate().equals(inventory.getUpdatedAt()) ){
+
+            InventoryDTO inventoryDTO = this.getById(id);
+
+            ObjectMapper oMapper = new ObjectMapper();
+            Map templateMap = oMapper.convertValue(inventoryDTO, Map.class);
+
+            String filename = fileStorageService.createPdfFromTemplate(
+                    PDF_TEMPLATE,
+                    templateMap,
+                    FileStorageService.PathCategory.INVENTORY_PDF
+            );
+
+            if(filename != null){
+                if(doc != null){
+                    fileStorageService.deleteFile(
+                            doc.getFileName(),
+                            FileStorageService.PathCategory.INVENTORY_PDF
+                    );
+                    doc.setFileName(filename);
+                    doc.setInventoryLastUpdate(inventory.getUpdatedAt());
+                }
+                else{
+                    doc = InventoryDocument.builder()
+                            .inventory(inventoryRepository.getOne(id))
+                            .fileName(filename)
+                            .inventoryLastUpdate(inventory.getUpdatedAt())
+                            .build();
+                }
+
+                inventoryDocRepository.save(doc);
+
+                response.setStatusToSuccess();
+                response.setInventoryDocUrl("/inventory/document/"+filename);
+            }
+            else{
+                response.setStatusToFailed();
+            }
+
+        }
+        else{
+            response.setStatusToSuccess();
+            response.setInventoryDocUrl("/inventory/document/"+doc.getFileName());
+        }
+
+        return response;
+
     }
 
 }

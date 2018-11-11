@@ -12,4 +12,12 @@ public class RequestResponse {
     public void setStatusToSuccess(){
         status = "success";
     }
+    public boolean isSuccess(){
+        return status.equals("success");
+    }
+
+    public boolean isFailed(){
+        return status.equals("failed");
+    }
+
 }

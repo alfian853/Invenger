@@ -1,7 +1,6 @@
 package com.bliblifuture.Invenger.model.inventory;
 
 import com.bliblifuture.Invenger.model.AuditModel;
-import com.bliblifuture.Invenger.model.Category;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -37,5 +36,8 @@ public class Inventory extends AuditModel {
     String description;
 
     String type;
+
+    @OneToOne(mappedBy = "inventory",fetch = FetchType.LAZY, optional = false)
+    InventoryDocument document;
 
 }
