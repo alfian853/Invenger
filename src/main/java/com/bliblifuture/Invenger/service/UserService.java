@@ -95,7 +95,7 @@ public class UserService implements UserDetailsService {
             }
         }
 
-        if(response.getStatus().equals("success")){
+        if(response.isSuccess()){
             userRepository.save(newUser);
             response.setUser_id(newUser.getId());
         }

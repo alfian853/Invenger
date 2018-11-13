@@ -124,7 +124,7 @@
 
                 this.on('success',function(file,response){//success get response
                     console.log(response);
-                    if(response['status'] == "success"){
+                    if(response['success']){
                         $('#user-pict').attr('src',response['new_pict_src']);
                         $('#dismiss-modal-pict').trigger('click');
                         $('#user-pict').notify('Photo changed','success',{position : "right top"});

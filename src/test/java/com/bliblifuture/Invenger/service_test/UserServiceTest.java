@@ -151,7 +151,7 @@ public class UserServiceTest {
         UploadProfilePictResponse response = userService.changeProfilePict(mock_getMultipart());
         RequestResponse test = new RequestResponse();
         test.setStatusToFailed();
-        Assert.assertEquals(response.getStatus(), test.getStatus());
+        Assert.assertFalse(response.isSuccess());
         Assert.assertEquals(response.getMessage(), test.getMessage());
         Assert.assertNull(response.getNew_pict_src());
 
@@ -173,7 +173,7 @@ public class UserServiceTest {
         UploadProfilePictResponse response = userService.changeProfilePict(mock_getMultipart());
         RequestResponse test = new RequestResponse();
         test.setStatusToSuccess();
-        Assert.assertEquals(response.getStatus(), test.getStatus());
+        Assert.assertTrue(response.isSuccess());
         Assert.assertEquals(response.getMessage(), test.getMessage());
     }
 
@@ -193,7 +193,7 @@ public class UserServiceTest {
         UploadProfilePictResponse response = userService.changeProfilePict(mock_getMultipart());
         RequestResponse test = new RequestResponse();
         test.setStatusToFailed();
-        Assert.assertEquals(response.getStatus(), test.getStatus());
+        Assert.assertFalse(response.isSuccess());
         Assert.assertEquals(response.getMessage(), test.getMessage());
     }
 

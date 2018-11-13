@@ -57,7 +57,7 @@ public class itemCategoryServiceTest {
 
         CategoryCreateResponse response = categoryService.createCategory(request);
 
-        Assert.assertEquals(response.getStatus(),successResponse.getStatus());
+        Assert.assertTrue(response.isSuccess());
         Assert.assertEquals(response.getCategory().getName(),parent.getName()+"/"+request.getName());
     }
 
@@ -71,7 +71,7 @@ public class itemCategoryServiceTest {
 
         CategoryCreateResponse response = categoryService.createCategory(request);
         System.out.println(response);
-        Assert.assertEquals(response.getStatus(),failedResponse.getStatus());
+        Assert.assertFalse(response.isSuccess());
     }
 
     @Test
@@ -80,7 +80,7 @@ public class itemCategoryServiceTest {
 
         RequestResponse response = categoryService.deleteCategory(PARENT_ID);
 
-        Assert.assertEquals(response.getStatus(),failedResponse.getStatus());
+        Assert.assertFalse(response.isSuccess());
         Assert.assertEquals(response.getMessage(),"Can't delete a record while other records still reference it");
     }
 
@@ -90,7 +90,7 @@ public class itemCategoryServiceTest {
 
         RequestResponse response = categoryService.deleteCategory(PARENT_ID);
 
-        Assert.assertEquals(response.getStatus(),successResponse.getStatus());
+        Assert.assertTrue(response.isSuccess());
     }
 
     private List<CategoryWithChildId> mock_getCategoryParentWithChildOrderById(){
@@ -193,7 +193,7 @@ public class itemCategoryServiceTest {
         request.setNewName("two");
         request.setNewParentId(3);
         CategoryEditResponse response = categoryService.updateCategory(request);
-        Assert.assertEquals(response.getStatus(),"success");
+        Assert.assertTrue(response.isSuccess());
     }
 
     @Test
@@ -207,7 +207,7 @@ public class itemCategoryServiceTest {
         request.setNewName("two");
         request.setNewParentId(4);
         CategoryEditResponse response = categoryService.updateCategory(request);
-        Assert.assertEquals(response.getStatus(),"failed");
+        Assert.assertFalse(response.isSuccess());
     }
 
 

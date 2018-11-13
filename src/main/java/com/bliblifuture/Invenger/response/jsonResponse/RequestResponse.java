@@ -3,21 +3,17 @@ package com.bliblifuture.Invenger.response.jsonResponse;
 import lombok.Data;
 @Data
 public class RequestResponse {
-    String status="";
+    Boolean success = false;
     String message="";
 
     public void setStatusToFailed(){
-        status = "failed";
+        success = false;
     }
     public void setStatusToSuccess(){
-        status = "success";
+        success = true;
     }
     public boolean isSuccess(){
-        return status.equals("success");
-    }
-
-    public boolean isFailed(){
-        return status.equals("failed");
+        return this.success;
     }
 
 }
