@@ -175,7 +175,7 @@ Documentation
             data: JSON.stringify(data),
             contentType : "application/json; charset=utf-8",
             success: function(response){
-                if(response['status'] === 'success'){
+                if(response['success']){
                     let len = items.length;
                     for(let i = 0; i < len; i++){
                         let id = items[i]['id'];

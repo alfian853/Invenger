@@ -94,7 +94,7 @@
                             contentType : "application/json; charset=utf-8",
                             success: function(response){
                                 console.log(response);
-                                if(response['status'] === 'success'){
+                                if(response['success']){
                                     toastMessage('success','Success',response['message']);
                                     for(let i=0 ; i<len; i++){
                                         lTableAccess.setColValueByRowId(inventories_id[i],'is-returned',true);
@@ -106,7 +106,7 @@
                                     lTableAccess.deselectAll();
                                 }
                                 else{
-                                    toastMessage('error','Error','Something wrong :(');
+                                    toastMessage('error','Error',response['message']);
                                 }
                             },
                             cache: false,
