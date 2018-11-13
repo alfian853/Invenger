@@ -5,6 +5,8 @@ import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -21,11 +23,15 @@ public class Inventory extends AuditModel {
     Integer id;
 
     String image;//image filename
+
+    @Column(unique = true)
     String name;
 
+    @Min(value = 0)
     int quantity;
 
     //in idr exchange rate
+    @Min(0)
     int price;
 
     @ManyToOne(fetch = FetchType.LAZY,optional = false)
@@ -35,6 +41,7 @@ public class Inventory extends AuditModel {
     @Column(columnDefinition = "text")
     String description;
 
+    @NotEmpty
     String type;
 
     @OneToOne(mappedBy = "inventory",fetch = FetchType.LAZY, optional = false)

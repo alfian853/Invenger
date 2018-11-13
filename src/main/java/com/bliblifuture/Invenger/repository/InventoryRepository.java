@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface InventoryRepository extends JpaRepository<Inventory,Integer> {
 
@@ -15,4 +17,6 @@ public interface InventoryRepository extends JpaRepository<Inventory,Integer> {
     @Query("select i from Inventory i join fetch i.document where i.id = :id")
     InventoryDocument findInventoryByIdFetchDocument(@Param("id") Integer id);
 
+    @Query("select i from Inventory i join fetch i.category")
+    List<Inventory> findAllFetchCategory();
 }
