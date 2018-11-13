@@ -69,8 +69,16 @@
             </table>
         </div>
     </div>
-
-
+    <div id="deleteModal">
+        <div class="modal-body">
+            <input name="id" type="hidden">
+            <div>Are you sure you want to delete category?</div>
+        </div>
+        <div class="modal-footer">
+            <button id="delete-close-btn" type="button" class="btn btn-outline-primary">No</button>
+            <button id="confirm-delete" type="button" class="btn btn-primary">Yes</button>
+        </div>
+    </div>
     <div id="editModal">
         <div class="modal-body">
             <input name="id" type="hidden">
@@ -224,19 +232,52 @@
         }
 
         function deleteCategory(id){
-            $.ajax({
-                type : "POST",
-                url : '/category/delete',
-                contentType: "application/json",
-                dataType: 'json',
-                data: {id : id},
-                success: function (response) {
-                    toastMessage('success', 'Success', 'Category removed');
+            let target = $('#deleteModal');
+            target.iziModal({
+                title : 'Delete',
+                width : screen.width*0.2,
+                height : screen.height*0.4,
+                closeButton : true,
+                fullScreen : true,
+                history: false,
+                onOpening : function (modal) {
+                    $('#delete-close-btn').click(function () {
+                        console.log('asd');
+                        $('.iziModal-button-close').click();
+                    });
+
+                    $('#confirm-delete').click(function () {
+                        let source = $('#deleteModal');
+                        var data = {
+                            'id' : id
+                        };
+                        $.ajax({
+                            type : "POST",
+                            url : '/category/delete',
+                            data : JSON.stringify(data),
+                            contentType : "application/json; charset=utf-8",
+                            dataType: 'json',
+                            success: function (response) {
+                                toastMessage('success', 'Success', 'Category removed');
+                            },
+                            error: function () {
+                                toastMessage('error','Error','Something Wrong :(');
+                            }
+                        });
+                    });
+
                 },
-                error: function () {
-                    toastMessage('error','Error','Something Wrong :(');
+                onClosed : function (modal) {
+                    select_superior.html('');
+                    select_superior.select2('destroy');
+                    target.iziModal('destroy');
                 }
+
             });
+            select2Superior = select_superior.select2({
+                selectOnClose : false
+            });
+            target.iziModal('open');
         }
 
         $(document).ready(function() {
@@ -308,4 +349,4 @@
     </script>
 </content>
 </body>
-</html> 
+</html>
