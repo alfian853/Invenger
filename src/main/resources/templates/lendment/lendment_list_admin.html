@@ -136,13 +136,13 @@
                             type: "POST",
                             url: "/lendment/handover/"+id,
                             success: function(response){
-                                if(response['status'] === 'success'){
+                                if(response['success']){
                                     tableAccess.setColValueByRowId(id,'status',response['lendment_status']);
                                     $(btn).remove();
                                     toastMessage('success','Success','Status changed');
                                 }
                                 else{
-                                    toastMessage('error','Error','Something wrong :(');
+                                    toastMessage('error','Error',response['message']);
                                 }
                             },
                             cache: false,

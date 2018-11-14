@@ -1,6 +1,8 @@
 package com.bliblifuture.Invenger.service;
 
 import com.bliblifuture.Invenger.ModelMapper.lendment.LendmentMapper;
+import com.bliblifuture.Invenger.exception.DataNotFoundException;
+import com.bliblifuture.Invenger.exception.InvalidRequestException;
 import com.bliblifuture.Invenger.model.inventory.Inventory;
 import com.bliblifuture.Invenger.model.lendment.Lendment;
 import com.bliblifuture.Invenger.model.lendment.LendmentDetail;
@@ -10,7 +12,6 @@ import com.bliblifuture.Invenger.repository.InventoryRepository;
 import com.bliblifuture.Invenger.repository.LendmentDetailRepository;
 import com.bliblifuture.Invenger.repository.LendmentRepository;
 import com.bliblifuture.Invenger.repository.UserRepository;
-import com.bliblifuture.Invenger.request.jsonRequest.LendmentHandOverRequest;
 import com.bliblifuture.Invenger.request.jsonRequest.LendmentCreateRequest;
 import com.bliblifuture.Invenger.request.jsonRequest.LendmentReturnRequest;
 import com.bliblifuture.Invenger.response.jsonResponse.HandOverResponse;
@@ -69,10 +70,11 @@ public class LendmentService {
         int itemSize = request.getItems().size();
         for(int i = 0;i < itemSize; ++i){
             Inventory inventory = inventoryRepository.findInventoryById( request.getChildIdAt(i) );
+
             if(request.getChildQuantityAt(i) > inventory.getQuantity()){
-                throw new Exception();
+                throw new InvalidRequestException(inventory.getName()+" is not Available");
             }
-            System.out.println(lendment.getId()+" "+inventory.getId());
+
             inventory.setQuantity(inventory.getQuantity() - request.getChildQuantityAt(i) );
             detailsList.add(
               LendmentDetail.builder()
@@ -88,6 +90,7 @@ public class LendmentService {
 
         lendmentDetailRepository.saveAll(detailsList);
         response.setStatusToSuccess();
+
         return response;
 
     }
@@ -100,14 +103,20 @@ public class LendmentService {
         return mapper.toLendmentDtoList(lendmentRepository.findAllByUserId(userService.getSessionUser().getId()) );
     }
 
-    public LendmentDTO getById(Integer id){
-        return mapper.toLendmentDTO(lendmentRepository.findById(id).get());
+    public LendmentDTO getById(Integer id) throws Exception {
+        Lendment lendment = lendmentRepository.findLendmentById(id);
+        if(lendment == null){
+            throw new DataNotFoundException("Lendment Not Found");
+        }
+        return mapper.toLendmentDTO(lendment);
     }
 
-    public List<LendmentDetailDTO> getLendmentDetailById(Integer id){
-        return mapper.toLendmentDetailDtoList(
-                lendmentDetailRepository.findAllByLendmentId(id)
-        );
+    public List<LendmentDetailDTO> getLendmentDetailById(Integer id) throws Exception {
+        List<LendmentDetail> details = lendmentDetailRepository.findAllByLendmentId(id);
+        if(details.size() == 0){
+            throw new DataNotFoundException("Lendment not Found");
+        }
+        return mapper.toLendmentDetailDtoList(details);
     }
 
     public List<LendmentDTO> getAllLendmentRequest(){
@@ -158,8 +167,13 @@ public class LendmentService {
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public RequestResponse approveLendmentRequest(Integer id) throws Exception {
         Lendment lendment = lendmentRepository.findLendmentById(id);
+
+        if(lendment == null){
+            throw new DataNotFoundException("Lendment Not Found");
+        }
+
         if(!lendment.getStatus().equals(LendmentStatus.WaitingForApproval.getDesc())){
-            throw new Exception();
+            throw new InvalidRequestException("Lendment had been approved");
         }
 
         lendment.setStatus(LendmentStatus.WaitingForPickUp.getDesc());
@@ -175,7 +189,7 @@ public class LendmentService {
     public HandOverResponse handOverOrderItems(Integer id) throws Exception {
         Lendment lendment = lendmentRepository.findLendmentById(id);
         if(!lendment.getStatus().equals(LendmentStatus.WaitingForPickUp.getDesc())){
-            throw new Exception();
+//            throw new Exception();
         }
 
         lendment.setStatus(LendmentStatus.InLending.getDesc());
@@ -184,6 +198,10 @@ public class LendmentService {
         HandOverResponse response = new HandOverResponse();
         response.setStatusToSuccess();
         response.setLendmentStatus(LendmentStatus.InLending.getDesc());
+
+        if(lendment.getId().equals(id)){
+            throw new DataNotFoundException("huhuhuhuhu");
+        }
 
         return response;
 

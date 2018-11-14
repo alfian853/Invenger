@@ -247,7 +247,7 @@
                             contentType : "application/json; charset=utf-8",
                             success : function (response) {
 
-                                if(response['status'] == 'success'){
+                                if(response['success']){
                                     let categories = response['categories'];
                                     let len = categories.length;
                                     for(let i=0; i < len; i++){
@@ -256,7 +256,7 @@
                                     }
                                 }
                                 else{
-                                    toastMessage('error','Error','Something Wrong :(');
+                                    toastMessage('error','Error',response['message']);
                                 }
                                 $('.iziModal-button-close').click();
                             },

@@ -1,5 +1,6 @@
 package com.bliblifuture.Invenger.controller;
 
+import com.bliblifuture.Invenger.exception.DataNotFoundException;
 import com.bliblifuture.Invenger.model.inventory.InventoryType;
 import com.bliblifuture.Invenger.request.formRequest.InventoryCreateRequest;
 import com.bliblifuture.Invenger.request.formRequest.InventoryEditRequest;
@@ -10,7 +11,6 @@ import com.bliblifuture.Invenger.service.InventoryService;
 import com.bliblifuture.Invenger.service.ItemCategoryService;
 import com.bliblifuture.Invenger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -47,20 +47,14 @@ public class InventoryController {
 
     @PostMapping("/inventory/create")
     @ResponseBody
-    public InventoryCreateResponse addNewInventory(@Valid @ModelAttribute InventoryCreateRequest request){
+    public InventoryCreateResponse addNewInventory(@Valid @ModelAttribute InventoryCreateRequest request) throws Exception {
         return inventoryService.createInventory(request);
     }
 
     @PostMapping("/inventory/edit")
     @ResponseBody
-    public RequestResponse editInventory(@Valid @ModelAttribute InventoryEditRequest request){
-        try {
-            return inventoryService.updateInventory(request);
-        } catch (Exception e) {
-            RequestResponse response = new RequestResponse();
-            response.setStatusToFailed();
-            return response;
-        }
+    public RequestResponse editInventory(@Valid @ModelAttribute InventoryEditRequest request) throws Exception {
+        return inventoryService.updateInventory(request);
     }
 
     @PostMapping("/inventory/delete/{id}")
@@ -70,7 +64,7 @@ public class InventoryController {
     }
 
     @GetMapping("/inventory/detail/{id}")
-    public String getInventoryDetail(Model model, @PathVariable("id") Integer id){
+    public String getInventoryDetail(Model model, @PathVariable("id") Integer id) throws Exception {
         model.addAttribute("inventory", inventoryService.getById(id));
         model.addAttribute("itemTypes", InventoryType.getAllType());
         if(userService.currentUserIsAdmin()){
@@ -82,15 +76,9 @@ public class InventoryController {
     }
 
     @GetMapping("/inventory/detail/{id}/download")
-    public String downloadInventoryDocument(@PathVariable("id") Integer id) {
+    public String downloadInventoryDocument(@PathVariable("id") Integer id) throws Exception {
         InventoryDocDownloadResponse response = inventoryService.downloadItemDetail(id);
-        if(response.isSuccess()){
-            return "redirect:"+response.getInventoryDocUrl();
-        }
-        else{
-            return "";
-        }
-
+        return "redirect:"+response.getInventoryDocUrl();
     }
 
 

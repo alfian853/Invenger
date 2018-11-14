@@ -13,6 +13,7 @@ public class InventoryCreateRequest {
     @NotEmpty(message = "Please fill name field")
     String name;
 
+    @NotNull
     MultipartFile photo_file;
 
     @NotNull

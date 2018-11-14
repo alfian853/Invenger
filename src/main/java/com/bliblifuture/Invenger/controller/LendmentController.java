@@ -34,15 +34,8 @@ public class LendmentController {
 
     @PostMapping("lendment/create")
     @ResponseBody
-    public RequestResponse assignItemToUser(@Valid @RequestBody LendmentCreateRequest request){
-        try {
-            return lendmentService.createLendment(request);
-        } catch (Exception e) {
-            e.printStackTrace();
-            RequestResponse response = new RequestResponse();
-            response.setStatusToFailed();
-            return response;
-        }
+    public RequestResponse assignItemToUser(@Valid @RequestBody LendmentCreateRequest request) throws Exception {
+        return lendmentService.createLendment(request);
     }
 
     @GetMapping("lendment/all")
@@ -70,19 +63,12 @@ public class LendmentController {
 
     @PostMapping("lendment/approve/{id}")
     @ResponseBody
-    public RequestResponse doApprovement(@PathVariable("id") Integer lendmentId){
-        try {
-            return lendmentService.approveLendmentRequest(lendmentId);
-        } catch (Exception e) {
-            e.printStackTrace();
-            RequestResponse response = new RequestResponse();
-            response.setStatusToFailed();
-            return response;
-        }
+    public RequestResponse doApprovement(@PathVariable("id") Integer lendmentId) throws Exception {
+        return lendmentService.approveLendmentRequest(lendmentId);
     }
 
     @GetMapping("lendment/detail/{id}")
-    public String getLendment(@PathVariable("id") Integer id,Model model){
+    public String getLendment(@PathVariable("id") Integer id,Model model) throws Exception {
 
         model.addAttribute("lendment_detail",
                 lendmentService.getLendmentDetailById(id));
@@ -112,15 +98,8 @@ public class LendmentController {
 
     @PostMapping("lendment/handover/{id}")
     @ResponseBody
-    public RequestResponse doHandOver(@PathVariable("id") Integer lendmentId){
-        try {
-            return lendmentService.handOverOrderItems(lendmentId);
-        } catch (Exception e) {
-            e.printStackTrace();
-            RequestResponse response = new RequestResponse();
-            response.setStatusToFailed();
-            return response;
-        }
+    public RequestResponse doHandOver(@PathVariable("id") Integer lendmentId) throws Exception {
+        return lendmentService.handOverOrderItems(lendmentId);
     }
 
 

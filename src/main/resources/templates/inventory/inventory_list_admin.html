@@ -189,8 +189,14 @@
                 history: false,
                 onOpening : function (modal) {
                     modal.startLoading();
-                    $.get('/inventory/detail/'+idInventory,function (html) {
-                        $('#inventory-detail-modal .iziModal-content').html(html);
+                    $.get('/inventory/detail/'+idInventory,function (html, textStatus, xhr) {
+                        console.log(xhr.status);
+                        if(xhr.status == 200){
+                            $('#inventory-detail-modal .iziModal-content').html(html);
+                        }
+                        else{
+                            toastMessage('error','Error',html['message']);
+                        }
                         modal.stopLoading();
                     }).fail(function (file,response) {
                         modal.stopLoading();

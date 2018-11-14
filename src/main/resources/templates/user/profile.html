@@ -124,13 +124,13 @@
 
                 this.on('success',function(file,response){//success get response
                     console.log(response);
-                    if(response['status'] == "success"){
+                    if(response['success']){
                         $('#user-pict').attr('src',response['new_pict_src']);
                         $('#dismiss-modal-pict').trigger('click');
                         $('#user-pict').notify('Photo changed','success',{position : "right top"});
                     }
                     else{
-                        //pesan error
+                        toastMessage('error','Error','Failed to attach file');
                     }
                 });
                 this.on('error',function (file,response) {
@@ -195,7 +195,7 @@
                     console.log(response);
 
                     if(response['new-telp'] != null){
-                        if(response['new-telp']['status'] == 'success'){
+                        if(response['new-telp']['success']){
                             $('input[name="telp"]').notify(
                                 response['new-telp']['message'],
                                 'success',
@@ -214,7 +214,7 @@
 
 					}
 					if(response['password'] != null){
-					    if(response['password']['status'] == 'success'){
+					    if(response['password']['success']){
                             $('#pwd-field').slideUp();
                             $('input[name="old-pwd"]').val("");
                             $('input[name="new-pwd1"]').val("");

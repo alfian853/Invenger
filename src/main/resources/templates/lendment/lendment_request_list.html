@@ -102,13 +102,13 @@
                             type: "POST",
                             url: "/lendment/approve/"+id,
                             success: function(response){
-                                if(response['status'] === 'success'){
+                                if(response['success']){
                                     tableAccess.removeRowById(id);
                                     console.log(tableAccess.getAll());
                                     toastMessage('success','Success','Request approved');
                                 }
                                 else{
-                                    toastMessage('error','Error','Something wrong :(');
+                                    toastMessage('error','Error',response['message']);
                                 }
                             },
                             cache: false,

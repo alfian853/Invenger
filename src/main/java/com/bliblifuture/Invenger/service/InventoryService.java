@@ -2,6 +2,8 @@ package com.bliblifuture.Invenger.service;
 
 import com.bliblifuture.Invenger.ModelMapper.inventory.InventoryMapper;
 import com.bliblifuture.Invenger.Utils.MyUtils;
+import com.bliblifuture.Invenger.exception.DataNotFoundException;
+import com.bliblifuture.Invenger.exception.DuplicateEntryException;
 import com.bliblifuture.Invenger.model.inventory.Inventory;
 import com.bliblifuture.Invenger.model.inventory.Category;
 import com.bliblifuture.Invenger.model.inventory.InventoryDocument;
@@ -18,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FilenameUtils;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,14 +54,19 @@ public class InventoryService {
 
 
     public List<InventoryDTO> getAll(){
-        return mapper.toInventoryDtoList(inventoryRepository.findAll());
+        return mapper.toInventoryDtoList(inventoryRepository.findAllFetchCategory());
     }
 
-    public InventoryDTO getById(Integer id){
-        return mapper.toInventoryDto(inventoryRepository.findInventoryById(id));
+    public InventoryDTO getById(Integer id) throws DataNotFoundException {
+        Inventory inventory = inventoryRepository.findInventoryById(id);
+        if(inventory == null){
+            throw new DataNotFoundException("Inventory Not Found");
+        }
+
+        return mapper.toInventoryDto(inventory);
     }
 
-    public InventoryCreateResponse createInventory(InventoryCreateRequest request){
+    public InventoryCreateResponse createInventory(InventoryCreateRequest request) throws DuplicateEntryException {
         InventoryCreateResponse response = new InventoryCreateResponse();
 
         String imgName = UUID.randomUUID().toString().replace("-","")+
@@ -81,14 +89,26 @@ public class InventoryService {
                 imgName,
                 FileStorageService.PathCategory.INVENTORY_PICT)
         ) {
-            inventoryRepository.save(newInventory);
+            try{
+                inventoryRepository.save(newInventory);
+            }
+            catch (DataIntegrityViolationException e){
+                e.printStackTrace();
+
+                if(e.getRootCause().getLocalizedMessage().contains("duplicate")){
+                    throw new DuplicateEntryException("Inventory name already exist");
+                }
+
+                System.out.println(e.getCause().getCause().getLocalizedMessage());
+
+            }
             response.setStatusToSuccess();
         }
         else{
             response.setStatusToFailed();
         }
 
-        if(response.getStatus().equals("success")){
+        if(response.isSuccess()){
             response.setInventory_id(newInventory.getId());
         }
 
@@ -96,9 +116,14 @@ public class InventoryService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public RequestResponse updateInventory(InventoryEditRequest request){
+    public RequestResponse updateInventory(InventoryEditRequest request) throws DataNotFoundException {
 
         Inventory inventory = inventoryRepository.getOne(request.getId());
+
+        if(inventory == null){
+            throw new DataNotFoundException("Inventory Not Found");
+        }
+
         RequestResponse response = new RequestResponse();
         response.setStatusToSuccess();
 
@@ -151,11 +176,14 @@ public class InventoryService {
         return response;
     }
 
-    public InventoryDocDownloadResponse downloadItemDetail(Integer id){
+    public InventoryDocDownloadResponse downloadItemDetail(Integer id) throws Exception {
 
         InventoryDocDownloadResponse response = new InventoryDocDownloadResponse();
 
         Inventory inventory = inventoryRepository.findInventoryById(id);
+        if(inventory == null){
+            throw new DataNotFoundException("Inventory Not Found");
+        }
         InventoryDocument doc = inventory.getDocument();
 
         if(doc == null || !doc.getInventoryLastUpdate().equals(inventory.getUpdatedAt()) ){

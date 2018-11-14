@@ -1,8 +1,8 @@
 package com.bliblifuture.Invenger.controller;
 
 import com.bliblifuture.Invenger.Utils.MyUtils;
-import com.bliblifuture.Invenger.model.user.User;
 import com.bliblifuture.Invenger.model.user.RoleType;
+import com.bliblifuture.Invenger.model.user.User;
 import com.bliblifuture.Invenger.request.formRequest.UserCreateRequest;
 import com.bliblifuture.Invenger.request.formRequest.UserEditRequest;
 import com.bliblifuture.Invenger.request.jsonRequest.ProfileRequest;
@@ -65,7 +65,7 @@ public class UserController {
 
     @PostMapping("/profile")
     @ResponseBody
-    public Map<String,FormFieldResponse> postProfile(@RequestBody ProfileRequest request){
+    public Map<String,FormFieldResponse> postProfile(@RequestBody ProfileRequest request) throws Exception {
         return userService.editProfile(request);
     }
 
@@ -88,29 +88,24 @@ public class UserController {
 
     @PostMapping("/user/create")
     @ResponseBody
-    public UserCreateResponse addNewUser(@Valid @ModelAttribute UserCreateRequest request){
+    public UserCreateResponse addNewUser(@Valid @ModelAttribute UserCreateRequest request) throws Exception {
         return userService.createUser(request);
     }
+
     @PostMapping("/user/edit")
     @ResponseBody
-    public RequestResponse editUser(@Valid @ModelAttribute UserEditRequest request){
-        try {
-            return userService.updateUser(request);
-        } catch (Exception e) {
-            RequestResponse response = new RequestResponse();
-            response.setStatusToFailed();
-            return response;
-        }
+    public RequestResponse editUser(@Valid @ModelAttribute UserEditRequest request) throws Exception {
+        return userService.updateUser(request);
     }
 
     @PostMapping("/user/delete/{id}")
     @ResponseBody
-    public RequestResponse removeUser(@PathVariable("id") Integer id){
+    public RequestResponse removeUser(@PathVariable("id") Integer id) throws Exception {
         return userService.deleteUser(id);
     }
 
     @GetMapping("/user/detail/{id}")
-    public String getUserDetail(Model model, @PathVariable("id") Integer id){
+    public String getUserDetail(Model model, @PathVariable("id") Integer id) throws Exception {
         model.addAttribute("user", userService.getById(id));
         return "user/user_detail";
     }
