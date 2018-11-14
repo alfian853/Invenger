@@ -1,6 +1,7 @@
 package com.bliblifuture.Invenger.service_test;
 
 
+import com.bliblifuture.Invenger.Utils.MyUtils;
 import com.bliblifuture.Invenger.model.user.Position;
 import com.bliblifuture.Invenger.model.user.User;
 import com.bliblifuture.Invenger.repository.PositionRepository;
@@ -10,6 +11,7 @@ import com.bliblifuture.Invenger.response.jsonResponse.UploadProfilePictResponse
 import com.bliblifuture.Invenger.service.FileStorageService;
 import com.bliblifuture.Invenger.service.UserService;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -46,6 +48,9 @@ public class UserServiceTest {
     @Mock
     private FileStorageService storageService;
 
+    @Mock
+    private MyUtils myUtils;
+
     private static String USERNAME = "dummy";
     private static String EMAIL = "dummy@dumail.com";
     private static String PASSWORD = new BCryptPasswordEncoder().encode("password");
@@ -62,6 +67,11 @@ public class UserServiceTest {
             .name("admin")
             .description("none")
             .build();
+
+    @Before
+    public void init(){
+        when(myUtils.getRandomFileName(any())).thenReturn("abcdefg");
+    }
 
     @Test
     public void loadUserByUsername_usernameFound() {
@@ -135,11 +145,10 @@ public class UserServiceTest {
     }
 
     private MultipartFile mock_getMultipart(){
-        MultipartFile file = new MockMultipartFile
-                ("data", "filename.txt",
+        return new MockMultipartFile
+                ("data", "filename.png",
                         "image/png", "".getBytes()
                 );
-        return file;
     }
 
     @Test
