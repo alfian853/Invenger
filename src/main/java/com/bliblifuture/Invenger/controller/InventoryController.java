@@ -78,13 +78,7 @@ public class InventoryController {
     @GetMapping("/inventory/detail/{id}/download")
     public String downloadInventoryDocument(@PathVariable("id") Integer id) throws Exception {
         InventoryDocDownloadResponse response = inventoryService.downloadItemDetail(id);
-        if(response.isSuccess()){
-            return "redirect:"+response.getInventoryDocUrl();
-        }
-        else{
-            return "";
-        }
-
+        return "redirect:"+response.getInventoryDocUrl();
     }
 
 

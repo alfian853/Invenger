@@ -4,6 +4,9 @@ import com.bliblifuture.Invenger.ModelMapper.user.UserMapper;
 import com.bliblifuture.Invenger.Utils.MyUtils;
 import com.bliblifuture.Invenger.annotation.imp.PasswordValdator;
 import com.bliblifuture.Invenger.annotation.imp.PhoneValidator;
+import com.bliblifuture.Invenger.exception.DataNotFoundException;
+import com.bliblifuture.Invenger.exception.DefaultException;
+import com.bliblifuture.Invenger.exception.DuplicateEntryException;
 import com.bliblifuture.Invenger.model.user.Position;
 import com.bliblifuture.Invenger.model.user.User;
 import com.bliblifuture.Invenger.model.user.RoleType;
@@ -21,6 +24,8 @@ import com.bliblifuture.Invenger.response.viewDto.UserDTO;
 import org.apache.commons.io.FilenameUtils;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -51,25 +56,40 @@ public class UserService implements UserDetailsService {
 
     private final UserMapper mapper = Mappers.getMapper(UserMapper.class);
 
-
-//    public List<User> getAll(){
-//        return userRepository.findAll();
-//    }
-
     public List<UserDTO> getAll(){
         return mapper.toUserDtoList(userRepository.findAllFetched());
     }
 
-    public User getById(Integer id){
-        return userRepository.findUserById(id);
+    public User getById(Integer id) throws Exception {
+        User user = userRepository.findUserById(id);
+        if(user == null){
+            throw new DataNotFoundException("User Not Found");
+        }
+        return user;
     }
 
-    public UserCreateResponse createUser(UserCreateRequest request){
+    private void saveUserHandler(User user) throws Exception {
+        try{
+            userRepository.save(user);
+        }
+        catch (DataIntegrityViolationException e){
+            System.out.println(e.getRootCause().getLocalizedMessage());
+            if(e.getRootCause().getLocalizedMessage().contains("duplicate")){
+                if(e.getRootCause().getLocalizedMessage().contains("username")){
+                    throw new DuplicateEntryException("Username already exist");
+                }
+                else{
+                    throw new DuplicateEntryException("Email already exist");
+                }
+            }
+        }
+    }
+
+    public UserCreateResponse createUser(UserCreateRequest request) throws Exception {
         UserCreateResponse response = new UserCreateResponse();
         response.setStatusToSuccess();
 
-        String imgName = UUID.randomUUID().toString().replace("-","")+
-                "."+ FilenameUtils.getExtension(request.getProfile_photo().getOriginalFilename());
+        String imgName = myUtils.getRandomFileName(request.getProfile_photo());
 
         Position newPosition = new Position();
         newPosition.setId(request.getPosition_id());
@@ -96,15 +116,15 @@ public class UserService implements UserDetailsService {
         }
 
         if(response.isSuccess()){
-            userRepository.save(newUser);
+            this.saveUserHandler(newUser);
             response.setUser_id(newUser.getId());
         }
-
+        response.setMessage("User Added to System");
         return response;
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public RequestResponse updateUser(UserEditRequest request){
+    public RequestResponse updateUser(UserEditRequest request) throws Exception {
 
         User user = userRepository.getOne(request.getId());
         System.out.println(request);
@@ -149,13 +169,24 @@ public class UserService implements UserDetailsService {
             user.setPictureName("default-pict.png");
         }
 
-        userRepository.save(user);
+        this.saveUserHandler(user);
+
         return response;
     }
 
-    public RequestResponse deleteUser(Integer id){
+    public RequestResponse deleteUser(Integer id) throws Exception {
         RequestResponse response = new RequestResponse();
-        userRepository.deleteById(id);
+        try{
+            userRepository.deleteById(id);
+        }
+        catch(Exception e){
+            if(e instanceof EmptyResultDataAccessException){
+                throw new DataNotFoundException("User Doesn\'t Exists!");
+            }
+            else{
+                throw new DefaultException("Internal Server Error");
+            }
+        }
         response.setStatusToSuccess();
         return response;
     }
@@ -183,8 +214,7 @@ public class UserService implements UserDetailsService {
     }
 
     public boolean currentUserIsAdmin(){
-        boolean isAdmin = RoleType.isEqual(RoleType.ROLE_ADMIN, this.getSessionUser().getRole());
-        return isAdmin;
+        return RoleType.isEqual(RoleType.ROLE_ADMIN, this.getSessionUser().getRole());
     }
 
     public ProfileDTO getProfile(){
@@ -206,7 +236,7 @@ public class UserService implements UserDetailsService {
                 .build();
     }
 
-    public Map<String,FormFieldResponse> editProfile(ProfileRequest request){
+    public Map<String,FormFieldResponse> editProfile(ProfileRequest request) throws Exception {
         User user = null;
         Map<String,FormFieldResponse> formResponses = new HashMap<>();
         FormFieldResponse formResponse = null;
@@ -276,7 +306,7 @@ public class UserService implements UserDetailsService {
             }
             if(myUtils.matches(request.getOldPwd(),user.getPassword() )){
                 user.setPassword(myUtils.getBcryptHash(newPassword));
-                userRepository.save(user);
+                this.saveUserHandler(user);
                 formResponse.setField_name("old-pwd");
                 formResponse.setStatusToSuccess();
                 formResponse.setMessage("Change password success");
@@ -323,7 +353,6 @@ public class UserService implements UserDetailsService {
 
             }
             else {
-                System.out.println("delete fileee");
                 fileStorageService.deleteFile(fileName, FileStorageService.PathCategory.PROFILE_PICT);
                 response.setStatusToFailed();
             }

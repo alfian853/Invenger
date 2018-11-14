@@ -28,6 +28,7 @@ public class UserCreateRequest {
     @NotEmpty
     String password;
 
+    @NotNull
     MultipartFile profile_photo;
 
     @NotNull

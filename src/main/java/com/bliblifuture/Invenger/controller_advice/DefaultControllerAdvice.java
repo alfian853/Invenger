@@ -16,12 +16,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @ControllerAdvice
 public class DefaultControllerAdvice {
 
+    @ExceptionHandler(Exception.class)
+    @RequestMapping(produces = "application/vnd.error+json")
+    public ResponseEntity<RequestResponse> DefaultExceptionHandler(Exception exception){
+
+        exception.printStackTrace();
+
+        RequestResponse response = new RequestResponse();
+        response.setStatusToFailed();
+        response.setMessage(exception.getMessage());
+        if(response.getMessage() == null){
+            response.setMessage("Internal Server Error!");
+        }
+        HttpHeaders headers = new HttpHeaders();
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        return new ResponseEntity<>(response, headers,status);
+    }
+
     @ExceptionHandler(DataNotFoundException.class)
     @RequestMapping(produces = "application/vnd.error+json")
     public ResponseEntity<RequestResponse> DataNotFoundExceptionHandler(DataNotFoundException exception){
 
-//        exception.printStackTrace();
-        System.out.println("welcomee");
+        exception.printStackTrace();
+
         RequestResponse response = new RequestResponse();
         response.setStatusToFailed();
         response.setMessage(exception.getMessage());
@@ -34,7 +51,6 @@ public class DefaultControllerAdvice {
     @RequestMapping(produces = "application/vnd.error+json")
     public ResponseEntity<RequestResponse> duplicateEntryExceptionHandler(DefaultException exception){
 
-        System.out.println("welcome for advice");
         exception.printStackTrace();
 
         RequestResponse response = new RequestResponse();
@@ -44,6 +60,9 @@ public class DefaultControllerAdvice {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         return new ResponseEntity<>(response, headers,status);
     }
+
+
+
 
 
 
