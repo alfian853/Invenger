@@ -69,7 +69,7 @@
             </table>
         </div>
     </div>
-    <div id="deleteModal">
+    <div id="deleteModal" style="display: none">
         <div class="modal-body">
             <input name="id" type="hidden">
             <div>Are you sure you want to delete category?</div>
@@ -79,7 +79,7 @@
             <button id="confirm-delete" type="button" class="btn btn-primary">Yes</button>
         </div>
     </div>
-    <div id="editModal">
+    <div id="editModal" style="display: none">
         <div class="modal-body">
             <input name="id" type="hidden">
             <div class="form-group">
@@ -97,7 +97,7 @@
         </div>
     </div>
 
-    <div id="addModal">
+    <div id="addModal" style="display: none">
         <div class="modal-body">
             <input name="id" type="hidden">
             <div class="form-group">
@@ -153,7 +153,6 @@
                 history: false,
                 onOpening : function (modal) {
                     $('#add-close-btn').click(function () {
-                        console.log('123');
                         $('.iziModal-button-close').click();
                     });
 
@@ -170,19 +169,24 @@
                             data : JSON.stringify(data),
                             contentType : "application/json; charset=utf-8",
                             success : function (response) {
-                                tableAccess.addData(
-                                    response['category_id'],
-                                    [   response['category_id'],
-                                        form.get('name'),
-                                        '<button class="submit" type="submit" th:onclick="|addCategory(${category.id})|">Add</button><button class="submit" type="submit" th:onclick="|editCategory(${category.id})|">Edit</button><button class="submit" style="background-color: #BB281A;" type="submit"><i class="fas fa-trash"></i></button>'
-                                    ],
-                                    [
-                                        'id',
-                                        'name',
-                                    ]
-                                );
-                                toastMessage('success', 'Success', 'New category added');
-                                listCategory[response['new-category']['id']] = response['new-category']['name'];
+                                if(response['success']){
+                                    tableAccess.addData(
+                                        response['category_id'],
+                                        [   response['category_id'],
+                                            form.get('name'),
+                                            '<button class="submit" type="submit" th:onclick="|addCategory(${category.id})|">Add</button><button class="submit" type="submit" th:onclick="|editCategory(${category.id})|">Edit</button><button class="submit" style="background-color: #BB281A;" type="submit"><i class="fas fa-trash"></i></button>'
+                                        ],
+                                        [
+                                            'id',
+                                            'name',
+                                        ]
+                                    );
+                                    toastMessage('success', 'Success', 'New category added');
+                                    listCategory[response['new-category']['id']] = response['new-category']['name'];
+                                }
+                                else{
+                                    toastMessage('error', 'Error', response['message']);
+                                }
                                 $('#categoryModal').iziModal('close');
                             },
                             error : function () {
@@ -196,23 +200,15 @@
 
                 },
                 onClosed : function (modal) {
-                    select_superior.html('');
-                    select_superior.select2('destroy');
                     target.iziModal('destroy');
                 }
 
             });
 
-            let par_id = tableAccess.getRowById(id).attr('name');
-
             target.find('input[name=\"parent_id\"]').val(
-                this.getRealName(tableAccess.getColByRowId(id,'name').text())
+                tableAccess.getColByRowId(id,'name').text()
             );
 
-            // redraw
-            select2Superior = select_superior.select2({
-                selectOnClose : false
-            });
             target.iziModal('open');
         }
 
@@ -228,7 +224,6 @@
                 history: false,
                 onOpening : function (modal) {
                     $('#edit-close-btn').click(function () {
-                        console.log('asd');
                         $('.iziModal-button-close').click();
                     });
 
@@ -327,40 +322,47 @@
                     });
 
                     $('#confirm-delete').click(function () {
-                        let source = $('#deleteModal');
-                        var data = {
-                            'id' : id
-                        };
                         $.ajax({
                             type : "POST",
-                            url : '/category/delete',
-                            data : JSON.stringify(data),
-                            contentType : "application/json; charset=utf-8",
-                            dataType: 'json',
+                            url : '/category/delete/'+id,
+
                             success: function (response) {
-                                toastMessage('success', 'Success', 'Category removed');
+                                if(response['success']){
+                                    toastMessage('success', 'Success', response['message']);
+                                }
+                                else{
+                                    toastMessage('error','Error',response['message']);
+                                }
+                                $('.iziModal-button-close').click();
+
                             },
-                            error: function () {
-                                toastMessage('error','Error','Something Wrong :(');
+                            error: function (xhr) {
+                                let response = JSON.parse(xhr.responseText);
+                                toastMessage('error','Error',response['message']);
+                                $('.iziModal-button-close').click();
                             }
+                        }).fail(function (response) {
+                            console.log(response);
                         });
                     });
 
                 },
                 onClosed : function (modal) {
-                    select_superior.html('');
-                    select_superior.select2('destroy');
                     target.iziModal('destroy');
                 }
 
             });
-            select2Superior = select_superior.select2({
-                selectOnClose : false
-            });
+
             target.iziModal('open');
         }
 
+        $(document).ready(function() {
 
+
+
+
+
+        });
 
     </script>
 </content>

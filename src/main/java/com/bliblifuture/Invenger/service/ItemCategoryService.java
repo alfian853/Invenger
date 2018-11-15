@@ -2,6 +2,8 @@ package com.bliblifuture.Invenger.service;
 
 import com.bliblifuture.Invenger.ModelMapper.category.CategoryMapper;
 import com.bliblifuture.Invenger.ModelMapper.category.CategoryMapperImpl;
+import com.bliblifuture.Invenger.exception.DataNotFoundException;
+import com.bliblifuture.Invenger.exception.InvalidRequestException;
 import com.bliblifuture.Invenger.model.inventory.Category;
 import com.bliblifuture.Invenger.repository.category.CategoryRepository;
 import com.bliblifuture.Invenger.repository.category.CategoryWithChildId;
@@ -12,6 +14,7 @@ import com.bliblifuture.Invenger.response.jsonResponse.CategoryEditResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.Invenger.response.viewDto.CategoryDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -174,18 +177,28 @@ public class ItemCategoryService {
         return response;
     }
 
-    public RequestResponse deleteCategory(int id){
+    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
+    public RequestResponse deleteCategory(int id) throws Exception {
         RequestResponse response = new RequestResponse();
         if(categoryRepository.existsByParentId(id)){
-            response.setStatusToFailed();
-            response.setMessage("Can't delete a record while other records still reference it");
-            return response;
+            throw new InvalidRequestException("Can't delete a record while other records still reference it");
         }
         else{
-            categoryRepository.deleteById(id);
-            response.setStatusToSuccess();
-            return response;
+            try{
+                categoryRepository.deleteById(id);
+            }
+            catch(Exception e){
+                e.printStackTrace();
+                if(e instanceof EmptyResultDataAccessException){
+                    throw new DataNotFoundException("Category Doesn\'t Exists!");
+                }
+            }
         }
+
+        response.setStatusToSuccess();
+        response.setMessage("Item Category Deleted");
+
+        return response;
     }
 
     public List<CategoryDTO> getAllItemCategory(boolean fetchParent){

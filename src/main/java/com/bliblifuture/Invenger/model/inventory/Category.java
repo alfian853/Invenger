@@ -34,6 +34,7 @@ public class Category implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     Integer id;
 
+    @Column(unique = true)
     String name;
 
     @JsonBackReference

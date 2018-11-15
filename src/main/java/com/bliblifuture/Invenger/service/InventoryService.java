@@ -94,12 +94,9 @@ public class InventoryService {
             }
             catch (DataIntegrityViolationException e){
                 e.printStackTrace();
-
                 if(e.getRootCause().getLocalizedMessage().contains("duplicate")){
                     throw new DuplicateEntryException("Inventory name already exist");
                 }
-
-                System.out.println(e.getCause().getCause().getLocalizedMessage());
 
             }
             response.setStatusToSuccess();

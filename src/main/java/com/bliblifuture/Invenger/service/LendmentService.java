@@ -188,8 +188,13 @@ public class LendmentService {
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public HandOverResponse handOverOrderItems(Integer id) throws Exception {
         Lendment lendment = lendmentRepository.findLendmentById(id);
+
+        if(lendment == null){
+            throw new DataNotFoundException("Lendment Not Found");
+        }
+
         if(!lendment.getStatus().equals(LendmentStatus.WaitingForPickUp.getDesc())){
-//            throw new Exception();
+            throw new InvalidRequestException("Invalid Request!");
         }
 
         lendment.setStatus(LendmentStatus.InLending.getDesc());
@@ -198,10 +203,6 @@ public class LendmentService {
         HandOverResponse response = new HandOverResponse();
         response.setStatusToSuccess();
         response.setLendmentStatus(LendmentStatus.InLending.getDesc());
-
-        if(lendment.getId().equals(id)){
-            throw new DataNotFoundException("huhuhuhuhu");
-        }
 
         return response;
 

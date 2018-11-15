@@ -1,4 +1,6 @@
 package com.bliblifuture.Invenger.service_test;
+import com.bliblifuture.Invenger.exception.DataNotFoundException;
+import com.bliblifuture.Invenger.exception.InvalidRequestException;
 import com.bliblifuture.Invenger.model.inventory.Category;
 import com.bliblifuture.Invenger.repository.category.CategoryRepository;
 import com.bliblifuture.Invenger.repository.category.CategoryWithChildId;
@@ -16,11 +18,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.omg.CORBA.DynAnyPackage.Invalid;
+import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
 
@@ -37,13 +42,9 @@ public class itemCategoryServiceTest {
 
     private static int PARENT_ID = 1;
 
-    private RequestResponse successResponse = new RequestResponse();
-    private RequestResponse failedResponse = new RequestResponse();
 
     @Before
     public void initAttribute(){
-        successResponse.setStatusToSuccess();
-        failedResponse.setStatusToFailed();
     }
 
     @Test
@@ -74,18 +75,21 @@ public class itemCategoryServiceTest {
         Assert.assertFalse(response.isSuccess());
     }
 
-    @Test
-    public void deleteCategory_isExistAsParent(){
+    @Test(expected = DataNotFoundException.class)
+    public void deleteCategory_idNotFound() throws Exception {
+//        Not finish yet, need to mock deleteById()
+//        when(categoryRepository.existsByParentId(PARENT_ID)).thenReturn(false);
+//        categoryService.deleteCategory(PARENT_ID);
+    }
+
+    @Test(expected = InvalidRequestException.class)
+    public void deleteCategory_isExistAsParent() throws Exception {
         when(categoryRepository.existsByParentId(PARENT_ID)).thenReturn(true);
-
-        RequestResponse response = categoryService.deleteCategory(PARENT_ID);
-
-        Assert.assertFalse(response.isSuccess());
-        Assert.assertEquals(response.getMessage(),"Can't delete a record while other records still reference it");
+        categoryService.deleteCategory(PARENT_ID);
     }
 
     @Test
-    public void deleteCategory_notExistAsParent(){
+    public void deleteCategory_notExistAsParent() throws Exception {
         when(categoryRepository.existsByParentId(PARENT_ID)).thenReturn(false);
 
         RequestResponse response = categoryService.deleteCategory(PARENT_ID);
