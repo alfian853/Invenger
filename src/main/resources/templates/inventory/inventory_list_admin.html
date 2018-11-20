@@ -16,28 +16,22 @@
         <script src="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/js/iziModal.min.js"></script>
         <script th:src="@{/js/DataTablesAccess.js}"></script>
 
-        <style>
-            tfoot input {
-                padding: 3px;
-                box-sizing: border-box;
-            }
-        </style>
 
         <script th:inline = "javascript">
         var tableAccess = null;
+        let preparedCol = DTAccess.generateColumnSpec([
+            {'col':'id'},
+            {'col':'name'},
+            {'col':'price'},
+            {'col':'quantity'},
+            {'col':'category',"orderable":false},
+            {'col':'type','orderable':false},
+            {'col':'action','orderable':false}
+        ]);
+
 		$(document).ready(function(){
 
-		    let preparedCol = DTAccess.generateColumnSpec([
-                {'col':'id'},
-                {'col':'name'},
-                {'col':'price'},
-                {'col':'quantity'},
-                {'col':'category',"orderable":false},
-                {'col':'type','orderable':false},
-                {'col':'action','orderable':false}
-            ]);
 			var datatables = $('#itemsTable').DataTable({
-                // sDom : '',
                 processing: true,
                 serverSide : true,
                 ajax : {
@@ -70,20 +64,7 @@
                 columns : preparedCol.column,
                 columnDefs : preparedCol.columnDefs
             });
-
-            datatables.columns().every( function () {
-                var that = this;
-
-                $( 'input', this.header() ).on( 'keyup change', function () {
-                    if ( that.search() !== this.value ) {
-                        that
-                            .search( this.value )
-                            .draw();
-                    }
-                } );
-            } );
-
-
+            
             var searchableList = ['id','name'];
 
             for(let i=0;i<searchableList.length;i++){

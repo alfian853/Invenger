@@ -15,12 +15,57 @@
         <script src="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/js/iziModal.min.js"></script>
         <script th:src="@{/js/DataTablesAccess.js}"></script>
 
-
         <script th:inline = "javascript">
+        let preparedCol = DTAccess.generateColumnSpec([
+            {'col':'id'},
+            {'col':'name'},
+            {'col':'price'},
+            {'col':'quantity'},
+            {'col':'category',"orderable":false},
+            {'col':'type','orderable':false},
+            {'col':'action','orderable':false}
+        ]);
 		$(document).ready(function(){
-			var datatables = $('#itemsTable').DataTable();
-		});
+            var datatables = $('#itemsTable').DataTable({
+                processing: true,
+                serverSide : true,
+                ajax : {
+                    'type' : 'GET',
+                    'url' : '/datatables/inventory',
+                    'dataSrc' : function (response) {
+                        console.log("called");
+                        console.log(response);
+                        let len = response.data.length;
+                        let ref = response.data;
+                        for(let i = 0; i<len; i++){
+                            ref[i]['action'] =
+                                '<button class="submit" type="submit" ' +
+                                'onclick="loadInventoryDetail('+ref[i].id+')">Item Detail' +
+                                '</button>'
+                        }
+                        return ref;
+                    }
+                },
+                columns : preparedCol.column,
+                columnDefs : preparedCol.columnDefs
+            });
+
+            var searchableList = ['id','name'];
+
+            for(let i=0;i<searchableList.length;i++){
+                let input = $('#itemsTable input[target-col=\"'+searchableList[i]+'\"]');
+                let target = datatables.column('#itemsTable th[col=\"'+searchableList[i]+'\"]');
+                input.on('keyup change',function () {
+                    if(target.search() !== input.val()){
+                        target.search(input.val()).draw();
+                    }
+                });
+            }
+
+
+        });
         var listCategory = {};
+
         /*[# th:each="category : ${categories}"]*/
 
         listCategory["[(${category.id})]"]=[[${category.name}]];
@@ -49,6 +94,15 @@
             <table id="itemsTable" class="display" style="width:100%;">
                 <thead>
                 <tr>
+                    <th><input type="text" style="width: 60px" placeholder="Id" target-col="id"/></th>
+                    <th><input type="text" placeholder="Name" target-col="name"/></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                <tr>
                     <th>Id</th>
                     <th>Name</th>
                     <th>Price</th>
@@ -59,20 +113,16 @@
                 </tr>
                 </thead>
                 <tbody id="items-table-body">
-                <th:block th:each="inventory : ${inventories}">
-                    <tr th:id="|item-${inventory.id}|">
-                        <td col="id" th:text="${inventory.id}"></td>
-                        <td col="name" th:text="${inventory.name}"></td>
-                        <td col="price" th:text="${inventory.price}"></td>
-                        <td col="quantity" th:text="${inventory.quantity}"></td>
-                        <td col="category" th:text="${inventory.category}"></td>
-                        <td col="type" th:text="${inventory.type}"></td>
-                        <td>
-                            <button class="submit" type="submit" th:onclick="|loadInventoryDetail(${inventory.id})|">Item Detail</button>
-                        </td>
-                    </tr>
-                </th:block>
                 </tbody>
+                <tfoot>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Category</th>
+                    <th>Type</th>
+                    <th>Action</th>
+                </tfoot>
             </table>
         </div>
     </div>
