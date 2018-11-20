@@ -2,7 +2,32 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 </head>
-<body>
-<p th:text="'Hello, ' + ${name} + '!'" />
+<body style="font-family: Calibri; padding: 72px; border: 1px solid black;">
+<div style="font-size: 25px;">
+    <div style="text-align: center; margin-bottom: 20px;">Inventory's Report</div>
+</div>
+<div>
+    <div style="font-size: 16px; clear: left;">
+        <div style="width: 150px; float: left;">Inventory Id</div>
+        <div style="float: left;" th:text="': ' + ${id}"></div>
+    </div>
+    <div style="font-size: 16px; clear: left;">
+        <div style="width: 150px; float: left;">Inventory Name</div>
+        <div style="float: left;" th:text="': ' + ${name}"></div>
+    </div>
+    <div style="font-size: 16px; clear: left;">
+        <div style="width: 150px; float: left;">Price</div>
+        <div style="float: left;" th:text="': ' + ${price}"></div>
+    </div>
+    <div style="font-size: 16px; clear: left;">
+        <div style="width: 150px; float: left;">Quantity</div>
+        <div style="float: left;" th:text="': ' + ${quantity}"></div>
+    </div>
+    <div style="font-size: 16px; clear: left;">
+        <div style="width: 150px; float: left;">Description</div>
+        <div style="float: left;" th:text="': ' + ${description}"></div>
+    </div>
+
+</div>
 </body>
 </html>
