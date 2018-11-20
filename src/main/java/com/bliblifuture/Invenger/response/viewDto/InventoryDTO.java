@@ -1,5 +1,6 @@
 package com.bliblifuture.Invenger.response.viewDto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 
@@ -13,12 +14,13 @@ public class InventoryDTO {
 
     String name;
 
-    int quantity;
-
     //in idr exchange rate
     int price;
 
+    int quantity;
+
     String category;
+
     Integer category_id;
 
     String description;

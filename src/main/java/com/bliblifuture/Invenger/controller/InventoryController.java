@@ -1,10 +1,12 @@
 package com.bliblifuture.Invenger.controller;
 
-import com.bliblifuture.Invenger.exception.DataNotFoundException;
 import com.bliblifuture.Invenger.model.inventory.InventoryType;
+import com.bliblifuture.Invenger.request.datatables.DataTablesRequest;
+import com.bliblifuture.Invenger.response.DataTablesResult;
 import com.bliblifuture.Invenger.request.formRequest.InventoryCreateRequest;
 import com.bliblifuture.Invenger.request.formRequest.InventoryEditRequest;
 import com.bliblifuture.Invenger.response.jsonResponse.InventoryCreateResponse;
+import com.bliblifuture.Invenger.response.jsonResponse.InventoryDataTableResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.InventoryDocDownloadResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.Invenger.service.InventoryService;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 
@@ -32,7 +35,6 @@ public class InventoryController {
 
     @GetMapping("/inventory/all")
     public String getInventoryTable(Model model){
-        model.addAttribute("inventories", inventoryService.getAll());
         model.addAttribute("categories",itemCategoryService.getAllItemCategory(false));
         model.addAttribute("itemTypes", InventoryType.getAllType());
         model.addAttribute("createItemForm",new InventoryCreateRequest());
@@ -80,6 +82,20 @@ public class InventoryController {
         InventoryDocDownloadResponse response = inventoryService.downloadItemDetail(id);
         return "redirect:"+response.getInventoryDocUrl();
     }
+
+    @GetMapping(value = "/datatables/inventory")
+    @ResponseBody
+    public Object fetchAllInventory(HttpServletRequest servletRequest){
+        DataTablesRequest request = new DataTablesRequest(servletRequest);
+        DataTablesResult<InventoryDataTableResponse> result = new DataTablesResult<>();
+        result.setDraw(request.getDraw());
+        result.setListOfDataObjects(inventoryService.getPaginatedDatatablesInventoryList(request));
+        result.setRecordsFiltered((int) inventoryService.countRecord());
+        result.setRecordsTotal(result.getRecordsFiltered());
+        return result;
+    }
+
+
 
 
 }

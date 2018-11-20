@@ -1,18 +1,22 @@
 package com.bliblifuture.Invenger.service;
 
 import com.bliblifuture.Invenger.ModelMapper.inventory.InventoryMapper;
+import com.bliblifuture.Invenger.Utils.DataTablesUtils;
 import com.bliblifuture.Invenger.Utils.MyUtils;
+import com.bliblifuture.Invenger.Utils.QuerySpec;
 import com.bliblifuture.Invenger.exception.DataNotFoundException;
 import com.bliblifuture.Invenger.exception.DuplicateEntryException;
-import com.bliblifuture.Invenger.model.inventory.Inventory;
 import com.bliblifuture.Invenger.model.inventory.Category;
+import com.bliblifuture.Invenger.model.inventory.Inventory;
 import com.bliblifuture.Invenger.model.inventory.InventoryDocument;
 import com.bliblifuture.Invenger.repository.InventoryDocRepository;
 import com.bliblifuture.Invenger.repository.InventoryRepository;
 import com.bliblifuture.Invenger.repository.category.CategoryRepository;
+import com.bliblifuture.Invenger.request.datatables.DataTablesRequest;
 import com.bliblifuture.Invenger.request.formRequest.InventoryCreateRequest;
 import com.bliblifuture.Invenger.request.formRequest.InventoryEditRequest;
 import com.bliblifuture.Invenger.response.jsonResponse.InventoryCreateResponse;
+import com.bliblifuture.Invenger.response.jsonResponse.InventoryDataTableResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.InventoryDocDownloadResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.Invenger.response.viewDto.InventoryDTO;
@@ -25,7 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -48,6 +52,14 @@ public class InventoryService {
     @Autowired
     MyUtils myUtils;
 
+    DataTablesUtils<Inventory> dataTablesUtils = new DataTablesUtils<>();
+
+    private LocalDateTime inventoriesLastUpdate = LocalDateTime.now();
+
+    private void refreshInventoriesLastUpdate(){
+        inventoriesLastUpdate = LocalDateTime.now();
+    }
+
     private final static String PDF_TEMPLATE = "inventory/pdf_template";
 
     private final InventoryMapper mapper = Mappers.getMapper(InventoryMapper.class);
@@ -56,6 +68,7 @@ public class InventoryService {
     public List<InventoryDTO> getAll(){
         return mapper.toInventoryDtoList(inventoryRepository.findAllFetchCategory());
     }
+
 
     public InventoryDTO getById(Integer id) throws DataNotFoundException {
         Inventory inventory = inventoryRepository.findInventoryById(id);
@@ -89,16 +102,26 @@ public class InventoryService {
                 imgName,
                 FileStorageService.PathCategory.INVENTORY_PICT)
         ) {
-            try{
-                inventoryRepository.save(newInventory);
-            }
-            catch (DataIntegrityViolationException e){
-                e.printStackTrace();
-                if(e.getRootCause().getLocalizedMessage().contains("duplicate")){
-                    throw new DuplicateEntryException("Inventory name already exist");
+            boolean hasError = false;
+            do{
+                try{
+                    inventoryRepository.save(newInventory);
+            hasError = false;
+                    }
+                catch (DataIntegrityViolationException e){
+                    fileStorageService.deleteFile(
+                            imgName,
+                            FileStorageService.PathCategory.INVENTORY_PICT
+                    );
+                    e.printStackTrace();
+//                if(e.getRootCause().getLocalizedMessage().contains("duplicate")){
+//                    throw new DuplicateEntryException("Inventory name already exist");
+//                }
+//                throw e;
+                    hasError = true;
                 }
-
             }
+            while (hasError);
             response.setStatusToSuccess();
         }
         else{
@@ -109,6 +132,7 @@ public class InventoryService {
             response.setInventory_id(newInventory.getId());
         }
 
+        this.refreshInventoriesLastUpdate();
         return response;
     }
 
@@ -163,6 +187,8 @@ public class InventoryService {
 
         inventoryRepository.save(inventory);
 
+        this.refreshInventoriesLastUpdate();
+
         return response;
     }
 
@@ -170,6 +196,9 @@ public class InventoryService {
         RequestResponse response = new RequestResponse();
         inventoryRepository.deleteById(id);
         response.setStatusToSuccess();
+
+        this.refreshInventoriesLastUpdate();
+
         return response;
     }
 
@@ -231,5 +260,25 @@ public class InventoryService {
         return response;
 
     }
+
+    public long countRecord(){
+        return inventoryRepository.count();
+    }
+
+    public List<InventoryDataTableResponse> getPaginatedDatatablesInventoryList(DataTablesRequest request){
+
+        QuerySpec<Inventory> spec = dataTablesUtils.getQuerySpec(request);
+
+        if(spec.getSpecification() == null){
+            return mapper.toInventoryDatatables(inventoryRepository.findAll(spec.getPageRequest()).getContent());
+        }
+        else{
+            return mapper.toInventoryDatatables(
+                    inventoryRepository.findAll(spec.getSpecification(),spec.getPageRequest()).getContent()
+            );
+        }
+    }
+
+
 
 }
