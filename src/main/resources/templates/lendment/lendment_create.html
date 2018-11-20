@@ -17,7 +17,7 @@
         </div>
         <div class="col-md-5">
             <select id="AI-item-select" style="width: 70%">
-                <option></option>
+                <!--<option></option>-->
             </select>
         </div>
         <div class="col-md-2">
@@ -88,25 +88,32 @@ Documentation
 
     var item_select = $('#AI-item-select');
     item_select.select2({
-        selectOnClose : false,
-        placeholder : 'please select item'
+        placeholder : 'please select item',
+        ajax : {
+            url : '/inventory/search',
+            params : null,
+            data : function (params) {
+                let query = {
+                    search : (params.term != null)?params.term:"",
+                    page : params.page || 1,
+                    length : 10
+                };
+                this.params = query;
+                return query;
+            },
+            processResults : function (result) {
+                let params = this['$element'].params;
+                result.pagination = {
+                    more : params.length*params.page < result['recordsFiltered']
+                };
+                return result;
+            }
+        }
     });
-
-    var items = window.tableAccess.getAll();
-    var len = items.length;
-
-    for(let i = 0; i < len; ++i){
-        item_select.append(
-            '<option value=\"'+window.tableAccess.getPrefixLessId(items[i].DT_RowId)+'\" qty=\"'+items[i][3]+'\" '+
-            'ctg=\"'+items[i][4]+'\">'+items[i][1]+'</option>'
-        )
-    }
-
-
 
     $('#AI-users-select').select2({
         selectOnClose : false,
-        placeholder : 'please select item'
+        placeholder : 'type something'
     });
 
     $('#assign-item-add').click(function () {

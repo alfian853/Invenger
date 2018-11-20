@@ -15,21 +15,23 @@ import com.bliblifuture.Invenger.repository.category.CategoryRepository;
 import com.bliblifuture.Invenger.request.datatables.DataTablesRequest;
 import com.bliblifuture.Invenger.request.formRequest.InventoryCreateRequest;
 import com.bliblifuture.Invenger.request.formRequest.InventoryEditRequest;
-import com.bliblifuture.Invenger.response.jsonResponse.InventoryCreateResponse;
-import com.bliblifuture.Invenger.response.jsonResponse.InventoryDataTableResponse;
-import com.bliblifuture.Invenger.response.jsonResponse.InventoryDocDownloadResponse;
-import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
+import com.bliblifuture.Invenger.response.jsonResponse.*;
 import com.bliblifuture.Invenger.response.viewDto.InventoryDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FilenameUtils;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.criteria.Predicate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -103,25 +105,19 @@ public class InventoryService {
                 FileStorageService.PathCategory.INVENTORY_PICT)
         ) {
             boolean hasError = false;
-            do{
-                try{
-                    inventoryRepository.save(newInventory);
-            hasError = false;
-                    }
-                catch (DataIntegrityViolationException e){
-                    fileStorageService.deleteFile(
-                            imgName,
-                            FileStorageService.PathCategory.INVENTORY_PICT
-                    );
-                    e.printStackTrace();
-//                if(e.getRootCause().getLocalizedMessage().contains("duplicate")){
-//                    throw new DuplicateEntryException("Inventory name already exist");
-//                }
-//                throw e;
-                    hasError = true;
-                }
+            try{
+                inventoryRepository.save(newInventory);
             }
-            while (hasError);
+            catch (DataIntegrityViolationException e){
+                fileStorageService.deleteFile(
+                        imgName,
+                        FileStorageService.PathCategory.INVENTORY_PICT
+                );
+                e.printStackTrace();
+            if(e.getRootCause().getLocalizedMessage().contains("duplicate")){
+                throw new DuplicateEntryException("Inventory name already exist");
+            }
+            }
             response.setStatusToSuccess();
         }
         else{
@@ -265,18 +261,47 @@ public class InventoryService {
         return inventoryRepository.count();
     }
 
-    public List<InventoryDataTableResponse> getPaginatedDatatablesInventoryList(DataTablesRequest request){
+    public DataTablesResult<InventoryDataTableResponse> getPaginatedDatatablesInventoryList(
+            DataTablesRequest request){
 
         QuerySpec<Inventory> spec = dataTablesUtils.getQuerySpec(request);
 
+        Page<Inventory> page;
+        DataTablesResult<InventoryDataTableResponse> result = new DataTablesResult<>();
+        System.out.println(spec.getSpecification());
         if(spec.getSpecification() == null){
-            return mapper.toInventoryDatatables(inventoryRepository.findAll(spec.getPageRequest()).getContent());
+            System.out.println("no filter");
+            page = inventoryRepository.findAll(spec.getPageRequest());
         }
         else{
-            return mapper.toInventoryDatatables(
-                    inventoryRepository.findAll(spec.getSpecification(),spec.getPageRequest()).getContent()
-            );
+            System.out.println("has filter");
+            page = inventoryRepository.findAll(spec.getSpecification(),spec.getPageRequest());
         }
+        
+        result.setListOfDataObjects(mapper.toInventoryDatatables(page.getContent()));
+        result.setDraw(Integer.parseInt(request.getDraw()));
+        result.setRecordsFiltered((int) page.getTotalElements());
+        result.setRecordsTotal((int) this.countRecord());
+
+        return result;
+    }
+
+    public SearchResponse getSearchedInventory(String query,Integer pageNum,Integer length){
+        PageRequest pageRequest = PageRequest.of(pageNum,length);
+        Specification<Inventory> specification = (root, criteriaQuery, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("name")), "%" + query.toLowerCase() + "%")
+            );
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+
+        Page<Inventory> page = inventoryRepository.findAll(specification,pageRequest);
+        SearchResponse response = new SearchResponse();
+        response.setResults(mapper.toSearchResultList(page.getContent()));
+        response.setRecordsFiltered((int) page.getTotalElements());
+
+        return response;
     }
 
 

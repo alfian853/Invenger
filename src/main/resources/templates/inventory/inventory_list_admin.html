@@ -45,9 +45,7 @@
                         let ref = response.data;
                         for(let i = 0; i<len; i++){
                             ref[i]['action'] =
-                                '<button class="submit" type="submit" onclick="loadInventoryDetail('+ref[i].id+')">Detail</button>' + '<button class="submit" type="submit">' +
-                                '<i class="fas fa-archive"></i>' +
-                                '</button>' +
+                                '<button class="submit" type="submit" onclick="loadInventoryDetail('+ref[i].id+')">Detail</button>' +
                                 '<a target="_blank" href="/inventory/detail/' + ref[i].id + '/download">' +
                                 '<button class="submit" type="submit">' +
                                 '<i class="fas fa-print"></i>' +
@@ -340,7 +338,8 @@
                                 'price',
                                 'quantity',
                                 'category',
-                                'type'
+                                'type',
+                                'action'
                             ]
                         );
 

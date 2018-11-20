@@ -1,4 +1,4 @@
-package com.bliblifuture.Invenger.response;
+package com.bliblifuture.Invenger.response.jsonResponse;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -8,7 +8,7 @@ import java.util.List;
 @Data
 public class DataTablesResult<T> {
 
-    private String draw;
+    private Integer draw;
 
     private Integer recordsFiltered;
 

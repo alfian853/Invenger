@@ -2,13 +2,9 @@ package com.bliblifuture.Invenger.controller;
 
 import com.bliblifuture.Invenger.model.inventory.InventoryType;
 import com.bliblifuture.Invenger.request.datatables.DataTablesRequest;
-import com.bliblifuture.Invenger.response.DataTablesResult;
+import com.bliblifuture.Invenger.response.jsonResponse.*;
 import com.bliblifuture.Invenger.request.formRequest.InventoryCreateRequest;
 import com.bliblifuture.Invenger.request.formRequest.InventoryEditRequest;
-import com.bliblifuture.Invenger.response.jsonResponse.InventoryCreateResponse;
-import com.bliblifuture.Invenger.response.jsonResponse.InventoryDataTableResponse;
-import com.bliblifuture.Invenger.response.jsonResponse.InventoryDocDownloadResponse;
-import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.Invenger.service.InventoryService;
 import com.bliblifuture.Invenger.service.ItemCategoryService;
 import com.bliblifuture.Invenger.service.UserService;
@@ -19,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.List;
 
 
 @Controller
@@ -83,19 +80,21 @@ public class InventoryController {
         return "redirect:"+response.getInventoryDocUrl();
     }
 
-    @GetMapping(value = "/datatables/inventory")
+    @GetMapping("/datatables/inventory")
     @ResponseBody
-    public Object fetchAllInventory(HttpServletRequest servletRequest){
+    public DataTablesResult<InventoryDataTableResponse> getPaginatedInventories(
+            HttpServletRequest servletRequest){
         DataTablesRequest request = new DataTablesRequest(servletRequest);
-        DataTablesResult<InventoryDataTableResponse> result = new DataTablesResult<>();
-        result.setDraw(request.getDraw());
-        result.setListOfDataObjects(inventoryService.getPaginatedDatatablesInventoryList(request));
-        result.setRecordsFiltered((int) inventoryService.countRecord());
-        result.setRecordsTotal(result.getRecordsFiltered());
-        return result;
+        return inventoryService.getPaginatedDatatablesInventoryList(request);
     }
 
+    @GetMapping("/inventory/search")
+    @ResponseBody
+    public SearchResponse searchInventory(@RequestParam("search")String query,
+                                          @RequestParam("page")Integer page,
+                                          @RequestParam("length")Integer length){
 
-
+        return inventoryService.getSearchedInventory(query,page,length);
+    }
 
 }

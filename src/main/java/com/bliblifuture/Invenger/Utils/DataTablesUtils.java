@@ -1,6 +1,5 @@
 package com.bliblifuture.Invenger.Utils;
 
-import com.bliblifuture.Invenger.model.inventory.Inventory;
 import com.bliblifuture.Invenger.request.datatables.DataTablesColumnSpecs;
 import com.bliblifuture.Invenger.request.datatables.DataTablesRequest;
 import org.springframework.data.domain.PageRequest;
@@ -45,6 +44,7 @@ public class DataTablesUtils<T> {
                 List<Predicate> predicates = new ArrayList<>();
                 for(DataTablesColumnSpecs specs : request.getColumns()){
                     if(specs.isSearchable() && !"".equals(specs.getSearch())){
+                        System.out.println("add spec");
                         predicates.add(
                                 criteriaBuilder.like(
                                         criteriaBuilder.lower(root.get(specs.getName()).as(String.class)),
