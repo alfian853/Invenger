@@ -3,21 +3,24 @@
       th:replace="~{masterLayout :: layout(~{::title}, ~{::content}, ~{::headContent})}">
 <head>
     <headContent>
-        <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}">
-        <link rel="stylesheet" type="text/css" th:href="@{/css/modal.css}">
-        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.foundation.min.css">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/modal.css}">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.foundation.min.css">
 
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.4.3/css/foundation.min.css">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.js"></script>
-        <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-        <script src="https://cdn.datatables.net/1.10.19/js/dataTables.foundation.min.js"></script>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/css/iziModal.min.css">
-        <script src="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/js/iziModal.min.js"></script>
-        <script th:src="@{/js/DataTablesAccess.js}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.4.3/css/foundation.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.js"></script>
+    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.19/js/dataTables.foundation.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/css/iziModal.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/js/iziModal.min.js"></script>
+    <script th:src="@{/js/DataTablesAccess.js}"></script>
 
+    <style>
+        .dataTables_filter, .dataTables_info { display: none; }
+    </style>
 
-        <script th:inline = "javascript">
+    <script th:inline = "javascript">
         var tableAccess = null;
         let preparedCol = DTAccess.generateColumnSpec([
             {'col':'id'},
@@ -29,23 +32,20 @@
             {'col':'action','orderable':false}
         ]);
 
-		$(document).ready(function(){
+        $(document).ready(function(){
 
-			var datatables = $('#itemsTable').DataTable({
+            var datatables = $('#itemsTable').DataTable({
                 processing: true,
                 serverSide : true,
                 ajax : {
                     'type' : 'GET',
                     'url' : '/datatables/inventory',
                     'dataSrc' : function (response) {
-                        console.log("called");
-                        console.log(response);
                         let len = response.data.length;
                         let ref = response.data;
                         for(let i = 0; i<len; i++){
                             ref[i]['action'] =
-                                '<button class="submit" type="submit" onclick="loadInventoryDetail('+ref[i].id+')">Item Detail</button>' +
-                                '<button class="submit" type="submit">' +
+                                '<button class="submit" type="submit" onclick="loadInventoryDetail('+ref[i].id+')">Detail</button>' + '<button class="submit" type="submit">' +
                                 '<i class="fas fa-archive"></i>' +
                                 '</button>' +
                                 '<a target="_blank" href="/inventory/detail/' + ref[i].id + '/download">' +
@@ -58,32 +58,32 @@
                                 '</button>'
 
                         }
-                       return ref;
+                        return ref;
                     }
                 },
                 columns : preparedCol.column,
                 columnDefs : preparedCol.columnDefs
             });
-            
+
             var searchableList = ['id','name'];
 
             for(let i=0;i<searchableList.length;i++){
                 let input = $('#itemsTable input[target-col=\"'+searchableList[i]+'\"]');
                 let target = datatables.column('#itemsTable th[col=\"'+searchableList[i]+'\"]');
                 input.on('keyup change',function () {
-                   if(target.search() !== input.val()){
-                       target.search(input.val()).draw();
-                   }
+                    if(target.search() !== input.val()){
+                        target.search(input.val()).draw();
+                    }
                 });
             }
 
-			tableAccess = new DTAccess(datatables,'row_',7);
+            tableAccess = new DTAccess(datatables,'row_',7);
 
-		});
-		/*[- will be initilize in the next script below -]*/
-		var listCategory = {};
+        });
+        /*[- will be initilize in the next script below -]*/
+        var listCategory = {};
     </script>
-	<title>Inventory</title>
+    <title>Inventory</title>
 
     </headContent>
 </head>
@@ -100,7 +100,6 @@
         <div th:replace="navbar :: navbar"></div>
         <div class="user-text">Inventory</div>
         <div style="margin-left: 22px;">
-            <button class="btn" id="categoryBtn">Category</button>
             <button class="btn" id="itemBtn">Item</button>
             <button class="btn" id="assignItemBtn">Assign Item to User</button>
         </div>
@@ -130,15 +129,15 @@
                 <tbody id="items-table-body" style="font-size: 15px;">
                 </tbody>
                 <tfoot>
-                    <tr>
-                        <th>Id</th>
-                        <th>Name</th>
-                        <th>Price</th>
-                        <th>Quantity</th>
-                        <th>Category</th>
-                        <th>Type</th>
-                        <th>Action</th>
-                    </tr>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Category</th>
+                    <th>Type</th>
+                    <th>Action</th>
+                </tr>
                 </tfoot>
             </table>
         </div>
@@ -244,21 +243,21 @@
 
             // init listCategory
             $('select[name=\"category_id\"] option').each(function () {
-				listCategory[$(this).val()] = $(this).text();
+                listCategory[$(this).val()] = $(this).text();
             });
 
-			$('#assignItemBtn').click(function () {
-			    console.log('clicked');
-				$('#assign-item-modal').iziModal({
-					title : 'Assign Item to User',
-					width : screen.width*0.6,
-					height : screen.height,
-					closeButton : true,
-					fullScreen : true,
-					history : false,
-					onOpening : function (modal) {
-						modal.startLoading();
-						$.get('/lendment/create',function (html) {
+            $('#assignItemBtn').click(function () {
+                console.log('clicked');
+                $('#assign-item-modal').iziModal({
+                    title : 'Assign Item to User',
+                    width : screen.width*0.6,
+                    height : screen.height,
+                    closeButton : true,
+                    fullScreen : true,
+                    history : false,
+                    onOpening : function (modal) {
+                        modal.startLoading();
+                        $.get('/lendment/create',function (html) {
                             $('#assign-item-modal .iziModal-content').html(html);
                             modal.stopLoading();
                         }).fail(function () {
@@ -267,7 +266,7 @@
                             $('.iziModal-button-close').click();
                         });
                     }
-				});
+                });
 
                 $('#assign-item-modal').iziModal('open');
 
@@ -325,7 +324,6 @@
                     url: "[[@{/inventory/create}]]",
                     data: form,
                     success: function(response){
-                        // console.log(response['inventory_id']);
                         tableAccess.addData(
                             response['inventory_id'],
                             [   response['inventory_id'],
@@ -334,7 +332,7 @@
                                 form.get('quantity'),
                                 listCategory[form.get('category_id')],
                                 form.get('type'),
-                                '<button class="submit" type=\"submit\" onclick=loadInventoryDetail('+response['inventory_id']+') >Item Detail</button><button class=\"submit\" type=\"submit\"  ><i class=\"fas fa-archive\"></i></button><button class=\"submit\" type=\"submit\"  ><i class=\"fas fa-print\"></i></button><button class=\"submit\" style=\"background-color: #BB281A;\" type=\"submit\"  ><i class=\"fas fa-trash\"></i></button>'
+                                '<button class="submit" type=\"submit\" onclick=loadInventoryDetail('+response['inventory_id']+') >Detail</button><button class=\"submit\" type=\"submit\"  ><i class=\"fas fa-archive\"></i></button><button class=\"submit\" type=\"submit\"  ><i class=\"fas fa-print\"></i></button><button class=\"submit\" style=\"background-color: #BB281A;\" type=\"submit\"  ><i class=\"fas fa-trash\"></i></button>'
                             ],
                             [
                                 'id',
@@ -347,7 +345,7 @@
                         );
 
                         toastMessage('success','Success','New item added to table');
-						$('#create-item-modal').iziModal('close');
+                        $('#create-item-modal').iziModal('close');
                         uploadFileDZ.removeFile(file_upload);
 
                     },
@@ -362,11 +360,9 @@
                 $('#create-item-modal').iziModal('open');
 
             });
-
-
         });
 
-	</script>
+    </script>
 </content>
 </body>
 </html> 

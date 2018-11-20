@@ -3,19 +3,23 @@
       th:replace="~{masterLayout :: layout(~{::title}, ~{::content}, ~{::headContent})}">
 <head>
     <headContent>
-        <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}">
-        <link rel="stylesheet" type="text/css" th:href="@{/css/modal.css}">
-        <link rel="stylesheet" href="http://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/modal.css}">
+    <link rel="stylesheet" href="http://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
 
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.css">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.js"></script>
 
-        <script src="http://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/css/iziModal.min.css">
-        <script src="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/js/iziModal.min.js"></script>
-        <script th:src="@{/js/DataTablesAccess.js}"></script>
+    <script src="http://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/css/iziModal.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/js/iziModal.min.js"></script>
+    <script th:src="@{/js/DataTablesAccess.js}"></script>
 
-        <script th:inline = "javascript">
+    <style>
+        .dataTables_filter, .dataTables_info { display: none; }
+    </style>
+
+    <script th:inline = "javascript">
         let preparedCol = DTAccess.generateColumnSpec([
             {'col':'id'},
             {'col':'name'},
@@ -25,7 +29,7 @@
             {'col':'type','orderable':false},
             {'col':'action','orderable':false}
         ]);
-		$(document).ready(function(){
+        $(document).ready(function(){
             var datatables = $('#itemsTable').DataTable({
                 processing: true,
                 serverSide : true,
@@ -33,8 +37,6 @@
                     'type' : 'GET',
                     'url' : '/datatables/inventory',
                     'dataSrc' : function (response) {
-                        console.log("called");
-                        console.log(response);
                         let len = response.data.length;
                         let ref = response.data;
                         for(let i = 0; i<len; i++){
@@ -72,8 +74,8 @@
 
         /*[/]*/
 
-        </script>
-	<title>Inventory</title>
+    </script>
+    <title>Inventory</title>
 
     </headContent>
 </head>
@@ -115,13 +117,13 @@
                 <tbody id="items-table-body">
                 </tbody>
                 <tfoot>
-                    <th>Id</th>
-                    <th>Name</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Category</th>
-                    <th>Type</th>
-                    <th>Action</th>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Category</th>
+                <th>Type</th>
+                <th>Action</th>
                 </tfoot>
             </table>
         </div>
@@ -172,7 +174,7 @@
 
         });
 
-	</script>
+    </script>
 </content>
 </body>
 </html> 
