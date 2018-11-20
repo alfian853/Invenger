@@ -10,22 +10,93 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.4.3/css/foundation.min.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.js"></script>
-
-        <!--<script src="https://code.jquery.com/jquery-3.3.1.js"></script>-->
         <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/1.10.19/js/dataTables.foundation.min.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/css/iziModal.min.css">
         <script src="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/js/iziModal.min.js"></script>
         <script th:src="@{/js/DataTablesAccess.js}"></script>
 
+        <style>
+            tfoot input {
+                padding: 3px;
+                box-sizing: border-box;
+            }
+        </style>
 
         <script th:inline = "javascript">
         var tableAccess = null;
 		$(document).ready(function(){
 
-			var datatables = $('#itemsTable').DataTable();
+		    let preparedCol = DTAccess.generateColumnSpec([
+                {'col':'id'},
+                {'col':'name'},
+                {'col':'price'},
+                {'col':'quantity'},
+                {'col':'category',"orderable":false},
+                {'col':'type','orderable':false},
+                {'col':'action','orderable':false}
+            ]);
+			var datatables = $('#itemsTable').DataTable({
+                // sDom : '',
+                processing: true,
+                serverSide : true,
+                ajax : {
+                    'type' : 'GET',
+                    'url' : '/datatables/inventory',
+                    'dataSrc' : function (response) {
+                        console.log("called");
+                        console.log(response);
+                        let len = response.data.length;
+                        let ref = response.data;
+                        for(let i = 0; i<len; i++){
+                            ref[i]['action'] =
+                                '<button class="submit" type="submit" onclick="loadInventoryDetail('+ref[i].id+')">Item Detail</button>' +
+                                '<button class="submit" type="submit">' +
+                                '<i class="fas fa-archive"></i>' +
+                                '</button>' +
+                                '<a target="_blank" href="/inventory/detail/' + ref[i].id + '/download">' +
+                                '<button class="submit" type="submit">' +
+                                '<i class="fas fa-print"></i>' +
+                                '</button>' +
+                                '</a>' +
+                                '<button class="submit" style="background-color: #BB281A;" type="submit">' +
+                                '<i class="fas fa-trash"></i>' +
+                                '</button>'
 
-			tableAccess = new DTAccess(datatables,'item-',7);
+                        }
+                       return ref;
+                    }
+                },
+                columns : preparedCol.column,
+                columnDefs : preparedCol.columnDefs
+            });
+
+            datatables.columns().every( function () {
+                var that = this;
+
+                $( 'input', this.header() ).on( 'keyup change', function () {
+                    if ( that.search() !== this.value ) {
+                        that
+                            .search( this.value )
+                            .draw();
+                    }
+                } );
+            } );
+
+
+            var searchableList = ['id','name'];
+
+            for(let i=0;i<searchableList.length;i++){
+                let input = $('#itemsTable input[target-col=\"'+searchableList[i]+'\"]');
+                let target = datatables.column('#itemsTable th[col=\"'+searchableList[i]+'\"]');
+                input.on('keyup change',function () {
+                   if(target.search() !== input.val()){
+                       target.search(input.val()).draw();
+                   }
+                });
+            }
+
+			tableAccess = new DTAccess(datatables,'row_',7);
 
 		});
 		/*[- will be initilize in the next script below -]*/
@@ -56,65 +127,39 @@
             <table id="itemsTable" class="display" style="width:100%;">
                 <thead>
                 <tr>
-                    <th>Id</th>
-                    <th>Name</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Category</th>
-                    <th>Type</th>
+                    <th><input type="text" style="width: 60px" placeholder="Id" target-col="id"/></th>
+                    <th><input type="text" placeholder="Name" target-col="name"/></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <th col="id">Id</th>
+                    <th col="name">Name</th>
+                    <th col="price">Price</th>
+                    <th col="quantity">Quantity</th>
+                    <th col="category">Category</th>
+                    <th col="type">Type</th>
                     <th>Action</th>
                 </tr>
                 </thead>
+
                 <tbody id="items-table-body" style="font-size: 15px;">
-                <th:block th:each="inventory : ${inventories}">
-                    <tr th:id="|item-${inventory.id}|">
-                        <td col="id" th:text="${inventory.id}"></td>
-                        <td col="name" th:text="${inventory.name}"></td>
-                        <td col="price" th:text="${inventory.price}"></td>
-                        <td col="quantity" th:text="${inventory.quantity}"></td>
-                        <td col="category" th:text="${inventory.category}"></td>
-                        <td col="type" th:text="${inventory.type}"></td>
-                        <td>
-                            <button class="submit" type="submit" th:onclick="|loadInventoryDetail(${inventory.id})|">Item Detail</button>
-                            <button class="submit" type="submit">
-                                <i class="fas fa-archive"></i>
-                            </button>
-                            <a target="_blank" th:href="${'/inventory/detail/' + inventory.id + '/download'}">
-                                <button class="submit" type="submit">
-                                    <i class="fas fa-print"></i>
-                                </button>
-                            </a>
-                            <button class="submit" style="background-color: #BB281A;" type="submit">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                </th:block>
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Category</th>
+                        <th>Type</th>
+                        <th>Action</th>
+                    </tr>
+                </tfoot>
             </table>
-        </div>
-    </div>
-
-
-    <div id="categoryModal">
-        <div class="modal-body">
-            <form id="create-category-form">
-                <div class="form-group">
-                    <label class="form-label">Category Name</label><br>
-                    <input id="ctg-new-name" class="form-input" style="width: 100%;" type="text" name="">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Category Parent</label><br>
-                    <select id="select-parent-ctg" class="form-input" style="width: 100%;">
-                        <th:block th:each="category : ${categories}">
-                            <option th:value="${category.id}" th:text="${category.name}">Option i</option>
-                        </th:block>
-                    </select>
-                </div>
-                <div class="form-action">
-                    <button id="submit-new-ctg" class="submit">Add Category</button>
-                </div>
-            </form>
         </div>
     </div>
 
@@ -174,7 +219,6 @@
     <div id="inventory-detail-modal"></div>
 
     <div id="assign-item-modal"></div>
-
 
     <script>
         Dropzone.autoDiscover = false;
@@ -262,19 +306,6 @@
 
             });
 
-            $('#categoryModal').iziModal({
-                title : 'Create Item Category',
-                width : screen.width*0.2,
-                height : screen.height*0.9,
-                closeButton : true,
-                fullScreen : true,
-                history: false,
-                onClosed : function (modal) {
-                    $('#categoryModal form')[0].reset();
-                }
-            });
-
-
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content')
@@ -346,37 +377,6 @@
 
             });
 
-            $('form#create-category-form').submit(function (e) {
-                e.preventDefault();
-                $.ajax({
-                    url: "[[@{/items/category/create}]]",
-                    type: 'POST',
-                    contentType : "application/json; charset=utf-8",
-                    data : JSON.stringify({
-                        "name": $('#ctg-new-name').val(),
-                        "parent_id": $('#select-parent-ctg').val()
-                    }),
-                    success: function (response) {
-                        $('#select-parent-ctg').append(
-                            '<option value="'+response['new-category']['id']+'">'+
-                            response['new-category']['name']+'</option>'
-                        );
-                        toastMessage('success', 'Success', 'New category added');
-                        listCategory[response['new-category']['id']] = response['new-category']['name'];
-                        $('#categoryModal').iziModal('close');
-                    }
-                }).fail(function (xhr, error, thrownError) {
-                    toastMessage('error', 'Error', 'Something wrong');
-                });
-            });
-
-
-            $("#categoryBtn").click(function(){
-                $("#categoryModal").iziModal('open');
-            });
-            $("#close0").click(function(){
-                $("#categoryModal").hide();
-            });
             $("#itemBtn").click(function(){
                 $('#create-item-modal').iziModal('open');
 
