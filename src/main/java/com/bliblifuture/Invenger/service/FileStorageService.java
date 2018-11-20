@@ -36,7 +36,7 @@ public class FileStorageService {
 
     private final HashMap<PathCategory,String> path = new HashMap<PathCategory,String>(){{
       put(PathCategory.PROFILE_PICT,BASE_PATH+"/profile-pict/");
-      put(PathCategory.INVENTORY_PICT,BASE_PATH+ "/inventory/");
+      put(PathCategory.INVENTORY_PICT,BASE_PATH+ "/inventory/pict/");
       put(PathCategory.INVENTORY_PDF,BASE_PATH+"/inventory/document/");
     }};
 

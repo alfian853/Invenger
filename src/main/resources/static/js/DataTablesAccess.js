@@ -2,7 +2,7 @@
 
 class DTAccess{
 
-    constructor(datatables,row_prefix='row-',column_len){
+    constructor(datatables,row_prefix='row_',column_len){
         this.datatables = datatables;
         this.row_prefix = row_prefix;
         this.column_len = column_len;
@@ -44,7 +44,6 @@ class DTAccess{
             .node().id = this.row_prefix + id;
 
         let target = this.getRowById(id);
-        console.log(target);
         for(let i = 0; i < this.column_len; i++){
             target.find('td:eq('+i+')').attr('col',columns_name[i]);
         }
@@ -68,6 +67,31 @@ class DTAccess{
 
     deselectRowById(id){
         this.datatables.row('#'+this.row_prefix+id).deselect();
+    }
+
+    static generateColumnSpec(listColumn){
+        let len = listColumn.length;
+        let result = {};
+        result.column = [];
+        result.columnDefs = [];
+
+        for(let i = 0; i < len; i++){
+            let tmp = {name : listColumn[i]['col'], mData : listColumn[i]['col'] , data : listColumn[i]['col']};
+            for(let key in listColumn[i]) {
+                if(key !== 'col'){
+                    tmp[key] = listColumn[i][key];
+                }
+            }
+            result.column.push(tmp);
+            result.columnDefs.push({
+                targets : i,
+                createdCell : function (td) {
+                    td.setAttribute('col',listColumn[i]['col']);
+                }
+            });
+        }
+
+        return result;
     }
 
 }
