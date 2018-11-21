@@ -109,4 +109,13 @@ public class UserController {
         model.addAttribute("user", userService.getById(id));
         return "user/user_detail";
     }
+
+    @GetMapping("/user/search")
+    public SearchResponse searchUser(@RequestParam("search")String query,
+                                     @RequestParam("page")Integer page,
+                                     @RequestParam("length")Integer length) {
+
+        return userService.getSearchedUser(query,page,length);
+    }
+
 }

@@ -1,8 +1,10 @@
 package com.bliblifuture.Invenger.ModelMapper.user;
 
 import com.bliblifuture.Invenger.model.user.User;
+import com.bliblifuture.Invenger.response.jsonResponse.SearchResponse;
 import com.bliblifuture.Invenger.response.viewDto.UserDTO;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,5 +26,17 @@ public class UserMapperImpl implements UserMapper {
     @Override
     public List<UserDTO> toUserDtoList(List<User> users) {
         return users.stream().map(this::toUserDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SearchResponse.Item> toSearchResultList(List<User> users) {
+        List<SearchResponse.Item> responses = new LinkedList<>();
+        for(User user : users){
+            responses.add(SearchResponse.Item.builder()
+                    .id(user.getId())
+                    .text(user.getUsername()+" ("+user.getFullName()+")")
+                    .build());
+        }
+        return responses;
     }
 }

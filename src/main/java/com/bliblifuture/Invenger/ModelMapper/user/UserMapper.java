@@ -1,6 +1,7 @@
 package com.bliblifuture.Invenger.ModelMapper.user;
 
 import com.bliblifuture.Invenger.model.user.User;
+import com.bliblifuture.Invenger.response.jsonResponse.SearchResponse;
 import com.bliblifuture.Invenger.response.viewDto.UserDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
@@ -11,4 +12,6 @@ import java.util.List;
 public interface UserMapper {
     UserDTO toUserDto(User user);
     List<UserDTO> toUserDtoList(List<User> users);
+    List<SearchResponse.Item> toSearchResultList(List<User> users);
+
 }

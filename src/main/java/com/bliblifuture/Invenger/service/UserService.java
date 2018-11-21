@@ -7,6 +7,7 @@ import com.bliblifuture.Invenger.annotation.imp.PhoneValidator;
 import com.bliblifuture.Invenger.exception.DataNotFoundException;
 import com.bliblifuture.Invenger.exception.DefaultException;
 import com.bliblifuture.Invenger.exception.DuplicateEntryException;
+import com.bliblifuture.Invenger.model.inventory.Inventory;
 import com.bliblifuture.Invenger.model.user.Position;
 import com.bliblifuture.Invenger.model.user.User;
 import com.bliblifuture.Invenger.model.user.RoleType;
@@ -15,10 +16,7 @@ import com.bliblifuture.Invenger.repository.UserRepository;
 import com.bliblifuture.Invenger.request.formRequest.UserCreateRequest;
 import com.bliblifuture.Invenger.request.formRequest.UserEditRequest;
 import com.bliblifuture.Invenger.request.jsonRequest.ProfileRequest;
-import com.bliblifuture.Invenger.response.jsonResponse.FormFieldResponse;
-import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
-import com.bliblifuture.Invenger.response.jsonResponse.UploadProfilePictResponse;
-import com.bliblifuture.Invenger.response.jsonResponse.UserCreateResponse;
+import com.bliblifuture.Invenger.response.jsonResponse.*;
 import com.bliblifuture.Invenger.response.viewDto.ProfileDTO;
 import com.bliblifuture.Invenger.response.viewDto.UserDTO;
 import org.apache.commons.io.FilenameUtils;
@@ -26,6 +24,9 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -34,10 +35,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import javax.persistence.criteria.Predicate;
+import java.util.*;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -363,6 +362,24 @@ public class UserService implements UserDetailsService {
         }
         return response;
     }
+    public SearchResponse getSearchedUser(String query, Integer pageNum, Integer length) {
 
-    
+        PageRequest pageRequest = PageRequest.of(pageNum,length);
+        Specification<User> specification = (root, criteriaQuery, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("name")), "%" + query.toLowerCase() + "%")
+            );
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+
+        Page<User> page = userRepository.findAll(specification,pageRequest);
+        SearchResponse response = new SearchResponse();
+        response.setResults(mapper.toSearchResultList(page.getContent()));
+        response.setRecordsFiltered((int) page.getTotalElements());
+
+        return response;
+    }
+
+
 }
