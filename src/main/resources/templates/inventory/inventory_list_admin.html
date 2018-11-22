@@ -51,7 +51,7 @@
                                 '<i class="fas fa-print"></i>' +
                                 '</button>' +
                                 '</a>' +
-                                '<button class="submit" style="background-color: #BB281A;" type="submit">' +
+                                '<button class="submit" style="background-color: #BB281A;" type="submit" onclick="deleteInventory('+ref[i].id+')">' +
                                 '<i class="fas fa-trash"></i>' +
                                 '</button>'
 
@@ -198,8 +198,70 @@
 
     <div id="assign-item-modal"></div>
 
+    <div id="deleteModal" style="display: none">
+        <div class="modal-body">
+            <input name="id" type="hidden">
+            <div>Are you sure you want to delete inventory?</div>
+        </div>
+        <div class="modal-footer">
+            <button id="delete-close-btn" type="button" class="btn btn-outline-primary">No</button>
+            <button id="confirm-delete" type="button" class="btn btn-primary">Yes</button>
+        </div>
+    </div>
+
     <script>
         Dropzone.autoDiscover = false;
+
+        function deleteInventory(id){
+            let target = $('#deleteModal');
+            target.iziModal({
+                title : 'Delete',
+                width : screen.width*0.2,
+                height : screen.height*0.4,
+                closeButton : true,
+                fullScreen : true,
+                history: false,
+                onOpening : function (modal) {
+                    $('#delete-close-btn').click(function () {
+                        console.log('asd');
+                        $('.iziModal-button-close').click();
+                    });
+
+                    $('#confirm-delete').click(function () {
+                        $.ajax({
+                            type : "POST",
+                            url : '/inventory/delete/'+id,
+
+                            success: function (response) {
+                                if(response['success']){
+                                    toastMessage('success', 'Success', response['message']);
+                                }
+                                else{
+                                    toastMessage('error','Error',response['message']);
+                                }
+                                $('.iziModal-button-close').click();
+
+                            },
+                            error: function (xhr) {
+                                let response = JSON.parse(xhr.responseText);
+                                toastMessage('error','Error',response['message']);
+                                $('.iziModal-button-close').click();
+                            }
+                        }).fail(function (response) {
+                            console.log(response);
+                        });
+                    });
+
+                },
+                onClosed : function (modal) {
+                    target.iziModal('destroy');
+                }
+
+            });
+
+            target.iziModal('open');
+        }
+
         function loadInventoryDetail(idInventory){
 
             $('#inventory-detail-modal').iziModal({

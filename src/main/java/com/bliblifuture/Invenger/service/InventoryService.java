@@ -189,10 +189,11 @@ public class InventoryService {
         return response;
     }
 
-    public RequestResponse deleteInventory(Integer id){
+    public RequestResponse deleteInventory(int id){
         RequestResponse response = new RequestResponse();
         inventoryRepository.deleteById(id);
         response.setStatusToSuccess();
+        response.setMessage("Item Deleted");
 
         this.refreshInventoriesLastUpdate();
 
