@@ -27,8 +27,7 @@ public class LendmentController {
     InventoryService inventoryService;
 
     @GetMapping("lendment/create")
-    public String getAssignItemForm(Model model){
-        model.addAttribute("users",userService.getAll());
+    public String getAssignItemForm(){
         return "lendment/lendment_create";
     }
 
