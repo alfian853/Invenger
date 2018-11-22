@@ -1,7 +1,8 @@
 package com.bliblifuture.Invenger.ModelMapper.user;
 
 import com.bliblifuture.Invenger.model.user.User;
-import com.bliblifuture.Invenger.response.jsonResponse.SearchResponse;
+import com.bliblifuture.Invenger.response.jsonResponse.search_response.SearchItem;
+import com.bliblifuture.Invenger.response.jsonResponse.search_response.SearchResponse;
 import com.bliblifuture.Invenger.response.viewDto.UserDTO;
 
 import java.util.LinkedList;
@@ -29,10 +30,10 @@ public class UserMapperImpl implements UserMapper {
     }
 
     @Override
-    public List<SearchResponse.Item> toSearchResultList(List<User> users) {
-        List<SearchResponse.Item> responses = new LinkedList<>();
+    public List<SearchItem> toSearchResultList(List<User> users) {
+        List<SearchItem> responses = new LinkedList<>();
         for(User user : users){
-            responses.add(SearchResponse.Item.builder()
+            responses.add(SearchItem.builder()
                     .id(user.getId())
                     .text(user.getUsername()+" ("+user.getFullName()+")")
                     .build());

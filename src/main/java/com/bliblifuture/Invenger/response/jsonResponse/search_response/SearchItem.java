@@ -1,4 +1,4 @@
-package com.bliblifuture.Invenger.response.jsonResponse;
+package com.bliblifuture.Invenger.response.jsonResponse.search_response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class InventorySearchResponse extends SearchResponse {
-    String category;
+public class SearchItem {
+    protected Integer id;
+    protected String text;
 }

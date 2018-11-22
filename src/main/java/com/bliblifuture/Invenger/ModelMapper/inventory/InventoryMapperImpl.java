@@ -2,10 +2,10 @@ package com.bliblifuture.Invenger.ModelMapper.inventory;
 
 import com.bliblifuture.Invenger.model.inventory.Inventory;
 import com.bliblifuture.Invenger.response.jsonResponse.*;
+import com.bliblifuture.Invenger.response.jsonResponse.search_response.InventorySearchItem;
+import com.bliblifuture.Invenger.response.jsonResponse.search_response.SearchItem;
 import com.bliblifuture.Invenger.response.viewDto.InventoryDTO;
-import org.springframework.data.domain.Page;
 
-import javax.naming.directory.SearchResult;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,13 +53,16 @@ public class InventoryMapperImpl implements InventoryMapper{
     }
 
     @Override
-    public List<SearchResponse.Item> toSearchResultList(List<Inventory> inventories) {
-        List<SearchResponse.Item> responses = new LinkedList<>();
+    public List<SearchItem> toSearchResultList(List<Inventory> inventories) {
+        List<SearchItem> responses = new LinkedList<>();
+        InventorySearchItem item;
         for(Inventory inventory : inventories){
-            responses.add(SearchResponse.Item.builder()
-                    .id(inventory.getId())
-                    .text(inventory.getName())
-                    .build());
+            item = new InventorySearchItem();
+            item.setId(inventory.getId());
+            item.setText(inventory.getName());
+            item.setCategory(inventory.getCategory().getName());
+            item.setQuantity(inventory.getQuantity());
+            responses.add(item);
         }
         return responses;
     }

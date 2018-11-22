@@ -16,6 +16,7 @@ import com.bliblifuture.Invenger.request.datatables.DataTablesRequest;
 import com.bliblifuture.Invenger.request.formRequest.InventoryCreateRequest;
 import com.bliblifuture.Invenger.request.formRequest.InventoryEditRequest;
 import com.bliblifuture.Invenger.response.jsonResponse.*;
+import com.bliblifuture.Invenger.response.jsonResponse.search_response.SearchResponse;
 import com.bliblifuture.Invenger.response.viewDto.InventoryDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FilenameUtils;
@@ -286,7 +287,7 @@ public class InventoryService {
         return result;
     }
 
-    public SearchResponse getSearchedInventory(String query,Integer pageNum,Integer length){
+    public SearchResponse getSearchedInventory(String query, Integer pageNum, Integer length){
         PageRequest pageRequest = PageRequest.of(pageNum,length);
         Specification<Inventory> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();

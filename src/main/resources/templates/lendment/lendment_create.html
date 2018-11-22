@@ -5,9 +5,9 @@
         </div>
         <div class="col-7">
             <select id="AI-users-select" style="width: 70%">
-                <th:block th:each="user : ${users}">
-                    <option th:value="${user.id}" th:text="${user.username}"></option>
-                </th:block>
+                <!--<th:block th:each="user : ${users}">-->
+                    <!--<option th:value="${user.id}" th:text="${user.username}"></option>-->
+                <!--</th:block>-->
             </select>
         </div>
     </div>
@@ -72,7 +72,7 @@ Documentation
 
     function qtyInputChange(input) {
         let maks = parseInt($(input).attr('max'));
-        console.log(maks);
+        // console.log(maks);
         console.log(parseInt($(input).val()));
         if(maks < parseInt($(input).val()) ){
             $(input).notify('quantity can\'t be greater than '+maks,{
@@ -86,16 +86,52 @@ Documentation
 
     }
 
+    var itemData = {};
+
     var item_select = $('#AI-item-select');
     item_select.select2({
         placeholder : 'please select item',
         ajax : {
             url : '/inventory/search',
             params : null,
+            delay : 350,
+            data : function (params) {
+                console.log(params);
+                let query = {
+                    search : (params.term != null)?params.term:"",
+                    page : (params.page)?params.page:0,
+                    length : 10
+                };
+                this.params = query;
+                return query;
+            },
+            processResults : function (result) {
+                let params = this['$element'].params;
+                result.pagination = {
+                    more : params.length*params.page < result['recordsFiltered']
+                };
+                let tmp = result.results;
+                let len = tmp.length;
+                for(let i=0; i<len; i++){
+                    itemData[tmp[i].id] = {'ctg': tmp[i].category, 'qty':tmp[i].quantity};
+                }
+                return result;
+            }
+
+        }
+    });
+
+    $('#AI-users-select').select2({
+        placeholder : 'please select user',
+        ajax : {
+            url : '/user/search',
+            delay : 350,
+            params : null,
+            quietMillis: 400,
             data : function (params) {
                 let query = {
                     search : (params.term != null)?params.term:"",
-                    page : params.page || 1,
+                    page : (params.page)?params.page:0,
                     length : 10
                 };
                 this.params = query;
@@ -111,12 +147,8 @@ Documentation
         }
     });
 
-    $('#AI-users-select').select2({
-        selectOnClose : false,
-        placeholder : 'type something'
-    });
-
     $('#assign-item-add').click(function () {
+        console.log(itemData);
         var id = $('#AI-item-select').val();
         console.log(id);
         if(id == '' || isSelected[id] === true){
@@ -124,8 +156,8 @@ Documentation
         }
         isSelected[id] = true;
         var row = $('#AI-item-select').find('option[value='+id+']');
-        var ctg = row.attr('ctg');
-        var qty = row.attr('qty');
+        var ctg = itemData[""+id].ctg;
+        var qty = itemData[""+id].qty;
         var name = row.text();
         $('#selected-items').append(
             '<div class="row selected-item-row" item_id="'+id+'">' +
@@ -175,7 +207,6 @@ Documentation
            return;
        }
        data['items'] = items;
-       console.log(data);
         $.ajax({
             type: "POST",
             url: "[[@{/lendment/create}]]",

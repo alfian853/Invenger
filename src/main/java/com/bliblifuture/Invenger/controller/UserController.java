@@ -7,6 +7,7 @@ import com.bliblifuture.Invenger.request.formRequest.UserCreateRequest;
 import com.bliblifuture.Invenger.request.formRequest.UserEditRequest;
 import com.bliblifuture.Invenger.request.jsonRequest.ProfileRequest;
 import com.bliblifuture.Invenger.response.jsonResponse.*;
+import com.bliblifuture.Invenger.response.jsonResponse.search_response.SearchResponse;
 import com.bliblifuture.Invenger.service.PositionService;
 import com.bliblifuture.Invenger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,6 +112,7 @@ public class UserController {
     }
 
     @GetMapping("/user/search")
+    @ResponseBody
     public SearchResponse searchUser(@RequestParam("search")String query,
                                      @RequestParam("page")Integer page,
                                      @RequestParam("length")Integer length) {

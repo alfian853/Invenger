@@ -1,13 +1,11 @@
 package com.bliblifuture.Invenger.ModelMapper.inventory;
 
 import com.bliblifuture.Invenger.model.inventory.Inventory;
-import com.bliblifuture.Invenger.response.jsonResponse.DataTablesResult;
 import com.bliblifuture.Invenger.response.jsonResponse.InventoryDataTableResponse;
-import com.bliblifuture.Invenger.response.jsonResponse.SearchResponse;
+import com.bliblifuture.Invenger.response.jsonResponse.search_response.SearchItem;
 import com.bliblifuture.Invenger.response.viewDto.InventoryDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
-import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -19,5 +17,5 @@ public interface InventoryMapper {
 
     List<InventoryDataTableResponse> toInventoryDatatables(List<Inventory> page);
 
-    List<SearchResponse.Item> toSearchResultList(List<Inventory> inventories);
+    List<SearchItem> toSearchResultList(List<Inventory> inventories);
 }

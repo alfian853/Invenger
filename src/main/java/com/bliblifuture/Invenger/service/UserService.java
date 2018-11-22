@@ -7,7 +7,6 @@ import com.bliblifuture.Invenger.annotation.imp.PhoneValidator;
 import com.bliblifuture.Invenger.exception.DataNotFoundException;
 import com.bliblifuture.Invenger.exception.DefaultException;
 import com.bliblifuture.Invenger.exception.DuplicateEntryException;
-import com.bliblifuture.Invenger.model.inventory.Inventory;
 import com.bliblifuture.Invenger.model.user.Position;
 import com.bliblifuture.Invenger.model.user.User;
 import com.bliblifuture.Invenger.model.user.RoleType;
@@ -17,9 +16,9 @@ import com.bliblifuture.Invenger.request.formRequest.UserCreateRequest;
 import com.bliblifuture.Invenger.request.formRequest.UserEditRequest;
 import com.bliblifuture.Invenger.request.jsonRequest.ProfileRequest;
 import com.bliblifuture.Invenger.response.jsonResponse.*;
+import com.bliblifuture.Invenger.response.jsonResponse.search_response.SearchResponse;
 import com.bliblifuture.Invenger.response.viewDto.ProfileDTO;
 import com.bliblifuture.Invenger.response.viewDto.UserDTO;
-import org.apache.commons.io.FilenameUtils;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -368,9 +367,12 @@ public class UserService implements UserDetailsService {
         Specification<User> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(criteriaBuilder.like(
-                    criteriaBuilder.lower(root.get("name")), "%" + query.toLowerCase() + "%")
+                    criteriaBuilder.lower(root.get("username")), "%" + query.toLowerCase() + "%")
             );
-            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+            predicates.add(criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("fullName")), "%" + query.toLowerCase() + "%")
+            );
+            return criteriaBuilder.or(predicates.toArray(new Predicate[0]));
         };
 
         Page<User> page = userRepository.findAll(specification,pageRequest);
