@@ -20,9 +20,10 @@
             var tableAccess = null;
             $(document).ready(function(){
                 var datatables = $('#itemsTable').DataTable();
-                tableAccess = new DTAccess(datatables,'usr-',6);
+                tableAccess = new DTAccess(datatables,'usr-',7);
             });
             var listPosition = {};
+            var select_superior = {};
         </script>
         <title>Users</title>
 
@@ -110,7 +111,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Password *</label>
-                        <input class="form-input" type="text" th:field="*{password}">
+                        <input class="form-input" type="password" th:field="*{password}">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Superior *</label>
@@ -273,7 +274,7 @@
             });
             //init user as superior
             let res = tableAccess.getAll();
-            let select_superior = $('#create-user-form select[name=\"superior_id\"]');
+            select_superior = $('#create-user-form select[name=\"superior_id\"]');
             select_superior.select2({
                 selectOnClose : false,
                 placeholder : 'please select superior'
@@ -328,7 +329,9 @@
                                 form.get('email'),
                                 form.get('telp'),
                                 listPosition[form.get('position_id')],
-                                '<button type=\"submit\" onclick=loadDetail('+response['user_id']+') >More</button>'
+                                select_superior[form.get('superior_id')],
+                                '<button class=\"submit\" type=\"submit\" onclick=loadDetail('+response['user_id']+') >More</button>'+
+                                '<button class=\"submit\" type=\"submit\" onclick=deleteUser('+response['user_id']+') style=\"background-color: #BB281A;\"><i class=\"fas fa-trash\"></i></button>'
                             ],
                             [
                                 'user-id',
@@ -336,6 +339,7 @@
                                 'email',
                                 'telp',
                                 'position',
+                                'superior',
                                 'action'
                             ]
                         );
