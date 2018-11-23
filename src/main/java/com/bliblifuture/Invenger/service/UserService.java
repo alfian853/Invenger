@@ -186,6 +186,7 @@ public class UserService implements UserDetailsService {
             }
         }
         response.setStatusToSuccess();
+        response.setMessage("User Deleted");
         return response;
     }
 

@@ -67,7 +67,10 @@
                         <td col="position" th:text="${user.position}"></td>
                         <td col="superior" th:text="${user.superior}"></td>
                         <td col="action">
-                            <button type="submit" th:onclick="|loadDetail(${user.id})|">More</button>
+                            <button class="submit" type="submit" th:onclick="|loadDetail(${user.id})|">More</button>
+                            <button class="submit" type="submit" th:onclick="|deleteUser(${user.id})|" style="background-color: #BB281A;">
+                                <i class="fas fa-trash"></i>
+                            </button>
                         </td>
                     </tr>
                 </th:block>
@@ -145,6 +148,16 @@
     </div>
 
     <div id="user-detail-modal"></div>
+    <div id="deleteModal" style="display: none">
+        <div class="modal-body">
+            <input name="id" type="hidden">
+            <div>Are you sure you want to delete this user?</div>
+        </div>
+        <div class="modal-footer">
+            <button id="delete-close-btn" type="button" class="btn btn-outline-primary">No</button>
+            <button id="confirm-delete" type="button" class="btn btn-primary">Yes</button>
+        </div>
+    </div>
 
     <script>
         Dropzone.autoDiscover = false;
@@ -154,6 +167,56 @@
                 'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content')
             }
         });
+
+        function deleteUser(id){
+            let target = $('#deleteModal');
+            target.iziModal({
+                title : 'Delete',
+                width : screen.width*0.2,
+                height : screen.height*0.4,
+                closeButton : true,
+                fullScreen : true,
+                history: false,
+                onOpening : function (modal) {
+                    $('#delete-close-btn').click(function () {
+                        console.log('asd');
+                        $('.iziModal-button-close').click();
+                    });
+
+                    $('#confirm-delete').click(function () {
+                        $.ajax({
+                            type : "POST",
+                            url : '/user/delete/'+id,
+
+                            success: function (response) {
+                                if(response['success']){
+                                    toastMessage('success', 'Success', response['message']);
+                                }
+                                else{
+                                    toastMessage('error','Error',response['message']);
+                                }
+                                $('.iziModal-button-close').click();
+
+                            },
+                            error: function (xhr) {
+                                let response = JSON.parse(xhr.responseText);
+                                toastMessage('error','Error',response['message']);
+                                $('.iziModal-button-close').click();
+                            }
+                        }).fail(function (response) {
+                            console.log(response);
+                        });
+                    });
+
+                },
+                onClosed : function (modal) {
+                    target.iziModal('destroy');
+                }
+
+            });
+
+            target.iziModal('open');
+        }
 
         function loadDetail(idCategory){
 
