@@ -48,8 +48,8 @@
                         <td col="id" th:text="${category.id}"></td>
                         <td col="name" th:text="${category.name}"></td>
                         <td>
+                            <button class="submit" type="submit" th:onclick="|addCategory(${category.id})|">Add</button>
                             <th:block th:if="${category.parent_id != null}">
-                                <button class="submit" type="submit" th:onclick="|addCategory(${category.id})|">Add</button>
                                 <button class="submit" type="submit" th:onclick="|editCategory(${category.id})|">Edit</button>
                                 <button class="submit" type="submit" th:onclick="|deleteCategory(${category.id})|" style="background-color: #BB281A;">
                                     <i class="fas fa-trash"></i>

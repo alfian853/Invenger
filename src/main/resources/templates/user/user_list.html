@@ -58,7 +58,7 @@
                     <th>Action</th>
                 </tr>
                 </thead>
-                <tbody id="users-table-body" style="font-size: 15px;">
+                <tbody id="users-table-body">
                 <th:block th:each="user : ${users}">
                     <tr th:id="|usr-${user.id}|">
                         <td col="user-id" th:text="${user.id}"></td>

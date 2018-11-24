@@ -9,12 +9,14 @@
         <link rel="stylesheet" type="text/css" th:href="@{/css/modal.css}">
 
         <link rel="stylesheet" href="https://cdn.datatables.net/select/1.2.7/css/select.dataTables.min.css">
-        <link rel="stylesheet" href="http://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.foundation.min.css">
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.4.3/css/foundation.min.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.js"></script>
 
         <script src="http://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.10.19/js/dataTables.foundation.min.js"></script>
         <script src="https://cdn.datatables.net/select/1.2.7/js/dataTables.select.min.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/css/iziModal.min.css">
         <script src="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/js/iziModal.min.js"></script>
@@ -58,7 +60,7 @@
                         <td col="order-date" th:text="${lendment.orderDate}"></td>
                         <td col="status" th:text="${lendment.status}"></td>
                         <td>
-                            <button type="submit" th:onclick="|loadLendmentDetail(${lendment.id})|">Detail</button>
+                            <button class="submit" type="submit" th:onclick="|loadLendmentDetail(${lendment.id})|">Detail</button>
                             <th:block th:switch="${lendment.status}">
                                 <th:block th:case="${status.get('WaitingForPickUp')}">
                                     <button class="btn btn-warning btn-sm" th:onclick="|doHandOver(this,${lendment.id})|">Picked Up</button>

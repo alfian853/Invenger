@@ -3,6 +3,9 @@ body{
     background-color: #f8f8f8;
     font-family: Roboto;
 }
+tbody{
+    font-size: 15px;
+}
 #sidebar{
     height: 100%;
     width: 250px;
