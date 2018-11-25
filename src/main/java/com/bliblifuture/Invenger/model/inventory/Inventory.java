@@ -3,6 +3,8 @@ package com.bliblifuture.Invenger.model.inventory;
 import com.bliblifuture.Invenger.model.AuditModel;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.LazyToOne;
+import org.hibernate.annotations.LazyToOneOption;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
@@ -19,7 +21,7 @@ import javax.validation.constraints.NotEmpty;
 public class Inventory extends AuditModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
 
     String image;//image filename
@@ -44,7 +46,9 @@ public class Inventory extends AuditModel {
     @NotEmpty
     String type;
 
-    @OneToOne(mappedBy = "inventory",fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "inventory_id")
+    @LazyToOne(value = LazyToOneOption.NO_PROXY)
     InventoryDocument document;
 
 }
