@@ -1,12 +1,13 @@
 package com.bliblifuture.Invenger.service;
 
+import com.bliblifuture.Invenger.ModelMapper.FieldMapper;
 import com.bliblifuture.Invenger.ModelMapper.inventory.InventoryMapper;
 import com.bliblifuture.Invenger.Utils.DataTablesUtils;
 import com.bliblifuture.Invenger.Utils.MyUtils;
-import com.bliblifuture.Invenger.Utils.PathMapper;
 import com.bliblifuture.Invenger.Utils.QuerySpec;
 import com.bliblifuture.Invenger.exception.DataNotFoundException;
 import com.bliblifuture.Invenger.exception.DuplicateEntryException;
+import com.bliblifuture.Invenger.exception.InvalidRequestException;
 import com.bliblifuture.Invenger.model.inventory.Category;
 import com.bliblifuture.Invenger.model.inventory.Inventory;
 import com.bliblifuture.Invenger.model.inventory.InventoryDocument;
@@ -33,6 +34,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.criteria.Predicate;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -68,7 +74,7 @@ public class InventoryService {
 
 
     public InventoryService(){
-        dataTablesUtils = new DataTablesUtils<>((PathMapper) mapper);
+        dataTablesUtils = new DataTablesUtils<>(mapper);
     }
 
 
@@ -269,7 +275,6 @@ public class InventoryService {
 
     public DataTablesResult<InventoryDataTableResponse> getPaginatedDatatablesInventoryList(
             DataTablesRequest request){
-        dataTablesUtils.setPathMapper((PathMapper) mapper);
         QuerySpec<Inventory> spec = dataTablesUtils.getQuerySpec(request);
 
         Page<Inventory> page;
@@ -310,9 +315,39 @@ public class InventoryService {
         return response;
     }
 
-//    public RequestResponse insertInventories(MultipartFile inventoriesFile){
-//
-//    }
+    public RequestResponse insertInventories(MultipartFile file) throws InvalidRequestException {
+        BufferedReader br;
+        List<Inventory> inventories = new LinkedList<>();
+        try {
+            String line;
+            InputStream is = file.getInputStream();
+            br = new BufferedReader(new InputStreamReader(is));
+
+            line = br.readLine();
+            String[] header = line.split(",");
+            System.out.println("header");
+            System.out.println(header);
+            Category category = categoryRepository.findCategoryByName("/all");
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(",");
+                Inventory inventory = new Inventory();
+                for(int i=0; i<values.length; i++){
+                    mapper.insertValueToObject(inventory,header[i],values[i]);
+                }
+                inventory.setCategory(category);
+                inventories.add(inventory);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new InvalidRequestException("File is invalid, Please check the instruction");
+        }
+
+        inventoryRepository.saveAll(inventories);
+        RequestResponse response = new RequestResponse();
+        response.setStatusToSuccess();
+        response.setMessage(inventories.size()+" data added to database");
+        return response;
+    }
 
 
 

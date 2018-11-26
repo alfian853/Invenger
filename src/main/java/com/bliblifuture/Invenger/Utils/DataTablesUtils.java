@@ -1,5 +1,6 @@
 package com.bliblifuture.Invenger.Utils;
 
+import com.bliblifuture.Invenger.ModelMapper.CriteriaPathMapper;
 import com.bliblifuture.Invenger.request.datatables.DataTablesColumnSpecs;
 import com.bliblifuture.Invenger.request.datatables.DataTablesRequest;
 import lombok.Data;
@@ -14,10 +15,10 @@ import java.util.List;
 @Data
 public class DataTablesUtils<T> {
 
-    private PathMapper pathMapper;
+    private CriteriaPathMapper criteriaPathMapper;
 
-    public DataTablesUtils(PathMapper pathMapper){
-        this.pathMapper = pathMapper;
+    public DataTablesUtils(CriteriaPathMapper criteriaPathMapper){
+        this.criteriaPathMapper = criteriaPathMapper;
     }
 
     public QuerySpec<T> getQuerySpec(DataTablesRequest request){
@@ -53,7 +54,7 @@ public class DataTablesUtils<T> {
                     if(spec.isSearchable() && !"".equals(spec.getSearch())){
                         predicates.add(
                                 criteriaBuilder.like(
-                                        criteriaBuilder.lower(pathMapper.getPathFrom(root,spec.getName()).as(String.class)),
+                                        criteriaBuilder.lower(criteriaPathMapper.getPathFrom(root,spec.getName()).as(String.class)),
                                         "%"+spec.getSearch().toLowerCase()+"%")
                         );
                     }

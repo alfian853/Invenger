@@ -1,8 +1,8 @@
-package com.bliblifuture.Invenger.Utils;
+package com.bliblifuture.Invenger.ModelMapper;
 
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Root;
 
-public interface PathMapper {
+public interface CriteriaPathMapper {
     Path getPathFrom(Root root,String field);
 }

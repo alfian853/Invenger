@@ -1,7 +1,9 @@
 package com.bliblifuture.Invenger.ModelMapper.inventory;
 
-import com.bliblifuture.Invenger.Utils.PathMapper;
+import com.bliblifuture.Invenger.ModelMapper.CriteriaPathMapper;
+import com.bliblifuture.Invenger.ModelMapper.FieldMapper;
 import com.bliblifuture.Invenger.model.inventory.Inventory;
+import com.bliblifuture.Invenger.model.inventory.InventoryType;
 import com.bliblifuture.Invenger.response.jsonResponse.InventoryDataTableResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.search_response.InventorySearchItem;
 import com.bliblifuture.Invenger.response.jsonResponse.search_response.SearchItem;
@@ -13,7 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class InventoryMapperImpl implements InventoryMapper, PathMapper {
+public class InventoryMapperImpl implements InventoryMapper{
 
     @Override
     public InventoryDTO toInventoryDto(Inventory inventory) {
@@ -77,5 +79,28 @@ public class InventoryMapperImpl implements InventoryMapper, PathMapper {
             return root.get("category").get("name");
         }
         return root.get(field);
+    }
+
+    @Override
+    public void insertValueToObject(Inventory object, String field, String value) throws Exception {
+        switch (field){
+            case "name":
+                object.setName(value);
+                break;
+            case "price":
+                object.setPrice(Integer.parseInt(value));
+                break;
+            case "quantity":
+                object.setQuantity(Integer.parseInt(value));
+                break;
+            case "description":
+                object.setDescription(value);
+                break;
+            case "type":
+                object.setType(InventoryType.valueOf(value).toString());
+                break;
+             default:
+                 throw new Exception("field \""+field+"\" not found");
+        }
     }
 }

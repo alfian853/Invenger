@@ -1,5 +1,6 @@
 package com.bliblifuture.Invenger.controller;
 
+import com.bliblifuture.Invenger.exception.InvalidRequestException;
 import com.bliblifuture.Invenger.model.inventory.InventoryType;
 import com.bliblifuture.Invenger.request.datatables.DataTablesRequest;
 import com.bliblifuture.Invenger.request.formRequest.InventoryCreateRequest;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -95,6 +97,12 @@ public class InventoryController {
                                           @RequestParam("length")Integer length){
 
         return inventoryService.getSearchedInventory(query,page,length);
+    }
+
+    @PostMapping("/inventory/upload")
+    @ResponseBody
+    public RequestResponse uploadInventories(@RequestParam("file") MultipartFile file) throws InvalidRequestException {
+        return inventoryService.insertInventories(file);
     }
 
 }
