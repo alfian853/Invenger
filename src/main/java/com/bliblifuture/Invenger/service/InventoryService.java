@@ -3,6 +3,7 @@ package com.bliblifuture.Invenger.service;
 import com.bliblifuture.Invenger.ModelMapper.inventory.InventoryMapper;
 import com.bliblifuture.Invenger.Utils.DataTablesUtils;
 import com.bliblifuture.Invenger.Utils.MyUtils;
+import com.bliblifuture.Invenger.Utils.PathMapper;
 import com.bliblifuture.Invenger.Utils.QuerySpec;
 import com.bliblifuture.Invenger.exception.DataNotFoundException;
 import com.bliblifuture.Invenger.exception.DuplicateEntryException;
@@ -29,13 +30,11 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.criteria.Predicate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class InventoryService {
@@ -55,7 +54,7 @@ public class InventoryService {
     @Autowired
     MyUtils myUtils;
 
-    DataTablesUtils<Inventory> dataTablesUtils = new DataTablesUtils<>();
+    private DataTablesUtils<Inventory> dataTablesUtils;
 
     private LocalDateTime inventoriesLastUpdate = LocalDateTime.now();
 
@@ -66,6 +65,11 @@ public class InventoryService {
     private final static String PDF_TEMPLATE = "inventory/pdf_template";
 
     private final InventoryMapper mapper = Mappers.getMapper(InventoryMapper.class);
+
+
+    public InventoryService(){
+        dataTablesUtils = new DataTablesUtils<>((PathMapper) mapper);
+    }
 
 
     public List<InventoryDTO> getAll(){
@@ -265,7 +269,7 @@ public class InventoryService {
 
     public DataTablesResult<InventoryDataTableResponse> getPaginatedDatatablesInventoryList(
             DataTablesRequest request){
-
+        dataTablesUtils.setPathMapper((PathMapper) mapper);
         QuerySpec<Inventory> spec = dataTablesUtils.getQuerySpec(request);
 
         Page<Inventory> page;
@@ -305,6 +309,10 @@ public class InventoryService {
 
         return response;
     }
+
+//    public RequestResponse insertInventories(MultipartFile inventoriesFile){
+//
+//    }
 
 
 

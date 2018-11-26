@@ -2,6 +2,7 @@ package com.bliblifuture.Invenger.Utils;
 
 import com.bliblifuture.Invenger.request.datatables.DataTablesColumnSpecs;
 import com.bliblifuture.Invenger.request.datatables.DataTablesRequest;
+import lombok.Data;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -10,8 +11,14 @@ import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
 
+@Data
 public class DataTablesUtils<T> {
 
+    private PathMapper pathMapper;
+
+    public DataTablesUtils(PathMapper pathMapper){
+        this.pathMapper = pathMapper;
+    }
 
     public QuerySpec<T> getQuerySpec(DataTablesRequest request){
 
@@ -42,13 +49,12 @@ public class DataTablesUtils<T> {
         if(isSearching){
             Specification<T> specification = (root, criteriaQuery, criteriaBuilder) -> {
                 List<Predicate> predicates = new ArrayList<>();
-                for(DataTablesColumnSpecs specs : request.getColumns()){
-                    if(specs.isSearchable() && !"".equals(specs.getSearch())){
-                        System.out.println("add spec");
+                for(DataTablesColumnSpecs spec : request.getColumns()){
+                    if(spec.isSearchable() && !"".equals(spec.getSearch())){
                         predicates.add(
                                 criteriaBuilder.like(
-                                        criteriaBuilder.lower(root.get(specs.getName()).as(String.class)),
-                                        "%"+specs.getSearch().toLowerCase()+"%")
+                                        criteriaBuilder.lower(pathMapper.getPathFrom(root,spec.getName()).as(String.class)),
+                                        "%"+spec.getSearch().toLowerCase()+"%")
                         );
                     }
                 }

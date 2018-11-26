@@ -1,16 +1,20 @@
 package com.bliblifuture.Invenger.ModelMapper.inventory;
 
+import com.bliblifuture.Invenger.Utils.PathMapper;
 import com.bliblifuture.Invenger.model.inventory.Inventory;
-import com.bliblifuture.Invenger.response.jsonResponse.*;
+import com.bliblifuture.Invenger.response.jsonResponse.InventoryDataTableResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.search_response.InventorySearchItem;
 import com.bliblifuture.Invenger.response.jsonResponse.search_response.SearchItem;
 import com.bliblifuture.Invenger.response.viewDto.InventoryDTO;
 
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class InventoryMapperImpl implements InventoryMapper{
+public class InventoryMapperImpl implements InventoryMapper, PathMapper {
+
     @Override
     public InventoryDTO toInventoryDto(Inventory inventory) {
         return InventoryDTO.builder()
@@ -67,5 +71,11 @@ public class InventoryMapperImpl implements InventoryMapper{
         return responses;
     }
 
-
+    @Override
+    public Path getPathFrom(Root root, String field) {
+        if(field.equals("category")){
+            return root.get("category").get("name");
+        }
+        return root.get(field);
+    }
 }
