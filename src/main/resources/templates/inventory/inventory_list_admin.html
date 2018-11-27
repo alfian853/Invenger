@@ -98,7 +98,8 @@
         <div th:replace="navbar :: navbar"></div>
         <div class="user-text">Inventory</div>
         <div style="margin-left: 22px;">
-            <button class="btn" id="itemBtn">Item</button>
+            <button class="btn" id="itemBtn">Create Item</button>
+            <button class="btn" id="importBtn">Import from file</button>
             <button class="btn" id="assignItemBtn">Assign Item to User</button>
         </div>
         <div style="padding: 50px;">
@@ -215,6 +216,22 @@
         </div>
     </div>
 
+    <div id="import-modal" style="display: none">
+        <form class="dropzone needsclick mx-4" id="importFile" action="/inventory/upload">
+            <div class="modal-body">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <div class="dz-message needsclick" name="user-pict"> Please Upload csv file
+                    <br> Drop the file here or click here for select file
+                    <i class="fa fa-paper-plane-o ml-1"></i>
+                    <br/>
+                </div>
+            </div>
+        </form>
+        <div class="modal-footer justify-content-center d-flex">
+            <a id="submit-import" class="btn btn-primary btn-lg">Import</a>
+        </div>
+    </div>
+
     <script>
         Dropzone.autoDiscover = false;
 
@@ -304,6 +321,12 @@
         }
 
         $(document).ready(function() {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content')
+                }
+            });
+
             var file_upload = null;
             var uploadFileDZ = null;
 
@@ -352,10 +375,18 @@
 
             });
 
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content')
+            $('#import-modal').iziModal({
+                title : 'Import data from csv file',
+                width : screen.width*0.4,
+                height : screen.height*0.4,
+                closeButton : true,
+                history: false,
+                onOpening : function (modal){
+
+                },
+                onClosed : function (modal) {
                 }
+
             });
 
             Dropzone.options.uploadFile = {
@@ -376,6 +407,43 @@
                             uploadFileDZ.hiddenFileInput.click();
                         });
                     });
+                }
+            };
+
+            Dropzone.options.importFile = {
+                headers : { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } ,
+                maxFiles : 1,
+                autoProcessQueue : false,
+                url : "/inventory/upload",
+                init : function() {
+                    console.log("masuk init nya");
+                    myDropzone = this;
+                    var prevFile = null;
+                    this.on("addedfile", function (file) {
+                        if (prevFile != null) {
+                            this.removeFile(prevFile);
+                        }
+                        prevFile = file;
+                    });
+
+                    $('#submit-import').click(function () {
+                        toastMessage('info','Info','Processing....');
+                        myDropzone.processQueue();
+                    });
+                },
+                success : function(file,response){//success get response
+                    if(response['success']){
+                        toastMessage('success','Success',response['message']);
+                    }
+                    else{
+                        toastMessage('error','Error',response['message']);
+                    }
+                    $('#import-modal').iziModal('close');
+                },
+                error : function (result) {
+                    let response = JSON.parse(result.xhr.responseText);
+                    toastMessage('error','Error',response['message']);
+                    $('#import-modal').iziModal('close');
                 }
             };
 
@@ -425,8 +493,12 @@
 
             $("#itemBtn").click(function(){
                 $('#create-item-modal').iziModal('open');
-
             });
+
+            $('#importBtn').click(function () {
+                $('#import-modal').iziModal('open');
+            });
+
         });
 
     </script>
