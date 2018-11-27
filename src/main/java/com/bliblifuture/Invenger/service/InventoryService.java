@@ -6,6 +6,7 @@ import com.bliblifuture.Invenger.Utils.DataTablesUtils;
 import com.bliblifuture.Invenger.Utils.MyUtils;
 import com.bliblifuture.Invenger.Utils.QuerySpec;
 import com.bliblifuture.Invenger.exception.DataNotFoundException;
+import com.bliblifuture.Invenger.exception.DefaultException;
 import com.bliblifuture.Invenger.exception.DuplicateEntryException;
 import com.bliblifuture.Invenger.exception.InvalidRequestException;
 import com.bliblifuture.Invenger.model.inventory.Category;
@@ -64,10 +65,6 @@ public class InventoryService {
 
     private LocalDateTime inventoriesLastUpdate = LocalDateTime.now();
 
-    private void refreshInventoriesLastUpdate(){
-        inventoriesLastUpdate = LocalDateTime.now();
-    }
-
     private final static String PDF_TEMPLATE = "inventory/pdf_template";
 
     private final InventoryMapper mapper = Mappers.getMapper(InventoryMapper.class);
@@ -92,12 +89,8 @@ public class InventoryService {
         return mapper.toInventoryDto(inventory);
     }
 
-    public InventoryCreateResponse createInventory(InventoryCreateRequest request) throws DuplicateEntryException {
+    public InventoryCreateResponse createInventory(InventoryCreateRequest request) throws DefaultException {
         InventoryCreateResponse response = new InventoryCreateResponse();
-
-        String imgName = UUID.randomUUID().toString().replace("-","")+
-                "."+ FilenameUtils.getExtension(request.getPhoto_file().getOriginalFilename());
-
         Category newCategory = new Category();
         newCategory.setId(request.getCategory_id());
 
@@ -105,41 +98,46 @@ public class InventoryService {
         newInventory.setName(request.getName());
         newInventory.setQuantity(request.getQuantity());
         newInventory.setPrice(request.getPrice());
-        newInventory.setImage(imgName);
+
         newInventory.setDescription(request.getDescription());
         newInventory.setCategory(newCategory);
         newInventory.setType(request.getType().toString());
 
-        if(fileStorageService.storeFile(
-                request.getPhoto_file(),
-                imgName,
-                FileStorageService.PathCategory.INVENTORY_PICT)
-        ) {
-            boolean hasError = false;
-            try{
-                inventoryRepository.save(newInventory);
+        String imgName = null;
+        if(request.getPhotoFile() == null) {
+            imgName = UUID.randomUUID().toString().replace("-", "") +
+                    "." + FilenameUtils.getExtension(request.getPhotoFile().getOriginalFilename());
+
+            if (!fileStorageService.storeFile(
+                    request.getPhotoFile(),
+                    imgName,
+                    FileStorageService.PathCategory.INVENTORY_PICT)
+            ){
+                throw new DefaultException("Error when storing item picture");
             }
-            catch (DataIntegrityViolationException e){
+            newInventory.setImage(imgName);
+
+        }
+
+        try{
+            inventoryRepository.save(newInventory);
+        }
+        catch (DataIntegrityViolationException e){
+            e.printStackTrace();
+            if(!newInventory.getImage().equals("default-item.jpg") && imgName != null){
                 fileStorageService.deleteFile(
                         imgName,
                         FileStorageService.PathCategory.INVENTORY_PICT
                 );
-                e.printStackTrace();
+            }
             if(e.getRootCause().getLocalizedMessage().contains("duplicate")){
                 throw new DuplicateEntryException("Inventory name already exist");
             }
-            }
-            response.setStatusToSuccess();
         }
-        else{
-            response.setStatusToFailed();
-        }
+        response.setStatusToSuccess();
 
-        if(response.isSuccess()){
-            response.setInventory_id(newInventory.getId());
-        }
+        response.setInventory_id(newInventory.getId());
 
-        this.refreshInventoriesLastUpdate();
         return response;
     }
 
@@ -194,8 +192,6 @@ public class InventoryService {
 
         inventoryRepository.save(inventory);
 
-        this.refreshInventoriesLastUpdate();
-
         return response;
     }
 
@@ -204,8 +200,6 @@ public class InventoryService {
         inventoryRepository.deleteById(id);
         response.setStatusToSuccess();
         response.setMessage("Item Deleted");
-
-        this.refreshInventoriesLastUpdate();
 
         return response;
     }
@@ -335,6 +329,7 @@ public class InventoryService {
                     mapper.insertValueToObject(inventory,header[i],values[i]);
                 }
                 inventory.setCategory(category);
+                inventory.setImage("default-item.jpg");
                 inventories.add(inventory);
             }
         } catch (Exception e) {

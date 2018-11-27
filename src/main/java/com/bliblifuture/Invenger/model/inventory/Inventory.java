@@ -24,7 +24,7 @@ public class Inventory extends AuditModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
 
-    String image;//image filename
+    String image="default-item.jpg";//image filename
 
     @Column(unique = true)
     String name;
