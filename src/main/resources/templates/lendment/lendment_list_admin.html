@@ -46,7 +46,7 @@
     <div id="content">
         <div th:replace="navbar :: navbar"></div>
         <div class="user-text">Lendment</div>
-        <div style="padding: 30px;">
+        <div style="padding: 50px;">
             <table id="lendmentsTable" class="display" style="width:100%;">
                 <thead>
                 <tr>
@@ -68,7 +68,7 @@
                             <button class="submit" type="submit" th:onclick="|loadLendmentDetail(${lendment.id})|">Detail</button>
                             <th:block th:switch="${lendment.status}">
                                 <th:block th:case="${status.get('WaitingForPickUp')}">
-                                    <button class="btn btn-warning btn-sm" th:onclick="|doHandOver(this,${lendment.id})|">Handover the order item</button>
+                                    <button class="btn btn-warning btn-sm" th:onclick="|doHandOver(this,${lendment.id})|">Handover Ordered Item</button>
                                 </th:block>
                             </th:block>
                         </td>
