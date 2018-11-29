@@ -1,6 +1,5 @@
 package com.bliblifuture.Invenger.service;
 
-import com.bliblifuture.Invenger.ModelMapper.FieldMapper;
 import com.bliblifuture.Invenger.ModelMapper.inventory.InventoryMapper;
 import com.bliblifuture.Invenger.Utils.DataTablesUtils;
 import com.bliblifuture.Invenger.Utils.MyUtils;
@@ -36,11 +35,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.criteria.Predicate;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -63,9 +59,7 @@ public class InventoryService {
 
     private DataTablesUtils<Inventory> dataTablesUtils;
 
-    private LocalDateTime inventoriesLastUpdate = LocalDateTime.now();
-
-    private final static String PDF_TEMPLATE = "inventory/pdf_template";
+    private final static String PDF_TEMPLATE_PATH = "inventory/pdf_template";
 
     private final InventoryMapper mapper = Mappers.getMapper(InventoryMapper.class);
 
@@ -104,12 +98,13 @@ public class InventoryService {
         newInventory.setType(request.getType().toString());
 
         String imgName = null;
-        if(request.getPhotoFile() == null) {
+        System.out.println(request.getPhoto_file());
+        if(request.getPhoto_file() != null) {
             imgName = UUID.randomUUID().toString().replace("-", "") +
-                    "." + FilenameUtils.getExtension(request.getPhotoFile().getOriginalFilename());
+                    "." + FilenameUtils.getExtension(request.getPhoto_file().getOriginalFilename());
 
             if (!fileStorageService.storeFile(
-                    request.getPhotoFile(),
+                    request.getPhoto_file(),
                     imgName,
                     FileStorageService.PathCategory.INVENTORY_PICT)
             ){
@@ -118,7 +113,8 @@ public class InventoryService {
             newInventory.setImage(imgName);
 
         }
-
+        System.out.println("save");
+        System.out.println(newInventory);
         try{
             inventoryRepository.save(newInventory);
         }
@@ -137,6 +133,7 @@ public class InventoryService {
         response.setStatusToSuccess();
 
         response.setInventory_id(newInventory.getId());
+        response.setMessage("New item added to table");
 
         return response;
     }
@@ -222,7 +219,7 @@ public class InventoryService {
             Map templateMap = oMapper.convertValue(inventoryDTO, Map.class);
 
             String filename = fileStorageService.createPdfFromTemplate(
-                    PDF_TEMPLATE,
+                    PDF_TEMPLATE_PATH,
                     templateMap,
                     FileStorageService.PathCategory.INVENTORY_PDF
             );
@@ -319,8 +316,7 @@ public class InventoryService {
 
             line = br.readLine();
             String[] header = line.split(",");
-            System.out.println("header");
-            System.out.println(header);
+
             Category category = categoryRepository.findCategoryByName("/all");
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");

@@ -47,7 +47,7 @@
                     <tr th:id="|ctg-${category.id}|" th:parent_id="${category.parent_id}">
                         <td col="id" th:text="${category.id}"></td>
                         <td col="name" th:text="${category.name}"></td>
-                        <td>
+                        <td col="action">
                             <button class="submit" type="submit" th:onclick="|addCategory(${category.id})|">Add</button>
                             <th:block th:if="${category.parent_id != null}">
                                 <button class="submit" type="submit" th:onclick="|editCategory(${category.id})|">Edit</button>
@@ -170,15 +170,21 @@
                             contentType : "application/json; charset=utf-8",
                             success : function (response) {
                                 if(response['success']){
+                                    response = response['new-category'];
                                     tableAccess.addData(
-                                        response['category_id'],
-                                        [   response['category_id'],
-                                            form.get('name'),
-                                            '<button class="submit" type="submit" th:onclick="|addCategory(${category.id})|">Add</button><button class="submit" type="submit" th:onclick="|editCategory(${category.id})|">Edit</button><button class="submit" style="background-color: #BB281A;" type="submit"><i class="fas fa-trash"></i></button>'
+                                        response['id'],
+                                        [   response['id'],
+                                            response['name'],
+                                            '<button class="submit" type="submit" onclick="addCategory('+response['id']+')">Add</button>' +
+                                            '<button class="submit" type="submit" onclick="editCategory('+response['id']+')">Edit</button>' +
+                                            '<button class="submit" type="submit" onclick="deleteCategory('+response['id']+')" style="background-color: #BB281A;">' +
+                                            '<i class="fas fa-trash"></i>' +
+                                            '</button>'
                                         ],
                                         [
                                             'id',
                                             'name',
+                                            'action'
                                         ]
                                     );
                                     toastMessage('success', 'Success', 'New category added');
@@ -329,6 +335,7 @@
                             success: function (response) {
                                 if(response['success']){
                                     toastMessage('success', 'Success', response['message']);
+                                    tableAccess.removeRowById(id);
                                 }
                                 else{
                                     toastMessage('error','Error',response['message']);

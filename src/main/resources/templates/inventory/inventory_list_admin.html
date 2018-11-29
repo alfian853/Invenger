@@ -258,6 +258,7 @@
                             success: function (response) {
                                 if(response['success']){
                                     toastMessage('success', 'Success', response['message']);
+                                    tableAccess.removeRowById(id);
                                 }
                                 else{
                                     toastMessage('error','Error',response['message']);
@@ -452,37 +453,30 @@
             $('form#create-item-form').submit(function(e){
                 e.preventDefault();
                 var form = new FormData(this);
-                form.append("photo_file",file_upload);
+                if(file_upload != null){
+                    form.append("photo_file",file_upload);
+                }
                 $.ajax({
                     type: "POST",
                     url: "[[@{/inventory/create}]]",
                     data: form,
                     success: function(response){
-                        tableAccess.addData(
-                            response['inventory_id'],
-                            [   response['inventory_id'],
-                                form.get('name'),
-                                form.get('price'),
-                                form.get('quantity'),
-                                listCategory[form.get('category_id')],
-                                form.get('type'),
-                                '<button class="submit" type=\"submit\" onclick=loadInventoryDetail('+response['inventory_id']+') >Detail</button><button class=\"submit\" type=\"submit\"  ><i class=\"fas fa-archive\"></i></button><button class=\"submit\" type=\"submit\"  ><i class=\"fas fa-print\"></i></button><button class=\"submit\" style=\"background-color: #BB281A;\" type=\"submit\"  ><i class=\"fas fa-trash\"></i></button>'
-                            ],
-                            [
-                                'id',
-                                'name',
-                                'price',
-                                'quantity',
-                                'category',
-                                'type',
-                                'action'
-                            ]
-                        );
-
-                        toastMessage('success','Success','New item added to table');
+                        if(response['success']){
+                            //reload datatables
+                            tableAccess.datatables.ajax.reload(null, false);
+                            toastMessage('success','Success',response['message']);
+                        }
+                        else{
+                            toastMessage('error','Error',response['message']);
+                        }
                         $('#create-item-modal').iziModal('close');
                         uploadFileDZ.removeFile(file_upload);
 
+                    },
+                    error : function (result) {
+                        let response = result['responseJSON'];
+                        toastMessage('error','Error',response['message']);
+                        $('#import-modal').iziModal('close');
                     },
                     cache: false,
                     contentType: false,
