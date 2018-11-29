@@ -13,8 +13,7 @@ public class InventoryCreateRequest {
     @NotEmpty(message = "Please fill name field")
     String name;
 
-    @NotNull
-    MultipartFile photo_file;
+    MultipartFile photoFile;
 
     @NotNull
     Integer category_id;

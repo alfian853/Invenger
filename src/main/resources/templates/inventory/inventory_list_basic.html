@@ -24,11 +24,11 @@
         let preparedCol = DTAccess.generateColumnSpec([
             {'col':'id'},
             {'col':'name'},
-            {'col':'price'},
-            {'col':'quantity'},
-            {'col':'category',"orderable":false},
-            {'col':'type','orderable':false},
-            {'col':'action','orderable':false}
+            {'col':'price','searchable' : false},
+            {'col':'quantity','searchable' : false},
+            {'col':'category'},
+            {'col':'type','searchable' : false,'orderable':false},
+            {'col':'action','searchable' : false,'orderable':false}
         ]);
         $(document).ready(function(){
             var datatables = $('#itemsTable').DataTable({
@@ -53,7 +53,7 @@
                 columnDefs : preparedCol.columnDefs
             });
 
-            var searchableList = ['id','name'];
+            var searchableList = ['id','name','category'];
 
             for(let i=0;i<searchableList.length;i++){
                 let input = $('#itemsTable input[target-col=\"'+searchableList[i]+'\"]');
@@ -103,7 +103,13 @@
                     <th><input type="text" placeholder="Name" target-col="name"/></th>
                     <th></th>
                     <th></th>
-                    <th></th>
+                    <th>
+                        <select target-col="category">
+                            <th:block th:each="category : ${categories}">
+                                <option th:value="${category.name}" th:text="${category.name}">Option i</option>
+                            </th:block>
+                        </select>
+                    </th>
                     <th></th>
                     <th></th>
                 </tr>

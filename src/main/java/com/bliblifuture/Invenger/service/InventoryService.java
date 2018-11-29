@@ -1,11 +1,14 @@
 package com.bliblifuture.Invenger.service;
 
+import com.bliblifuture.Invenger.ModelMapper.FieldMapper;
 import com.bliblifuture.Invenger.ModelMapper.inventory.InventoryMapper;
 import com.bliblifuture.Invenger.Utils.DataTablesUtils;
 import com.bliblifuture.Invenger.Utils.MyUtils;
 import com.bliblifuture.Invenger.Utils.QuerySpec;
 import com.bliblifuture.Invenger.exception.DataNotFoundException;
+import com.bliblifuture.Invenger.exception.DefaultException;
 import com.bliblifuture.Invenger.exception.DuplicateEntryException;
+import com.bliblifuture.Invenger.exception.InvalidRequestException;
 import com.bliblifuture.Invenger.model.inventory.Category;
 import com.bliblifuture.Invenger.model.inventory.Inventory;
 import com.bliblifuture.Invenger.model.inventory.InventoryDocument;
@@ -29,13 +32,16 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.criteria.Predicate;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class InventoryService {
@@ -55,17 +61,18 @@ public class InventoryService {
     @Autowired
     MyUtils myUtils;
 
-    DataTablesUtils<Inventory> dataTablesUtils = new DataTablesUtils<>();
+    private DataTablesUtils<Inventory> dataTablesUtils;
 
     private LocalDateTime inventoriesLastUpdate = LocalDateTime.now();
-
-    private void refreshInventoriesLastUpdate(){
-        inventoriesLastUpdate = LocalDateTime.now();
-    }
 
     private final static String PDF_TEMPLATE = "inventory/pdf_template";
 
     private final InventoryMapper mapper = Mappers.getMapper(InventoryMapper.class);
+
+
+    public InventoryService(){
+        dataTablesUtils = new DataTablesUtils<>(mapper);
+    }
 
 
     public List<InventoryDTO> getAll(){
@@ -82,12 +89,8 @@ public class InventoryService {
         return mapper.toInventoryDto(inventory);
     }
 
-    public InventoryCreateResponse createInventory(InventoryCreateRequest request) throws DuplicateEntryException {
+    public InventoryCreateResponse createInventory(InventoryCreateRequest request) throws DefaultException {
         InventoryCreateResponse response = new InventoryCreateResponse();
-
-        String imgName = UUID.randomUUID().toString().replace("-","")+
-                "."+ FilenameUtils.getExtension(request.getPhoto_file().getOriginalFilename());
-
         Category newCategory = new Category();
         newCategory.setId(request.getCategory_id());
 
@@ -95,41 +98,46 @@ public class InventoryService {
         newInventory.setName(request.getName());
         newInventory.setQuantity(request.getQuantity());
         newInventory.setPrice(request.getPrice());
-        newInventory.setImage(imgName);
+
         newInventory.setDescription(request.getDescription());
         newInventory.setCategory(newCategory);
         newInventory.setType(request.getType().toString());
 
-        if(fileStorageService.storeFile(
-                request.getPhoto_file(),
-                imgName,
-                FileStorageService.PathCategory.INVENTORY_PICT)
-        ) {
-            boolean hasError = false;
-            try{
-                inventoryRepository.save(newInventory);
+        String imgName = null;
+        if(request.getPhotoFile() == null) {
+            imgName = UUID.randomUUID().toString().replace("-", "") +
+                    "." + FilenameUtils.getExtension(request.getPhotoFile().getOriginalFilename());
+
+            if (!fileStorageService.storeFile(
+                    request.getPhotoFile(),
+                    imgName,
+                    FileStorageService.PathCategory.INVENTORY_PICT)
+            ){
+                throw new DefaultException("Error when storing item picture");
             }
-            catch (DataIntegrityViolationException e){
+            newInventory.setImage(imgName);
+
+        }
+
+        try{
+            inventoryRepository.save(newInventory);
+        }
+        catch (DataIntegrityViolationException e){
+            e.printStackTrace();
+            if(!newInventory.getImage().equals("default-item.jpg") && imgName != null){
                 fileStorageService.deleteFile(
                         imgName,
                         FileStorageService.PathCategory.INVENTORY_PICT
                 );
-                e.printStackTrace();
+            }
             if(e.getRootCause().getLocalizedMessage().contains("duplicate")){
                 throw new DuplicateEntryException("Inventory name already exist");
             }
-            }
-            response.setStatusToSuccess();
         }
-        else{
-            response.setStatusToFailed();
-        }
+        response.setStatusToSuccess();
 
-        if(response.isSuccess()){
-            response.setInventory_id(newInventory.getId());
-        }
+        response.setInventory_id(newInventory.getId());
 
-        this.refreshInventoriesLastUpdate();
         return response;
     }
 
@@ -184,8 +192,6 @@ public class InventoryService {
 
         inventoryRepository.save(inventory);
 
-        this.refreshInventoriesLastUpdate();
-
         return response;
     }
 
@@ -194,8 +200,6 @@ public class InventoryService {
         inventoryRepository.deleteById(id);
         response.setStatusToSuccess();
         response.setMessage("Item Deleted");
-
-        this.refreshInventoriesLastUpdate();
 
         return response;
     }
@@ -265,7 +269,6 @@ public class InventoryService {
 
     public DataTablesResult<InventoryDataTableResponse> getPaginatedDatatablesInventoryList(
             DataTablesRequest request){
-
         QuerySpec<Inventory> spec = dataTablesUtils.getQuerySpec(request);
 
         Page<Inventory> page;
@@ -303,6 +306,41 @@ public class InventoryService {
         response.setResults(mapper.toSearchResultList(page.getContent()));
         response.setRecordsFiltered((int) page.getTotalElements());
 
+        return response;
+    }
+
+    public RequestResponse insertInventories(MultipartFile file) throws InvalidRequestException {
+        BufferedReader br;
+        List<Inventory> inventories = new LinkedList<>();
+        try {
+            String line;
+            InputStream is = file.getInputStream();
+            br = new BufferedReader(new InputStreamReader(is));
+
+            line = br.readLine();
+            String[] header = line.split(",");
+            System.out.println("header");
+            System.out.println(header);
+            Category category = categoryRepository.findCategoryByName("/all");
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(",");
+                Inventory inventory = new Inventory();
+                for(int i=0; i<values.length; i++){
+                    mapper.insertValueToObject(inventory,header[i],values[i]);
+                }
+                inventory.setCategory(category);
+                inventory.setImage("default-item.jpg");
+                inventories.add(inventory);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new InvalidRequestException("File is invalid, Please check the instruction");
+        }
+
+        inventoryRepository.saveAll(inventories);
+        RequestResponse response = new RequestResponse();
+        response.setStatusToSuccess();
+        response.setMessage(inventories.size()+" data added to database");
         return response;
     }
 
