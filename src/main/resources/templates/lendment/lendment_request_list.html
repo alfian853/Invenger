@@ -63,6 +63,7 @@
                         <td col="order-date" th:text="${lendment.orderDate}"></td>
                         <td col="status" th:text="${lendment.status}"></td>
                         <td>
+                            <button class="submit" type="submit" th:onclick="|loadLendmentDetail(${lendment.id})|">Detail</button>
                             <button class="submit" type="submit" th:onclick="|approve(${lendment.id})|">Approve</button>
                         </td>
                     </tr>
@@ -81,6 +82,34 @@
                 'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content')
             }
         });
+
+        function loadLendmentDetail(id) {
+
+            $('#lendment-detail-modal').iziModal({
+                title : 'Lendment Detail',
+                width : screen.width*0.9,
+                height : screen.height*0.9,
+                closeButton : true,
+                fullScreen : true,
+                history: false,
+                onOpening : function (modal) {
+                    modal.startLoading();
+                    $.get('/lendment/detail/'+id,function (html) {
+                        $('#lendment-detail-modal .iziModal-content').html(html);
+                        modal.stopLoading();
+                    }).fail(function (file,response) {
+                        modal.stopLoading();
+                        toastMessage('error','Failed','Something wrong :(');
+                        $('.iziModal-button-close').click();
+                    });
+                },
+                onClosed : function (modal) {
+                    $('#lendment-detail-modal').iziModal('destroy');
+                }
+
+            });
+            $('#lendment-detail-modal').iziModal('open');
+        }
 
         function approve(id) {
 
