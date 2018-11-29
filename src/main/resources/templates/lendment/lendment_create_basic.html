@@ -47,16 +47,6 @@
     </div>
 </div>
 
-
-<!--/*
-Documentation
-
-        list of global variable usage
-        [
-            tableAccess => global access for dataTables, initialize in inventory_list.html,
-        ]
-*/-->
-
 <script>
 
     var isSelected = {};
@@ -122,32 +112,6 @@ Documentation
 
         }
     });
-
-    <!--$('#AI-users-select').select2({-->
-        <!--placeholder : 'please select user',-->
-        <!--ajax : {-->
-            <!--url : '/user/search',-->
-            <!--delay : 350,-->
-            <!--params : null,-->
-            <!--quietMillis: 400,-->
-            <!--data : function (params) {-->
-                <!--let query = {-->
-                    <!--search : (params.term != null)?params.term:"",-->
-                    <!--page : (params.page)?params.page:0,-->
-                    <!--length : 10-->
-                <!--};-->
-                <!--this.params = query;-->
-                <!--return query;-->
-            <!--},-->
-            <!--processResults : function (result) {-->
-                <!--let params = this['$element'].params;-->
-                <!--result.pagination = {-->
-                    <!--more : params.length*params.page < result['recordsFiltered']-->
-                <!--};-->
-                <!--return result;-->
-            <!--}-->
-        <!--}-->
-    <!--});-->
 
     $('#assign-item-add').click(function () {
         console.log(itemData);
@@ -236,8 +200,6 @@ Documentation
             toastMessage('error','Error','Something wrong :(');
         });
 
-
     });
-
 
 </script>
