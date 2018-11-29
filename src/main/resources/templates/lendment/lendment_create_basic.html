@@ -1,0 +1,243 @@
+<div style="padding:10px;" xmlns:th="http://www.w3.org/1999/xhtml">
+    <div style="display: none;">
+        <div class="col-5">
+            <label>Employee name : </label>
+        </div>
+        <div class="col-7">
+            <select id="AI-users-select" style="width: 70%">
+                <th:block th:each="user : ${users}">
+                    <th:block th:if="${user.username == users2.name}">
+                        <option th:value="${user.id}" th:text="${user.username}" selected></option>
+                    </th:block>
+                </th:block>
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-5">
+            <label>Select items : </label>
+        </div>
+        <div class="col-md-5">
+            <select id="AI-item-select" style="width: 70%">
+                <!--<option></option>-->
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button id="assign-item-add" type="button" class="btn btn-secondary">
+                <i class="fas fa-plus"></i>
+            </button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4">
+            <label>Category</label>
+        </div>
+        <div class="col-4">
+            <label>Name</label>
+        </div>
+        <div class="col-4">
+            <label>Quantity</label>
+        </div>
+    </div>
+    <div class="row" id="selected-items">
+    </div>
+    <div class="modal-footer">
+        <button id="item-assign-submit" class="btn btn-primary">Assign</button>
+        <button id="item-assign-cancel" class="btn btn-primary">Cancel</button>
+    </div>
+</div>
+
+
+<!--/*
+Documentation
+
+        list of global variable usage
+        [
+            tableAccess => global access for dataTables, initialize in inventory_list.html,
+        ]
+*/-->
+
+<script>
+
+    var isSelected = {};
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content')
+        }
+    });
+
+    function removeItem(id){
+        $('#selected-items div[item-id=\"'+id+'\"]').remove();
+        isSelected[id]=false;
+    }
+
+    function qtyInputChange(input) {
+        let maks = parseInt($(input).attr('max'));
+        // console.log(maks);
+        console.log(parseInt($(input).val()));
+        if(maks < parseInt($(input).val()) ){
+            $(input).notify('quantity can\'t be greater than '+maks,{
+                position : 'left',
+                autoHide : true,
+                clickToHide: true,
+                className : 'warn'
+            });
+            $(input).val(maks);
+        }
+
+    }
+
+    var itemData = {};
+
+    var item_select = $('#AI-item-select');
+    item_select.select2({
+        placeholder : 'please select item',
+        ajax : {
+            url : '/inventory/search',
+            params : null,
+            delay : 350,
+            data : function (params) {
+                console.log(params);
+                let query = {
+                    search : (params.term != null)?params.term:"",
+                    page : (params.page)?params.page:0,
+                    length : 10
+                };
+                this.params = query;
+                return query;
+            },
+            processResults : function (result) {
+                let params = this['$element'].params;
+                result.pagination = {
+                    more : params.length*params.page < result['recordsFiltered']
+                };
+                let tmp = result.results;
+                let len = tmp.length;
+                for(let i=0; i<len; i++){
+                    itemData[tmp[i].id] = {'ctg': tmp[i].category, 'qty':tmp[i].quantity};
+                }
+                return result;
+            }
+
+        }
+    });
+
+    <!--$('#AI-users-select').select2({-->
+        <!--placeholder : 'please select user',-->
+        <!--ajax : {-->
+            <!--url : '/user/search',-->
+            <!--delay : 350,-->
+            <!--params : null,-->
+            <!--quietMillis: 400,-->
+            <!--data : function (params) {-->
+                <!--let query = {-->
+                    <!--search : (params.term != null)?params.term:"",-->
+                    <!--page : (params.page)?params.page:0,-->
+                    <!--length : 10-->
+                <!--};-->
+                <!--this.params = query;-->
+                <!--return query;-->
+            <!--},-->
+            <!--processResults : function (result) {-->
+                <!--let params = this['$element'].params;-->
+                <!--result.pagination = {-->
+                    <!--more : params.length*params.page < result['recordsFiltered']-->
+                <!--};-->
+                <!--return result;-->
+            <!--}-->
+        <!--}-->
+    <!--});-->
+
+    $('#assign-item-add').click(function () {
+        console.log(itemData);
+        var id = $('#AI-item-select').val();
+        console.log(id);
+        if(id == '' || isSelected[id] === true){
+            return;
+        }
+        isSelected[id] = true;
+        var row = $('#AI-item-select').find('option[value='+id+']');
+        var ctg = itemData[""+id].ctg;
+        var qty = itemData[""+id].qty;
+        var name = row.text();
+        $('#selected-items').append(
+            '<div class="row selected-item-row" item_id="'+id+'">' +
+            '   <div class="col-4">' +
+            '       <input type="text" name="category" disabled="disabled" value="'+ctg+'">' +
+            '   </div>' +
+            '   <div class="col-4">' +
+            '       <input type="text" name="name" disabled="disabled" value="'+name+'\">' +
+            '   </div>' +
+            '   <div class="col-2">' +
+            '       <input type="text" name="quantity" value="0" max="'+qty+'" ' +
+            'placeholder=\"max : '+qty+'\" onchange=\"qtyInputChange(this)\">' +
+            '   </div>' +
+            '   <div class="col-2">' +
+            '       <button type="button" class="btn btn-secondary" onclick="removeItem('+id+')">' +
+            '           <i class="fas fa-minus"></i>' +
+            '       </button>' +
+            '   </div>' +
+            '</div>'
+        );
+    });
+
+    $('#item-assign-cancel').click(function () {
+        $('.iziModal-button-close').click();
+    });
+
+    $('#item-assign-submit').click(function () {
+        var data = {};
+        data['user_id'] = $('#AI-users-select').val();
+        var items = [];
+        var valid = true;
+        $('#selected-items > .row').each(function () {
+            var item = {};
+            item['id'] = $(this).attr('item_id');
+            item['quantity'] = $(this).find('[name=\"quantity\"]').val();
+            if(item['quantity'] === '' || item['quantity'] == null){
+                $(this).find('[name=\"quantity\"]').notify('Required',{
+                   position : 'right',
+                   className : 'warn'
+                });
+                valid = false;
+                return;
+            }
+            items.push(item);
+       });
+       if(!valid){
+           return;
+       }
+       data['items'] = items;
+        $.ajax({
+            type: "POST",
+            url: "[[@{/lendment/create}]]",
+            data: JSON.stringify(data),
+            contentType : "application/json; charset=utf-8",
+            success: function(response){
+                if(response['success']){
+                    let len = items.length;
+                    for(let i = 0; i < len; i++){
+                        let id = items[i]['id'];
+                        let qty = parseInt(items[i]['quantity']);
+
+                        let col = window.tableAccess.getColByRowId(id,'quantity')
+                        let old_val = parseInt(col.text());
+                        window.tableAccess.setColValueByRowId(id,'quantity', old_val - qty );
+                    }
+                    toastMessage('success','Success',response['message']);
+                }
+                else{
+                    toastMessage('error','Error',response['message']);
+                }
+                $('.iziModal-button-close').click();
+            }
+        }).fail(function () {
+            toastMessage('error','Error','Something wrong :(');
+        });
+
+
+    });
+
+
+</script>

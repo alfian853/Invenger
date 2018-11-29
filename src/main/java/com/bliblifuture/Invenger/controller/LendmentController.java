@@ -27,8 +27,15 @@ public class LendmentController {
     InventoryService inventoryService;
 
     @GetMapping("lendment/create")
-    public String getAssignItemForm(){
-        return "lendment/lendment_create";
+    public String getAssignItemForm(Model model){
+        if(userService.currentUserIsAdmin()){
+            return "lendment/lendment_create";
+        }
+        else{
+            model.addAttribute("users2",userService.getProfile());
+            model.addAttribute("users",userService.getAll());
+            return "lendment/lendment_create_basic";
+        }
     }
 
     @PostMapping("lendment/create")

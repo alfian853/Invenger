@@ -92,7 +92,9 @@
 
         <div th:replace="navbar :: navbar"></div>
         <div class="user-text">Inventory</div>
-
+        <div style="margin-left: 22px;">
+            <button class="btn" id="assignItemBtn">Request Item</button>
+        </div>
         <div style="padding: 30px;">
             <table id="itemsTable" class="display" style="width:100%;">
                 <thead>
@@ -131,6 +133,7 @@
     </div>
 
     <div id="inventory-detail-modal"></div>
+    <div id="assign-item-modal"></div>
 
     <script>
         Dropzone.autoDiscover = false;
@@ -165,6 +168,31 @@
         }
 
         $(document).ready(function() {
+            $('#assignItemBtn').click(function () {
+                console.log('clicked');
+                $('#assign-item-modal').iziModal({
+                    title : 'Assign Item to User',
+                    width : screen.width*0.6,
+                    height : screen.height,
+                    closeButton : true,
+                    fullScreen : true,
+                    history : false,
+                    onOpening : function (modal) {
+                        modal.startLoading();
+                        $.get('/lendment/create',function (html) {
+                            $('#assign-item-modal .iziModal-content').html(html);
+                            modal.stopLoading();
+                        }).fail(function () {
+                            modal.stopLoading();
+                            toastMessage('error','Failed','Something wrong :(');
+                            $('.iziModal-button-close').click();
+                        });
+                    }
+                });
+
+                $('#assign-item-modal').iziModal('open');
+
+            });
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content')
