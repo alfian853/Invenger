@@ -1,8 +1,9 @@
 package com.bliblifuture.Invenger.ModelMapper.user;
 
+import com.bliblifuture.Invenger.model.user.Position;
 import com.bliblifuture.Invenger.model.user.User;
 import com.bliblifuture.Invenger.response.jsonResponse.search_response.SearchItem;
-import com.bliblifuture.Invenger.response.jsonResponse.search_response.SearchResponse;
+import com.bliblifuture.Invenger.response.viewDto.PositionDTO;
 import com.bliblifuture.Invenger.response.viewDto.UserDTO;
 
 import java.util.LinkedList;
@@ -39,5 +40,19 @@ public class UserMapperImpl implements UserMapper {
                     .build());
         }
         return responses;
+    }
+
+    @Override
+    public PositionDTO toPositionDto(Position position) {
+        return PositionDTO.builder()
+                .id(position.getId())
+                .name(position.getName())
+                .level(position.getLevel())
+                .build();
+    }
+
+    @Override
+    public List<PositionDTO> toPositionDtoList(List<Position> positions) {
+        return positions.stream().map(this::toPositionDto).collect(Collectors.toList());
     }
 }

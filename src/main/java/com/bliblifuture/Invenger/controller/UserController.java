@@ -1,6 +1,7 @@
 package com.bliblifuture.Invenger.controller;
 
 import com.bliblifuture.Invenger.Utils.MyUtils;
+import com.bliblifuture.Invenger.exception.DefaultException;
 import com.bliblifuture.Invenger.model.user.RoleType;
 import com.bliblifuture.Invenger.model.user.User;
 import com.bliblifuture.Invenger.request.formRequest.UserCreateRequest;
@@ -8,7 +9,7 @@ import com.bliblifuture.Invenger.request.formRequest.UserEditRequest;
 import com.bliblifuture.Invenger.request.jsonRequest.ProfileRequest;
 import com.bliblifuture.Invenger.response.jsonResponse.*;
 import com.bliblifuture.Invenger.response.jsonResponse.search_response.SearchResponse;
-import com.bliblifuture.Invenger.service.PositionService;
+import com.bliblifuture.Invenger.response.viewDto.PositionDTO;
 import com.bliblifuture.Invenger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -26,9 +27,6 @@ public class UserController {
 
     @Autowired
     UserService userService;
-
-    @Autowired
-    PositionService positionService;
 
     @Autowired
     MyUtils myUtils;
@@ -82,7 +80,7 @@ public class UserController {
         model.addAttribute("users", userService.getAll());
         model.addAttribute("user",userService.getProfile());
         model.addAttribute("roles", RoleType.values());
-        model.addAttribute("positions", positionService.getAllPosition());
+        model.addAttribute("positions", userService.getAllPosition());
         model.addAttribute("createUserForm", new UserCreateRequest());
         return "user/user_list";
     }
@@ -118,6 +116,30 @@ public class UserController {
                                      @RequestParam("length")Integer length) {
 
         return userService.getSearchedUser(query,page,length);
+    }
+
+    @GetMapping("/user/positions")
+    public String getPositionTable(Model model){
+        model.addAttribute("positions", userService.getAllPosition());
+        return "user/position_list";
+    }
+
+    @PostMapping("/user/positions/create")
+    @ResponseBody
+    public PositionCreateResponse createPosition(@Valid @RequestBody PositionDTO positionDTO) throws DefaultException {
+        return userService.createPosition(positionDTO);
+    }
+
+    @PostMapping("/user/positions/edit")
+    @ResponseBody
+    public RequestResponse editPosition(@RequestBody PositionDTO editedPosition) throws DefaultException {
+        return userService.editPosition(editedPosition);
+    }
+
+    @PostMapping("/user/positions/delete/{id}")
+    @ResponseBody
+    public RequestResponse deletePosition(@PathVariable("id") Integer id) throws DefaultException {
+        return userService.deletePosition(id);
     }
 
 }

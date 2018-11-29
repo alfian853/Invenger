@@ -54,7 +54,6 @@ public class DataSeeder {
         Position position = positionRepository.findByName("inventory system admin");
         if(position == null){
             position = new Position();
-            position.setDescription("manage invenger");
             position.setName("inventory system admin");
             positionRepository.save(position);
         }
@@ -63,7 +62,6 @@ public class DataSeeder {
 
         if(position == null){
             position = new Position();
-            position.setDescription("basic user");
             position.setName("junior software engineer");
             positionRepository.save(position);
         }

@@ -22,7 +22,5 @@ public class Position {
 
     String name;
 
-    @Column(columnDefinition = "text")
-    String description;
-
+    Integer level;
 }

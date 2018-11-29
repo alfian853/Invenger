@@ -17,6 +17,7 @@ import com.bliblifuture.Invenger.request.formRequest.UserEditRequest;
 import com.bliblifuture.Invenger.request.jsonRequest.ProfileRequest;
 import com.bliblifuture.Invenger.response.jsonResponse.*;
 import com.bliblifuture.Invenger.response.jsonResponse.search_response.SearchResponse;
+import com.bliblifuture.Invenger.response.viewDto.PositionDTO;
 import com.bliblifuture.Invenger.response.viewDto.ProfileDTO;
 import com.bliblifuture.Invenger.response.viewDto.UserDTO;
 import org.mapstruct.factory.Mappers;
@@ -182,7 +183,7 @@ public class UserService implements UserDetailsService {
                 throw new DataNotFoundException("User Doesn\'t Exists!");
             }
             else{
-                throw new DefaultException("Internal Server Error");
+                throw new DefaultException(e.getLocalizedMessage());
             }
         }
         response.setStatusToSuccess();
@@ -384,5 +385,80 @@ public class UserService implements UserDetailsService {
         return response;
     }
 
+    public List<PositionDTO> getAllPosition(){
+        return mapper.toPositionDtoList(positionRepository.findAll());
+    }
+
+    private void savePositionHandler(Position position) throws DefaultException {
+        try{
+            positionRepository.save(position);
+        }
+        catch (DataIntegrityViolationException e){
+            if(e.getRootCause().getLocalizedMessage().contains("duplicate")){
+                if(e.getRootCause().getLocalizedMessage().contains("username")){
+                    throw new DuplicateEntryException("Position already exist!");
+                }
+                throw new DefaultException(e.getLocalizedMessage());
+            }
+        }
+    }
+
+    public PositionCreateResponse createPosition(PositionDTO newPosition) throws DefaultException {
+        Position position = Position.builder()
+                .name(newPosition.getName())
+                .level(newPosition.getLevel())
+                .build();
+
+        this.savePositionHandler(position);
+
+        PositionCreateResponse response = new PositionCreateResponse();
+
+        if(position != null && position.getId() != null){
+            response.setMessage("New position added to table");
+            response.setStatusToSuccess();
+            response.setPositionId(position.getId());
+        }
+        else{
+            response.setMessage("Unknown error");
+            response.setStatusToFailed();
+        }
+
+        return response;
+
+    }
+
+    public RequestResponse editPosition(PositionDTO editedPosition) throws DefaultException {
+
+        Position position = Position.builder()
+                .id(editedPosition.getId())
+                .name(editedPosition.getName())
+                .level(editedPosition.getLevel())
+                .build();
+
+        this.savePositionHandler(position);
+
+        RequestResponse response = new RequestResponse();
+        response.setStatusToSuccess();
+        return response;
+    }
+
+    public RequestResponse deletePosition(Integer id) throws DefaultException {
+        try{
+            positionRepository.deleteById(id);
+        }
+        catch(Exception e){
+            if(e instanceof EmptyResultDataAccessException){
+                throw new DataNotFoundException("Position Doesn\'t Exists!");
+            }
+            else{
+                throw new DefaultException(e.getLocalizedMessage());
+            }
+        }
+        RequestResponse response = new RequestResponse();
+        response.setStatusToSuccess();
+        response.setMessage("Position deleted");
+
+        return response;
+    }
 
 }

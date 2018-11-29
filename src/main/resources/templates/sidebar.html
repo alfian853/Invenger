@@ -19,6 +19,9 @@
 	<a class="icon" href="/user/all" sec:authorize="hasRole('ADMIN')">
 		<i class="fas fa-users"></i><div class="text">Users</div>
 	</a>
+	<a class="icon" href="/user/positions" sec:authorize="hasRole('ADMIN')">
+		<i class="fas fa-users"></i><div class="text">User Positions</div>
+	</a>
 	<script>
         function myFunction(){
             var z = document.getElementsByClassName("text");
