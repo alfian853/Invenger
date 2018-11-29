@@ -56,13 +56,23 @@ public class LendmentService {
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public RequestResponse createLendment(LendmentCreateRequest request) throws Exception {
         RequestResponse response = new RequestResponse();
-        Lendment lendment = Lendment
-                .builder()
-                .user( userRepository.getOne(request.getUserId()) )
-                .status(LendmentStatus.WaitingForApproval.getDesc())
-                .notReturnedCount(request.getItems().size())
-                .build();
-
+        Lendment lendment;
+        if(userService.currentUserIsAdmin()){
+            lendment = Lendment
+                    .builder()
+                    .user( userRepository.getOne(request.getUserId()) )
+                    .status(LendmentStatus.WaitingForPickUp.getDesc())
+                    .notReturnedCount(request.getItems().size())
+                    .build();
+        }
+        else{
+            lendment = Lendment
+                    .builder()
+                    .user( userRepository.getOne(request.getUserId()) )
+                    .status(LendmentStatus.WaitingForApproval.getDesc())
+                    .notReturnedCount(request.getItems().size())
+                    .build();
+        }
         lendmentRepository.save(lendment);
 
         List<LendmentDetail> detailsList = new LinkedList<>();
