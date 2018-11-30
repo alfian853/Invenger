@@ -1,7 +1,5 @@
 package com.bliblifuture.Invenger.ModelMapper.inventory;
 
-import com.bliblifuture.Invenger.ModelMapper.CriteriaPathMapper;
-import com.bliblifuture.Invenger.ModelMapper.FieldMapper;
 import com.bliblifuture.Invenger.model.inventory.Inventory;
 import com.bliblifuture.Invenger.model.inventory.InventoryType;
 import com.bliblifuture.Invenger.response.jsonResponse.InventoryDataTableResponse;

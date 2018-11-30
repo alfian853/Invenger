@@ -1,11 +1,15 @@
 package com.bliblifuture.Invenger.ModelMapper.user;
 
+import com.bliblifuture.Invenger.model.inventory.Inventory;
 import com.bliblifuture.Invenger.model.user.Position;
 import com.bliblifuture.Invenger.model.user.User;
+import com.bliblifuture.Invenger.response.jsonResponse.UserDataTableResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.search_response.SearchItem;
 import com.bliblifuture.Invenger.response.viewDto.PositionDTO;
 import com.bliblifuture.Invenger.response.viewDto.UserDTO;
 
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -57,5 +61,33 @@ public class UserMapperImpl implements UserMapper {
     @Override
     public List<PositionDTO> toPositionDtoList(List<Position> positions) {
         return positions.stream().map(this::toPositionDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserDataTableResponse> toUserDatatables(List<User> users) {
+
+        List<UserDataTableResponse> responses = new LinkedList<>();
+
+        for(User user : users){
+            responses.add(UserDataTableResponse.builder()
+                    .id(user.getId())
+                    .rowId("row_"+user.getId())
+                    .fullName(user.getFullName())
+                    .email(user.getEmail())
+                    .position(user.getPosition().getName())
+                    .build()
+            );
+        }
+
+        return responses;
+    }
+
+    @Override
+    public Path getPathFrom(Root root, String field) {
+        switch (field){
+            case "position":
+                return root.get("position").get("name");
+        }
+        return root.get(field);
     }
 }

@@ -260,30 +260,24 @@ public class InventoryService {
 
     }
 
-    public long countRecord(){
-        return inventoryRepository.count();
-    }
-
     public DataTablesResult<InventoryDataTableResponse> getPaginatedDatatablesInventoryList(
             DataTablesRequest request){
         QuerySpec<Inventory> spec = dataTablesUtils.getQuerySpec(request);
 
         Page<Inventory> page;
         DataTablesResult<InventoryDataTableResponse> result = new DataTablesResult<>();
-        System.out.println(spec.getSpecification());
+
         if(spec.getSpecification() == null){
-            System.out.println("no filter");
             page = inventoryRepository.findAll(spec.getPageRequest());
         }
         else{
-            System.out.println("has filter");
             page = inventoryRepository.findAll(spec.getSpecification(),spec.getPageRequest());
         }
         
         result.setListOfDataObjects(mapper.toInventoryDatatables(page.getContent()));
         result.setDraw(Integer.parseInt(request.getDraw()));
         result.setRecordsFiltered((int) page.getTotalElements());
-        result.setRecordsTotal((int) this.countRecord());
+        result.setRecordsTotal((int) inventoryRepository.count());
 
         return result;
     }

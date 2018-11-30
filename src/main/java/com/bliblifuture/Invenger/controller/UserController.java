@@ -4,6 +4,7 @@ import com.bliblifuture.Invenger.Utils.MyUtils;
 import com.bliblifuture.Invenger.exception.DefaultException;
 import com.bliblifuture.Invenger.model.user.RoleType;
 import com.bliblifuture.Invenger.model.user.User;
+import com.bliblifuture.Invenger.request.datatables.DataTablesRequest;
 import com.bliblifuture.Invenger.request.formRequest.UserCreateRequest;
 import com.bliblifuture.Invenger.request.formRequest.UserEditRequest;
 import com.bliblifuture.Invenger.request.jsonRequest.ProfileRequest;
@@ -141,6 +142,14 @@ public class UserController {
     @ResponseBody
     public RequestResponse deletePosition(@PathVariable("id") Integer id) throws DefaultException {
         return userService.deletePosition(id);
+    }
+
+    @GetMapping("/datatables/user")
+    @ResponseBody
+    public DataTablesResult<UserDataTableResponse> getPaginatedInventories(
+            HttpServletRequest servletRequest){
+        DataTablesRequest request = new DataTablesRequest(servletRequest);
+        return userService.getPaginatedDatatablesUserList(request);
     }
 
 }

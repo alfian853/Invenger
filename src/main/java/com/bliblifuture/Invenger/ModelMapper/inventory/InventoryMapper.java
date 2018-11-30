@@ -17,7 +17,7 @@ public interface InventoryMapper extends CriteriaPathMapper, FieldMapper<Invento
     InventoryDTO toInventoryDto(Inventory inventory);
     List<InventoryDTO> toInventoryDtoList(List<Inventory> inventories);
 
-    List<InventoryDataTableResponse> toInventoryDatatables(List<Inventory> page);
+    List<InventoryDataTableResponse> toInventoryDatatables(List<Inventory> inventories);
 
     List<SearchItem> toSearchResultList(List<Inventory> inventories);
 }

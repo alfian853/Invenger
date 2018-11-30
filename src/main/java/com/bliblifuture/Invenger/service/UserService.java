@@ -1,7 +1,9 @@
 package com.bliblifuture.Invenger.service;
 
 import com.bliblifuture.Invenger.ModelMapper.user.UserMapper;
+import com.bliblifuture.Invenger.Utils.DataTablesUtils;
 import com.bliblifuture.Invenger.Utils.MyUtils;
+import com.bliblifuture.Invenger.Utils.QuerySpec;
 import com.bliblifuture.Invenger.annotation.imp.PasswordValdator;
 import com.bliblifuture.Invenger.annotation.imp.PhoneValidator;
 import com.bliblifuture.Invenger.exception.DataNotFoundException;
@@ -13,6 +15,7 @@ import com.bliblifuture.Invenger.model.user.User;
 import com.bliblifuture.Invenger.model.user.RoleType;
 import com.bliblifuture.Invenger.repository.PositionRepository;
 import com.bliblifuture.Invenger.repository.UserRepository;
+import com.bliblifuture.Invenger.request.datatables.DataTablesRequest;
 import com.bliblifuture.Invenger.request.formRequest.UserCreateRequest;
 import com.bliblifuture.Invenger.request.formRequest.UserEditRequest;
 import com.bliblifuture.Invenger.request.jsonRequest.ProfileRequest;
@@ -53,6 +56,12 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     MyUtils myUtils;
+
+    private DataTablesUtils<User> dataTablesUtils;
+
+    public UserService(){
+        dataTablesUtils = new DataTablesUtils<>(mapper);
+    }
 
     private final UserMapper mapper = Mappers.getMapper(UserMapper.class);
 
@@ -444,6 +453,29 @@ public class UserService implements UserDetailsService {
         response.setMessage("Position deleted");
 
         return response;
+    }
+
+    public DataTablesResult<UserDataTableResponse> getPaginatedDatatablesUserList(DataTablesRequest request){
+        QuerySpec<User> spec = dataTablesUtils.getQuerySpec(request);
+
+        Page<User> page;
+
+        DataTablesResult<UserDataTableResponse> result = new DataTablesResult<>();
+
+        if(spec.getSpecification() == null){
+            System.out.println("no filter");
+            page = userRepository.findAll(spec.getPageRequest());
+        }
+        else{
+            System.out.println("has filter");
+            page = userRepository.findAll(spec.getSpecification(),spec.getPageRequest());
+        }
+
+        result.setListOfDataObjects(mapper.toUserDatatables(page.getContent()));
+        result.setDraw(Integer.parseInt(request.getDraw()));
+        result.setRecordsFiltered((int) page.getTotalElements());
+        result.setRecordsTotal((int) this.userRepository.count());
+        return result;
     }
 
 }

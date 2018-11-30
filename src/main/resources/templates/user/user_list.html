@@ -16,11 +16,59 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/css/iziModal.min.css">
         <script src="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/js/iziModal.min.js"></script>
         <script th:src="@{/js/DataTablesAccess.js}"></script>
+
+        <style>
+            .dataTables_filter, .dataTables_info { display: none; }
+        </style>
+
+
         <script th:inline = "javascript">
             var tableAccess = null;
+            let preparedCol = DTAccess.generateColumnSpec([
+                {'col':'fullName'},
+                {'col':'email'},
+                {'col':'position'},
+                {'col':'action','searchable' : false,'orderable':false}
+            ]);
+
             $(document).ready(function(){
-                var datatables = $('#itemsTable').DataTable();
-                tableAccess = new DTAccess(datatables,'usr-',7);
+                var datatables = $('#usersTable').DataTable({
+                    processing: true,
+                    serverSide : true,
+                    ajax : {
+                        'type' : 'GET',
+                        'url' : '/datatables/user',
+                        'dataSrc' : function (response) {
+                            let len = response.data.length;
+                            let ref = response.data;
+                            for(let i = 0; i<len; i++){
+                                ref[i]['action'] =
+                                    '<button class="submit" type="submit" onclick="loadDetail('+ref[i].id+')">More</button>' +
+                                    '<button class="submit" type="submit" onclick="deleteUser('+ref[i].id+')" style="background-color: #BB281A;">' +
+                                    '<i class="fas fa-trash"></i>' +
+                                    '</button>'
+
+                            }
+                            return ref;
+                        }
+                    },
+                    columns : preparedCol.column,
+                    columnDefs : preparedCol.columnDefs
+                });
+
+                var searchableList = ['fullName','email','position'];
+
+                for(let i=0;i<searchableList.length;i++){
+                    let input = $('#usersTable [target-col=\"'+searchableList[i]+'\"]');
+                    let target = datatables.column('#usersTable th[col=\"'+searchableList[i]+'\"]');
+                    input.on('keyup change',function () {
+                        if(target.search() !== input.val()){
+                            target.search(input.val()).draw();
+                        }
+                    });
+                }
+
+                tableAccess = new DTAccess(datatables,'usr-',4);
             });
             var listPosition = {};
             var select_superior = {};
@@ -46,44 +94,35 @@
             <button class="btn" id="userBtn">New User</button>
         </div>
         <div style="padding: 50px;">
-            <table id="itemsTable" class="display" style="width:100%;">
+            <table id="usersTable" class="display" style="width:100%;">
                 <thead>
                 <tr>
-                    <th>Id</th>
-                    <th>Username</th>
-                    <th>Email</th>
-                    <th>Telp</th>
-                    <th>Position</th>
-                    <th>Superior</th>
+                    <th><input type="text" style="width: 60px" placeholder="name" target-col="fullName"/></th>
+                    <th><input type="text" placeholder="email" target-col="email"/></th>
+                    <th>
+                        <select target-col="position">
+                            <option selected>&lt;Filter by position&gt;</option>
+                            <th:block th:each="position : ${positions}">
+                                <option th:value="${position.name}" th:text="${position.name}">Option i</option>
+                            </th:block>
+                        </select>
+                    </th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <th col="fullName">Full Name</th>
+                    <th col="email">Email</th>
+                    <th col="position">Position</th>
                     <th>Action</th>
                 </tr>
                 </thead>
                 <tbody id="users-table-body">
-                <th:block th:each="user : ${users}">
-                    <tr th:id="|usr-${user.id}|">
-                        <td col="user-id" th:text="${user.id}"></td>
-                        <td col="username" th:text="${user.username}"></td>
-                        <td col="email" th:text="${user.email}"></td>
-                        <td col="telp" th:text="${user.telp}"></td>
-                        <td col="position" th:text="${user.position}"></td>
-                        <td col="superior" th:text="${user.superior}"></td>
-                        <td col="action">
-                            <button class="submit" type="submit" th:onclick="|loadDetail(${user.id})|">More</button>
-                            <button class="submit" type="submit" th:onclick="|deleteUser(${user.id})|" style="background-color: #BB281A;">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                </th:block>
                 </tbody>
                 <tfoot>
                 <tr>
-                    <th>Id</th>
-                    <th>Username</th>
-                    <th>Email</th>
-                    <th>Telp</th>
-                    <th>Position</th>
-                    <th>Superior</th>
+                    <th >Full Name</th>
+                    <th >Email</th>
+                    <th >Position</th>
                     <th>Action</th>
                 </tr>
                 </tfoot>
