@@ -21,6 +21,12 @@ public class UserDTO {
 
     private String position;
 
+    private Integer positionId;
+
+    private Integer positionLevel;
+
     private String superior;
+
+    private Integer superiorId;
 
 }

@@ -7,15 +7,6 @@
                          th:src="@{/profile/pict/{link}(link=${user.pictureName})}" style="height: 350px;width:350px;">
                 </div>
             </div>
-            <div class="row" style="margin-left: 10px">
-                <div class="col-md-12">
-                    <div class="btn-group">
-                        <label>Change Picture</label>
-                        <input type="file" name="pict" value="" id="upload-img-btn" class="btn btn-secondary"
-                               onchange="update(this);">
-                    </div>
-                </div>
-            </div>
         </div>
         <div class="col-md-6" style="padding-left: 0px">
             <div class="row my-2">
@@ -25,7 +16,7 @@
                 <div class="col-md-6">
                     <div class="input-group">
                         <input type="text" name="username" th:value="${user.username}" class="form-control"
-                               placeholder="Username" onchange="update(this);">
+                               placeholder="Username" disabled="disabled">
                     </div>
                 </div>
             </div>
@@ -36,7 +27,18 @@
                 <div class="col-md-6">
                     <div class="input-group">
                         <input type="text" name="email" th:value="${user.email}" class="form-control"
-                               placeholder="User Email" onchange="update(this);">
+                               placeholder="User Email" disabled="disabled">
+                    </div>
+                </div>
+            </div>
+            <div class="row my-2">
+                <div class="col-md-5">
+                    <label>Telp* :</label>
+                </div>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" name="telp" th:value="${user.telp}" class="form-control"
+                               placeholder="Telp" disabled="disabled">
                     </div>
                 </div>
             </div>
@@ -53,23 +55,25 @@
             </div>
             <div class="row my-2">
                 <div class="col-md-5">
-                    <label>Telp* :</label>
-                </div>
-                <div class="col-md-6">
-                    <div class="input-group">
-                        <input type="text" name="telp" th:value="${user.telp}" class="form-control"
-                               placeholder="Telp" onchange="update(this);">
-                    </div>
-                </div>
-            </div>
-            <div class="row my-2">
-                <div class="col-md-5">
                     <label>Position* :</label>
                 </div>
                 <div class="col-md-6">
                     <div class="input-group">
                         <select id="user-detail-position" class="btn-outline-primary form-input" style="width: 100%;"
                                 th:name="position_id" onchange="update(this);">
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row my-2">
+                <div class="col-md-5">
+                    <label>Superior* :</label>
+                </div>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <select id="user-detail-superior" class="btn-outline-primary form-input" style="width: 100%;"
+                                th:name="superior_id" onchange="update(this);">
+                            <option th:value="${superiorId}" th:text="${superior}"></option>
                         </select>
                     </div>
                 </div>
@@ -94,12 +98,9 @@ Documentation
 <script>
     var user_id = '[[${user.id}]]';
     var listOfField = {
-        'username' : '[[${user.username}]]',
-        'email' : '[[${user.email}]]',
         'password' : '',
-        'telp' : '[[${user.telp}]]',
-        'position_id' : '[[${user.position.id}]]',
-        'pict' : ''
+        'position_id' : '[[${user.positionId}]]',
+        'superior_id' : '[[${user.superiorId}]]'
     };
 
     var upload_file = null;
@@ -129,7 +130,7 @@ Documentation
     $(document).ready(function() {
 
         for(var key in listPosition){
-            if(key == '[[${user.position.id}]]'){
+            if(key == '[[${user.positionId}]]'){
                 $('#user-detail-position').append(
                     '<option selected=\"selected\" value=\"'+key+'\" >'+listPosition[key]+'</option>'
                 );
@@ -140,6 +141,33 @@ Documentation
                 );
             }
         }
+        $('#user-detail-superior').select2({
+            ajax : {
+                url : '/user/search',
+                params : null,
+                delay : 350,
+                data : function (params) {
+                    let query = {
+                        search : (params.term != null)?params.term:"",
+                        page : (params.page)?params.page:0,
+                        length : 10,
+                        min_level : '[[${user.positionLevel}]]'
+                    };
+                    this.params = query;
+                    return query;
+                },
+                processResults : function (result) {
+                    let params = this['$element'].params;
+                    result.pagination = {
+                        more : params.length*params.page < result['recordsFiltered']
+                    };
+                    return result;
+                }
+
+            }
+        });
+
+        $('#user-detail-superior').append('<option selected=\"selected\" value=\"[[${user.superiorId}]]\">[[${user.superior}]]</option>');
 
 
         $('#user-detail-save-btn').click(function () {

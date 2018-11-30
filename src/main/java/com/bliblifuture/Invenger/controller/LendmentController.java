@@ -32,7 +32,6 @@ public class LendmentController {
             return "lendment/lendment_create";
         }
         else{
-            model.addAttribute("users2",userService.getProfile());
             model.addAttribute("users",userService.getAll());
             return "lendment/lendment_create_basic";
         }

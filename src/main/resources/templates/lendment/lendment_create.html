@@ -5,9 +5,6 @@
         </div>
         <div class="col-7">
             <select id="AI-users-select" style="width: 70%">
-                <!--<th:block th:each="user : ${users}">-->
-                    <!--<option th:value="${user.id}" th:text="${user.username}"></option>-->
-                <!--</th:block>-->
             </select>
         </div>
     </div>
@@ -85,6 +82,33 @@ Documentation
         }
 
     }
+
+    $('#AI-users-select').select2({
+        placeholder : 'please select user',
+        ajax : {
+            url : '/user/search',
+            params : null,
+            delay : 350,
+            data : function (params) {
+                console.log(params);
+                let query = {
+                    search : (params.term != null)?params.term:"",
+                    page : (params.page)?params.page:0,
+                    length : 10
+                };
+                this.params = query;
+                return query;
+            },
+            processResults : function (result) {
+                let params = this['$element'].params;
+                result.pagination = {
+                    more : params.length*params.page < result['recordsFiltered']
+                };
+                return result;
+            }
+
+        }
+    });
 
     var itemData = {};
 

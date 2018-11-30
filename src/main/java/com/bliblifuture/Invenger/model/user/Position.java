@@ -20,7 +20,9 @@ public class Position {
     @GeneratedValue(strategy = GenerationType.AUTO)
     Integer id;
 
+    @Column(unique = true,nullable = false)
     String name;
 
+    @Column(nullable = false)
     Integer level;
 }

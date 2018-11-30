@@ -7,6 +7,7 @@ import com.bliblifuture.Invenger.annotation.imp.PhoneValidator;
 import com.bliblifuture.Invenger.exception.DataNotFoundException;
 import com.bliblifuture.Invenger.exception.DefaultException;
 import com.bliblifuture.Invenger.exception.DuplicateEntryException;
+import com.bliblifuture.Invenger.exception.InvalidRequestException;
 import com.bliblifuture.Invenger.model.user.Position;
 import com.bliblifuture.Invenger.model.user.User;
 import com.bliblifuture.Invenger.model.user.RoleType;
@@ -59,12 +60,12 @@ public class UserService implements UserDetailsService {
         return mapper.toUserDtoList(userRepository.findAllFetched());
     }
 
-    public User getById(Integer id) throws Exception {
+    public UserDTO getById(Integer id) throws Exception {
         User user = userRepository.findUserById(id);
         if(user == null){
             throw new DataNotFoundException("User Not Found");
         }
-        return user;
+        return mapper.toUserDto(user);
     }
 
     private void saveUserHandler(User user) throws Exception {
@@ -125,51 +126,29 @@ public class UserService implements UserDetailsService {
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public RequestResponse updateUser(UserEditRequest request) throws Exception {
 
-        User user = userRepository.getOne(request.getId());
-        System.out.println(request);
-        RequestResponse response = new RequestResponse();
-        response.setStatusToSuccess();
+        User user = userRepository.findUserById(request.getId());
 
-        if(request.getUsername() != null){
-            user.setUsername(request.getUsername());
-        }
-        if(request.getEmail() != null){
-            user.setEmail(request.getEmail());
-        }
         if(request.getPassword() != null){
             user.setPassword(myUtils.getBcryptHash(request.getPassword()));
         }
-        if(request.getTelp() != null){
-            user.setTelp(request.getTelp());
-        }
+
         if(request.getPosition_id() != null){
             Position position = positionRepository.getOne(request.getPosition_id());
             user.setPosition(position);
         }
 
-        if(request.getPict() != null){
-
-            String newFileName = myUtils.getRandomFileName(request.getPict());
-
-            if(fileStorageService.storeFile(request.getPict(),newFileName,
-                    FileStorageService.PathCategory.PROFILE_PICT) ){
-
-                String oldFileName = user.getPictureName();
-                fileStorageService.deleteFile(oldFileName, FileStorageService.PathCategory.PROFILE_PICT);
-                user.setPictureName(newFileName);
+        if(request.getSuperior_id() != null){
+            User superior = userRepository.findUserById(request.getSuperior_id());
+            if(superior.getPosition().getLevel() <= user.getPosition().getLevel()){
+                throw new InvalidRequestException("Invalid Request Superior level");
             }
-            else {
-                response.setStatusToFailed();
-                response.setMessage("Internal server error");
-            }
-
-        }
-        else{
-            user.setPictureName("default-pict.png");
+            user.setSuperior(superior);
         }
 
         this.saveUserHandler(user);
 
+        RequestResponse response = new RequestResponse();
+        response.setStatusToSuccess();
         return response;
     }
 
@@ -363,7 +342,7 @@ public class UserService implements UserDetailsService {
         }
         return response;
     }
-    public SearchResponse getSearchedUser(String query, Integer pageNum, Integer length) {
+    public SearchResponse getSearchedUser(String query, Integer pageNum, Integer length,Integer minLevel) {
 
         PageRequest pageRequest = PageRequest.of(pageNum,length);
         Specification<User> specification = (root, criteriaQuery, criteriaBuilder) -> {
@@ -374,7 +353,13 @@ public class UserService implements UserDetailsService {
             predicates.add(criteriaBuilder.like(
                     criteriaBuilder.lower(root.get("fullName")), "%" + query.toLowerCase() + "%")
             );
-            return criteriaBuilder.or(predicates.toArray(new Predicate[0]));
+            if(minLevel != null){
+                Predicate levelPredicate = criteriaBuilder.greaterThan(root.get("position").get("level"),minLevel);
+                return criteriaBuilder.and(criteriaBuilder.or(predicates.toArray(new Predicate[0])),levelPredicate);
+            }
+            else{
+                return criteriaBuilder.or(predicates.toArray(new Predicate[0]));
+            }
         };
 
         Page<User> page = userRepository.findAll(specification,pageRequest);

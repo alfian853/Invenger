@@ -65,7 +65,6 @@ public class UserServiceTest {
 
     private static Position POSITION = Position.builder()
             .name("admin")
-            .description("none")
             .build();
 
     @Before

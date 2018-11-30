@@ -19,8 +19,11 @@ public class UserMapperImpl implements UserMapper {
                 .fullName(user.getFullName())
                 .username(user.getUsername())
                 .position(user.getPosition().getName())
+                .positionId(user.getPosition().getId())
+                .positionLevel(user.getPosition().getLevel())
                 .pictureName(user.getPictureName())
                 .superior((user.getSuperior() != null)?user.getSuperior().getFullName():"")
+                .superiorId((user.getSuperior() != null)?user.getSuperior().getId():null)
                 .telp(user.getTelp())
                 .build();
     }

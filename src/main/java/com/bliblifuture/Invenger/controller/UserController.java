@@ -113,9 +113,10 @@ public class UserController {
     @ResponseBody
     public SearchResponse searchUser(@RequestParam("search")String query,
                                      @RequestParam("page")Integer page,
-                                     @RequestParam("length")Integer length) {
+                                     @RequestParam("length")Integer length,
+                                     @RequestParam(value = "min_level",required = false) Integer minLevel) {
 
-        return userService.getSearchedUser(query,page,length);
+        return userService.getSearchedUser(query,page,length,minLevel);
     }
 
     @GetMapping("/user/positions")
