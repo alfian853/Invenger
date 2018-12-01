@@ -101,7 +101,7 @@
                     <th><input type="text" placeholder="email" target-col="email"/></th>
                     <th>
                         <select target-col="position">
-                            <option selected>&lt;Filter by position&gt;</option>
+                            <option selected value="">&lt;Filter by position&gt;</option>
                             <th:block th:each="position : ${positions}">
                                 <option th:value="${position.name}" th:text="${position.name}">Option i</option>
                             </th:block>
