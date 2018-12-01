@@ -4,6 +4,7 @@ import com.bliblifuture.Invenger.model.lendment.LendmentStatus;
 import com.bliblifuture.Invenger.request.jsonRequest.LendmentCreateRequest;
 import com.bliblifuture.Invenger.request.jsonRequest.LendmentReturnRequest;
 import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
+import com.bliblifuture.Invenger.response.viewDto.LendmentDTO;
 import com.bliblifuture.Invenger.service.InventoryService;
 import com.bliblifuture.Invenger.service.LendmentService;
 import com.bliblifuture.Invenger.service.UserService;
@@ -32,7 +33,7 @@ public class LendmentController {
             return "lendment/lendment_create";
         }
         else{
-            model.addAttribute("users",userService.getAll());
+            model.addAttribute("user",userService.getProfile());
             return "lendment/lendment_create_basic";
         }
     }
@@ -45,17 +46,15 @@ public class LendmentController {
 
     @GetMapping("lendment/all")
     public String getLendmentTable(Model model){
-
         model.addAttribute("status",LendmentStatus.getMap());
-      if(userService.currentUserIsAdmin()){
+        if(userService.currentUserIsAdmin()){
           model.addAttribute("lendments",lendmentService.getAll());
           return "lendment/lendment_list_admin";
-      }
-      else{
+        }
+        else{
           model.addAttribute("lendments",lendmentService.getAllByUser());
           return "lendment/lendment_list_basic";
-      }
-
+        }
     }
 
     @GetMapping("lendment/requests")
@@ -75,10 +74,13 @@ public class LendmentController {
     @GetMapping("lendment/detail/{id}")
     public String getLendment(@PathVariable("id") Integer id,Model model) throws Exception {
 
-        model.addAttribute("lendment_detail",
-                lendmentService.getLendmentDetailById(id));
-        model.addAttribute("lendment_id",id);
+        LendmentDTO lendment = lendmentService.getLendmentDetailById(id);
+        model.addAttribute("lendment", lendment);
+        System.out.println(lendment.getStatus());
         if(userService.currentUserIsAdmin()){
+            if(!lendment.getStatus().equals(LendmentStatus.InLending.getDesc())){
+                return "lendment/lendment_detail_basic";
+            }
             return "lendment/lendment_detail_admin";
         }
         else{
@@ -89,16 +91,8 @@ public class LendmentController {
 
     @PostMapping("lendment/return")
     @ResponseBody
-    public RequestResponse returnInventory(@Valid @RequestBody LendmentReturnRequest request){
-        System.out.println(request);
-        try {
-            return lendmentService.returnInventory(request);
-        } catch (Exception e) {
-            e.printStackTrace();
-            RequestResponse response = new RequestResponse();
-            response.setStatusToFailed();
-            return response;
-        }
+    public RequestResponse returnInventory(@Valid @RequestBody LendmentReturnRequest request) throws Exception {
+        return lendmentService.returnInventory(request);
     }
 
     @PostMapping("lendment/handover/{id}")

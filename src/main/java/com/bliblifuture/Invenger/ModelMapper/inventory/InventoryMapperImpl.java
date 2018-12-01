@@ -76,6 +76,9 @@ public class InventoryMapperImpl implements InventoryMapper{
         if(field.equals("category")){
             return root.get("category").get("name");
         }
+        else if(field.equals("inventory_id")){
+            return root.get("id");
+        }
         return root.get(field);
     }
 

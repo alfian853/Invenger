@@ -216,7 +216,9 @@ public class UserService implements UserDetailsService {
             user.setPosition(position);
         }
         return ProfileDTO.builder()
-                .name(user.getUsername())
+                .id(user.getId())
+                .name(user.getFullName())
+                .username(user.getUsername())
                 .email(user.getEmail())
                 .position(user.getPosition().getName())
                 .pictureName(user.getPictureName())

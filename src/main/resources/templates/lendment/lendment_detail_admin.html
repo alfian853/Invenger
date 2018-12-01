@@ -1,5 +1,5 @@
 <div class="modal-body" xmlns:th="http://www.w3.org/1999/xhtml" style="padding: 50px;">
-    <input type="hidden" name="lendment_id" th:value="${lendment_id}">
+    <input type="hidden" name="lendment_id" th:value="${lendment.id}">
     <table id="lendmentDetail-table" class="display" style="width:100%;">
     <thead>
     <tr>
@@ -12,7 +12,7 @@
     </tr>
     </thead>
     <tbody>
-    <th:block th:each="detail : ${lendment_detail}">
+    <th:block th:each="detail : ${lendment.details}">
         <tr th:id="|l-item-${detail.inventoryId}|">
             <td></td>
             <td col="inventory-id" th:text="${detail.inventoryId}"></td>
@@ -71,7 +71,7 @@
             console.log(tmp);
             console.log(len);
 
-            let data = {"lendment_id":"[[${lendment_id}]]","inventories_id" : inventories_id};
+            let data = {"lendment_id":"[[${lendment.id}]]","inventories_id" : inventories_id};
 
             iziToast.question({
                 timeout: 20000,

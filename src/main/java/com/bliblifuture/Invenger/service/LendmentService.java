@@ -18,7 +18,6 @@ import com.bliblifuture.Invenger.response.jsonResponse.HandOverResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.LendmentReturnResponse;
 import com.bliblifuture.Invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.Invenger.response.viewDto.LendmentDTO;
-import com.bliblifuture.Invenger.response.viewDto.LendmentDetailDTO;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -106,11 +105,14 @@ public class LendmentService {
     }
 
     public List<LendmentDTO> getAll(){
-        return mapper.toLendmentDtoList(lendmentRepository.findAll());
+        return mapper.toLendmentDtoList(lendmentRepository.findAll(),false);
     }
 
     public List<LendmentDTO> getAllByUser(){
-        return mapper.toLendmentDtoList(lendmentRepository.findAllByUserId(userService.getSessionUser().getId()) );
+        return mapper.toLendmentDtoList(
+                lendmentRepository.findAllByUserId(userService.getSessionUser().getId()),
+                false
+        );
     }
 
     public LendmentDTO getById(Integer id) throws Exception {
@@ -121,12 +123,14 @@ public class LendmentService {
         return mapper.toLendmentDTO(lendment);
     }
 
-    public List<LendmentDetailDTO> getLendmentDetailById(Integer id) throws Exception {
-        List<LendmentDetail> details = lendmentDetailRepository.findAllByLendmentId(id);
-        if(details.size() == 0){
+    public LendmentDTO getLendmentDetailById(Integer id) throws Exception {
+        Lendment lendment = lendmentRepository.findLendmentById(id);
+
+        if(lendment == null){
             throw new DataNotFoundException("Lendment not Found");
         }
-        return mapper.toLendmentDetailDtoList(details);
+
+        return mapper.toLendmentWithDetailDTO(lendment);
     }
 
     public List<LendmentDTO> getAllLendmentRequest(){
@@ -135,7 +139,7 @@ public class LendmentService {
                 lendmentRepository.findAllBySuperiorIdAndStatus(
                         userService.getSessionUser().getId(),
                         LendmentStatus.WaitingForApproval.getDesc()
-                )
+                ),false
         );
 
     }
@@ -163,12 +167,15 @@ public class LendmentService {
                     new LendmentDetailIdentity(request.getLendmentId(), item_id)
             );
             if(detail.isReturned()){
-                throw new Exception();
+                throw new InvalidRequestException("Item had been returned!");
             }
             detail.setReturnDate(date);
             detail.setReturned(true);
+            Inventory inventory = detail.getInventory();
+            inventory.setQuantity(inventory.getQuantity() + detail.getQuantity());
             lendmentDetailRepository.save(detail);
         }
+
         response.setReturnDate(format.format(date));
         response.setStatusToSuccess();
         return response;

@@ -31,7 +31,7 @@ public class Lendment extends AuditModel {
     User user;
     
     @OneToMany(mappedBy = "lendment", cascade = CascadeType.ALL)
-    List<LendmentDetail> lendment_details;
+    List<LendmentDetail> lendmentDetails;
 
     //based on enum: LendmentStatus
     @Column(nullable = false)

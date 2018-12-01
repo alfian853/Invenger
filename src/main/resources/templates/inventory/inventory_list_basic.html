@@ -30,6 +30,7 @@
             {'col':'type','searchable' : false,'orderable':false},
             {'col':'action','searchable' : false,'orderable':false}
         ]);
+        var tableAccess = null;
         $(document).ready(function(){
             var datatables = $('#itemsTable').DataTable({
                 processing: true,
@@ -64,8 +65,7 @@
                     }
                 });
             }
-
-
+            tableAccess = new DTAccess(datatables,'row_',7);
         });
         var listCategory = {};
 

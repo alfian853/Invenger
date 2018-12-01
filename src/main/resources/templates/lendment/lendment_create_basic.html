@@ -5,11 +5,7 @@
         </div>
         <div class="col-7">
             <select id="AI-users-select" style="width: 70%">
-                <th:block th:each="user : ${users}">
-                    <th:block th:if="${user.username == users2.name}">
-                        <option th:value="${user.id}" th:text="${user.username}" selected></option>
-                    </th:block>
-                </th:block>
+                <option th:value="${user.id}" th:text="${user.username}" selected></option>
             </select>
         </div>
     </div>
