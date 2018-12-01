@@ -2,6 +2,7 @@ package com.bliblifuture.Invenger.controller;
 
 import com.bliblifuture.Invenger.Utils.MyUtils;
 import com.bliblifuture.Invenger.exception.DefaultException;
+import com.bliblifuture.Invenger.exception.InvalidRequestException;
 import com.bliblifuture.Invenger.model.user.RoleType;
 import com.bliblifuture.Invenger.model.user.User;
 import com.bliblifuture.Invenger.request.datatables.DataTablesRequest;
@@ -135,6 +136,9 @@ public class UserController {
     @PostMapping("/user/positions/edit")
     @ResponseBody
     public RequestResponse editPosition(@RequestBody PositionDTO editedPosition) throws DefaultException {
+        if(editedPosition.getId() == null){
+            throw new InvalidRequestException("Id can\'t be null");
+        }
         return userService.editPosition(editedPosition);
     }
 

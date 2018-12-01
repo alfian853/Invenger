@@ -221,8 +221,8 @@
                     $('#submit-edit').click(function () {
                         var data = {
                             'id' : id,
-                            'new_name' : source.find('input[name=\"name\"]').val(),
-                            'new_level' : source.find('input[name=\"level\"]').val()
+                            'name' : source.find('input[name=\"name\"]').val(),
+                            'level' : source.find('input[name=\"level\"]').val()
                         };
 
                         $.ajax({
@@ -234,8 +234,8 @@
 
                                 if(response['success']){
                                     toastMessage('success','Success',response['message']);
-                                    tableAccess.setColValueByRowId(id,'position',data['new_name']);
-                                    tableAccess.setColValueByRowId(id,'level',data['new_level']);
+                                    tableAccess.setColValueByRowId(id,'name',data['name']);
+                                    tableAccess.setColValueByRowId(id,'level',data['level']);
                                 }
                                 else{
                                     toastMessage('error','Error',response['message']);

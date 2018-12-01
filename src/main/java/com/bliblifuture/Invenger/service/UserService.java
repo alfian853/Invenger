@@ -425,12 +425,16 @@ public class UserService implements UserDetailsService {
 
     public RequestResponse editPosition(PositionDTO editedPosition) throws DefaultException {
 
-        Position position = Position.builder()
-                .id(editedPosition.getId())
-                .name(editedPosition.getName())
-                .level(editedPosition.getLevel())
-                .build();
-
+        Position position = positionRepository.getOne(editedPosition.getId());
+        if(position == null){
+            throw new DataNotFoundException("Can\'t find \"position\" with id ="+editedPosition.getId());
+        }
+        if(editedPosition.getLevel() != null){
+            position.setLevel(editedPosition.getLevel());
+        }
+        if(editedPosition.getName() != null){
+            position.setName(editedPosition.getName());
+        }
         this.savePositionHandler(position);
 
         RequestResponse response = new RequestResponse();
