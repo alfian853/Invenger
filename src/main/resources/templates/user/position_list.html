@@ -17,7 +17,7 @@
         <script src="https://cdn.jsdelivr.net/npm/izimodal-1.6.0@1.6.1/js/iziModal.min.js"></script>
         <script th:src="@{/js/DataTablesAccess.js}"></script>
 
-        <title>Categories</title>
+        <title>Positions</title>
     </headContent>
 </head>
 <body>
@@ -32,9 +32,10 @@
 
         <div th:replace="navbar :: navbar"></div>
         <div class="user-text">Positions</div>
-
-        <div style="padding: 30px;">
-            <button class="submit" type="submit" onclick="addPosition()">Add</button>
+        <div style="margin-left: 22px;">
+            <button class="btn" onclick="addPosition()">Add Position</button>
+        </div>
+        <div style="padding: 50px;">
             <table id="itemsTable" class="display" style="width:100%;">
                 <thead>
                 <tr>
