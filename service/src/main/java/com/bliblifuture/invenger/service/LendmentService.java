@@ -224,4 +224,10 @@ public class LendmentService {
         return response;
 
     }
+    public List<LendmentDTO> getInventoryLendment(Integer id){
+        return mapper.toLendmentDtoList(
+                lendmentRepository.findLendmentContainInventory(id),true
+        );
+    }
+
 }

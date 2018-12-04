@@ -14,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Controller
 public class LendmentController {
@@ -101,5 +102,10 @@ public class LendmentController {
         return lendmentService.handOverOrderItems(lendmentId);
     }
 
+    @GetMapping("/lendment")
+    public String trackInventory(Model model,@RequestParam("having-item-id") Integer inventoryId){
+        model.addAttribute("lendments",lendmentService.getInventoryLendment(inventoryId));
+        return "lendment/lendment_inventory";
+    }
 
 }

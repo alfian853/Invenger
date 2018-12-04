@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -18,5 +19,7 @@ public interface LendmentRepository extends JpaRepository<Lendment,Integer> {
     @Query("select l from Lendment l join fetch l.user x join fetch x.superior y where y.id = :superior_id and l.status = :status")
     List<Lendment> findAllBySuperiorIdAndStatus(@Param("superior_id") Integer superiorId, @Param("status") String status);
 
-
+    @Query("select l from Lendment l join fetch l.lendmentDetails ld where ld.isReturned = false and ld.inventory.id = :_inventory_id")
+    List<Lendment> findLendmentContainInventory(@Param("_inventory_id")Integer inventoryId);
+    
 }

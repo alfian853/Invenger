@@ -1,0 +1,39 @@
+<div class="modal-body" xmlns:th="http://www.w3.org/1999/xhtml" style="padding: 50px;">
+    <table id="lendment-inventory-table" class="display" style="width:100%;">
+        <thead>
+            <tr>
+                <td>Lendment Id</td>
+                <td>Username</td>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+        <th:block th:each="lendment : ${lendments}">
+            <tr>
+                <td th:text="${lendment.id}"></td>
+                <td th:text="${lendment.username}"></td>
+                <td th:text="${lendment.details[0].quantity}"></td>
+            </tr>
+        </th:block>
+        </tbody>
+    </table>
+</div>
+<div class="modal-footer">
+    <button id="lendment-inventory-close-btn" type="button" class="btn btn-secondary">Close</button>
+</div>
+
+
+<script>
+    $(document).ready(function() {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content')
+            }
+        });
+        let table = $('#lendment-inventory-table').DataTable();
+
+        $('#lendment-inventory-close-btn').click(function () {
+            $('.iziModal-button-close').click();
+        });
+    });
+</script>
