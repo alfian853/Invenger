@@ -23,6 +23,26 @@
             <artifactId>web-model</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
+
+
+
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-web</artifactId>
+            <version>5.0.7.RELEASE</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
+            <version>5.0.7.RELEASE</version>
+        </dependency>
+        <dependency>
+
+            <groupId>org.thymeleaf.extras</groupId>
+            <artifactId>thymeleaf-extras-springsecurity4</artifactId>
+        </dependency>
+
     </dependencies>
     
 </project>
