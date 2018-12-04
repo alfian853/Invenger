@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface InventoryDocRepository extends JpaRepository<InventoryDocument,Integer> {
 
+    InventoryDocument findInventoryDocumentById(Integer id);
 }

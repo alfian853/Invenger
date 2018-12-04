@@ -3,8 +3,6 @@ package com.bliblifuture.invenger.model.inventory;
 import com.bliblifuture.invenger.model.AuditModel;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.LazyToOne;
-import org.hibernate.annotations.LazyToOneOption;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
@@ -45,10 +43,5 @@ public class Inventory extends AuditModel {
 
     @NotEmpty
     String type;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "inventory_id")
-    @LazyToOne(value = LazyToOneOption.NO_PROXY)
-    InventoryDocument document;
 
 }

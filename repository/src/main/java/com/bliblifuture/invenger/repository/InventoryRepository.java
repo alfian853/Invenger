@@ -15,9 +15,6 @@ public interface InventoryRepository extends JpaRepository<Inventory,Integer>,Jp
 
     Inventory findInventoryById(Integer id);
 
-    @Query("select i from Inventory i join fetch i.document where i.id = :id")
-    InventoryDocument findInventoryByIdFetchDocument(@Param("id") Integer id);
-
     @Query("select i from Inventory i join fetch i.category")
     List<Inventory> findAllFetchCategory();
 }

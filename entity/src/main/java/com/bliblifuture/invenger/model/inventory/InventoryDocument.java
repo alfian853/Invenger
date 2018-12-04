@@ -21,7 +21,7 @@ public class InventoryDocument{
 
     @MapsId
     @OneToOne(fetch = FetchType.LAZY,optional = false)
-    @JoinColumn(name = "inventory_id",referencedColumnName = "id")
+    @JoinColumn(name = "inventory_id")
     Inventory inventory;
 
     String fileName;

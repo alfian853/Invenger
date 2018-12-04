@@ -209,7 +209,7 @@ public class InventoryService {
         if(inventory == null){
             throw new DataNotFoundException("Inventory Not Found");
         }
-        InventoryDocument doc = inventory.getDocument();
+        InventoryDocument doc = inventoryDocRepository.findInventoryDocumentById(id);
 
         if(doc == null || !doc.getInventoryLastUpdate().equals(inventory.getUpdatedAt()) ){
 
