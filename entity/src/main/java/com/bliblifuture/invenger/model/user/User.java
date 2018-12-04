@@ -1,7 +1,7 @@
 package com.bliblifuture.invenger.model.user;
 
-//import com.bliblifuture.invenger.annotation.PhoneConstraint;
 import com.bliblifuture.invenger.model.AuditModel;
+import com.bliblifuture.invenger.model.annotation.PhoneConstraint;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -33,7 +33,7 @@ public class User extends AuditModel implements UserDetails {
     @Column(nullable = false)
     private String fullName;
 
-//    @PhoneConstraint
+    @PhoneConstraint
     private String telp;
 
     @Column(length = 72,nullable = false)

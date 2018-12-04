@@ -1,6 +1,6 @@
-package com.bliblifuture.invenger.annotation.imp;
+package com.bliblifuture.invenger.model.annotation.imp;
 
-import com.bliblifuture.invenger.annotation.PasswordConstraint;
+import com.bliblifuture.invenger.model.annotation.PasswordConstraint;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

@@ -1,21 +1,20 @@
-package com.bliblifuture.invenger.annotation.imp;
+package com.bliblifuture.invenger.model.annotation.imp;
 
-import com.bliblifuture.invenger.annotation.PhoneConstraint;
+import com.bliblifuture.invenger.model.annotation.PhoneConstraint;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 public class PhoneValidator implements ConstraintValidator<PhoneConstraint,String> {
 
-//    private final static String PATTERN = "^\\+?\\d+$";
-    private final static String PATTERN = "[^\\d]";
+    private final static String PATTERN = "^\\+?\\d+$";
 
     @Override
     public void initialize(PhoneConstraint constraintAnnotation) {
     }
 
     public static boolean isValid(String s){
-        return !s.matches(PATTERN);
+        return s.matches(PATTERN);
     }
 
 
@@ -26,6 +25,6 @@ public class PhoneValidator implements ConstraintValidator<PhoneConstraint,Strin
 
     @Override
     public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
-        return !s.matches(PATTERN);
+        return s.matches(PATTERN);
     }
 }
