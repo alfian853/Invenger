@@ -28,7 +28,7 @@ public class FileStorageService {
     @Autowired
     TemplateEngine templateEngine;
 
-    private final String BASE_PATH = "file:web/src/main/resources";
+    private final String BASE_PATH = "web/src/main/resources";
 
     public enum PathCategory{
         PROFILE_PICT,INVENTORY_PICT, INVENTORY_PDF
