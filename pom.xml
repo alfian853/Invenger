@@ -6,7 +6,15 @@
 	<groupId>com.blibli-future</groupId>
 	<artifactId>Invenger</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+    <modules>
+        <module>app</module>
+		<module>web</module>
+		<module>entity</module>
+		<module>web-model</module>
+		<module>service</module>
+		<module>repository</module>
+	</modules>
+    <packaging>pom</packaging>
 
 	<name>Invenger</name>
 	<description>Demo project for Spring Boot</description>
