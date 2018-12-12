@@ -1,4 +1,4 @@
-package com.bliblifuture.invenger.model;
+package com.bliblifuture.invenger.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;

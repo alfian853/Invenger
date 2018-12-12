@@ -1,6 +1,6 @@
 package com.bliblifuture.invenger.repository;
 
-import com.bliblifuture.invenger.model.user.Position;
+import com.bliblifuture.invenger.entity.user.Position;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

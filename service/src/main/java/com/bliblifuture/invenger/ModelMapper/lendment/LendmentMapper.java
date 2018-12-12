@@ -1,6 +1,6 @@
 package com.bliblifuture.invenger.ModelMapper.lendment;
 
-import com.bliblifuture.invenger.model.lendment.Lendment;
+import com.bliblifuture.invenger.entity.lendment.Lendment;
 import com.bliblifuture.invenger.response.viewDto.LendmentDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;

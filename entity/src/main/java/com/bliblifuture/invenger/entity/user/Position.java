@@ -1,4 +1,4 @@
-package com.bliblifuture.invenger.model.user;
+package com.bliblifuture.invenger.entity.user;
 
 
 import lombok.AllArgsConstructor;
@@ -17,7 +17,8 @@ import javax.persistence.*;
 public class Position {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "position_generator")
+    @SequenceGenerator(name="position_generator", sequenceName = "position_seq")
     Integer id;
 
     @Column(unique = true,nullable = false)

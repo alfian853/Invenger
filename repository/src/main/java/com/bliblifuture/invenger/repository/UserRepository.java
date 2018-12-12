@@ -1,6 +1,6 @@
 package com.bliblifuture.invenger.repository;
 
-import com.bliblifuture.invenger.model.user.User;
+import com.bliblifuture.invenger.entity.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;

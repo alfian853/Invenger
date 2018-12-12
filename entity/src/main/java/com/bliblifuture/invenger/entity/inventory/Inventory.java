@@ -1,6 +1,6 @@
-package com.bliblifuture.invenger.model.inventory;
+package com.bliblifuture.invenger.entity.inventory;
 
-import com.bliblifuture.invenger.model.AuditModel;
+import com.bliblifuture.invenger.entity.AuditModel;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -19,7 +19,8 @@ import javax.validation.constraints.NotEmpty;
 public class Inventory extends AuditModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "inventory_generator")
+    @SequenceGenerator(name="inventory_generator", sequenceName = "inventory_seq")
     Integer id;
 
     String image="default-item.jpg";//image filename

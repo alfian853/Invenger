@@ -1,11 +1,9 @@
 package com.bliblifuture.invenger.repository;
 
-import com.bliblifuture.invenger.model.inventory.Inventory;
-import com.bliblifuture.invenger.model.inventory.InventoryDocument;
+import com.bliblifuture.invenger.entity.inventory.Inventory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

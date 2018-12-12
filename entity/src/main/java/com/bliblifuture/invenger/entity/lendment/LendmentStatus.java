@@ -1,4 +1,4 @@
-package com.bliblifuture.invenger.model.lendment;
+package com.bliblifuture.invenger.entity.lendment;
 
 import java.util.Arrays;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package com.bliblifuture.invenger.model.user;
+package com.bliblifuture.invenger.entity.user;
 
 
 import lombok.AllArgsConstructor;

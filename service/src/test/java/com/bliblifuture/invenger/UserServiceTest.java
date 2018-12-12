@@ -2,8 +2,8 @@ package com.bliblifuture.invenger;
 
 
 import com.bliblifuture.invenger.Utils.MyUtils;
-import com.bliblifuture.invenger.model.user.Position;
-import com.bliblifuture.invenger.model.user.User;
+import com.bliblifuture.invenger.entity.user.Position;
+import com.bliblifuture.invenger.entity.user.User;
 import com.bliblifuture.invenger.repository.PositionRepository;
 import com.bliblifuture.invenger.repository.UserRepository;
 import com.bliblifuture.invenger.response.jsonResponse.RequestResponse;

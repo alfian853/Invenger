@@ -1,7 +1,7 @@
 package com.bliblifuture.invenger.ModelMapper.lendment;
 
-import com.bliblifuture.invenger.model.lendment.Lendment;
-import com.bliblifuture.invenger.model.lendment.LendmentDetail;
+import com.bliblifuture.invenger.entity.lendment.Lendment;
+import com.bliblifuture.invenger.entity.lendment.LendmentDetail;
 import com.bliblifuture.invenger.response.viewDto.LendmentDTO;
 
 import java.text.SimpleDateFormat;

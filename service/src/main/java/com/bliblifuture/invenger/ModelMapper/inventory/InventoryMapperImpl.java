@@ -1,7 +1,7 @@
 package com.bliblifuture.invenger.ModelMapper.inventory;
 
-import com.bliblifuture.invenger.model.inventory.Inventory;
-import com.bliblifuture.invenger.model.inventory.InventoryType;
+import com.bliblifuture.invenger.entity.inventory.Inventory;
+import com.bliblifuture.invenger.entity.inventory.InventoryType;
 import com.bliblifuture.invenger.response.jsonResponse.InventoryDataTableResponse;
 import com.bliblifuture.invenger.response.jsonResponse.search_response.InventorySearchItem;
 import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchItem;

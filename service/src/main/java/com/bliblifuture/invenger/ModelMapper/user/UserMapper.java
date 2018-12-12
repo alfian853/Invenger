@@ -1,8 +1,8 @@
 package com.bliblifuture.invenger.ModelMapper.user;
 
 import com.bliblifuture.invenger.ModelMapper.CriteriaPathMapper;
-import com.bliblifuture.invenger.model.user.Position;
-import com.bliblifuture.invenger.model.user.User;
+import com.bliblifuture.invenger.entity.user.Position;
+import com.bliblifuture.invenger.entity.user.User;
 import com.bliblifuture.invenger.response.jsonResponse.UserDataTableResponse;
 import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchItem;
 import com.bliblifuture.invenger.response.viewDto.PositionDTO;

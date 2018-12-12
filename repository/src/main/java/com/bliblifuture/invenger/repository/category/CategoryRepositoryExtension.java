@@ -1,6 +1,6 @@
 package com.bliblifuture.invenger.repository.category;
 
-import com.bliblifuture.invenger.model.inventory.CategoryWithChildId;
+import com.bliblifuture.invenger.entity.inventory.CategoryWithChildId;
 
 import java.util.List;
 

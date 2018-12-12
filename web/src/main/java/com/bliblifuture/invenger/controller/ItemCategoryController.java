@@ -52,7 +52,7 @@ public class ItemCategoryController {
     @GetMapping("/category/all2")
     @ResponseBody
     public Object getCategoryList2(Model model){
-//        model.addAttribute("categories", );
+//        entity.addAttribute("categories", );
         return itemCategoryService.getAllItemCategory(true);
     }
 

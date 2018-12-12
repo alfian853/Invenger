@@ -1,4 +1,4 @@
-package com.bliblifuture.invenger.model.lendment;
+package com.bliblifuture.invenger.entity.lendment;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.bliblifuture.invenger.model;
+package com.bliblifuture.invenger;
 
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;

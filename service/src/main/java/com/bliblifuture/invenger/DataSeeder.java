@@ -1,9 +1,9 @@
 package com.bliblifuture.invenger;
 
-import com.bliblifuture.invenger.model.inventory.Category;
-import com.bliblifuture.invenger.model.user.Position;
-import com.bliblifuture.invenger.model.user.User;
-import com.bliblifuture.invenger.model.user.RoleType;
+import com.bliblifuture.invenger.entity.inventory.Category;
+import com.bliblifuture.invenger.entity.user.Position;
+import com.bliblifuture.invenger.entity.user.User;
+import com.bliblifuture.invenger.entity.user.RoleType;
 import com.bliblifuture.invenger.repository.PositionRepository;
 import com.bliblifuture.invenger.repository.UserRepository;
 import com.bliblifuture.invenger.repository.category.CategoryRepository;
@@ -54,6 +54,7 @@ public class DataSeeder {
         Position position = positionRepository.findByName("inventory system admin");
         if(position == null){
             position = new Position();
+            position.setLevel(100);
             position.setName("inventory system admin");
             positionRepository.save(position);
         }
@@ -62,6 +63,7 @@ public class DataSeeder {
 
         if(position == null){
             position = new Position();
+            position.setLevel(2);
             position.setName("junior software engineer");
             positionRepository.save(position);
         }

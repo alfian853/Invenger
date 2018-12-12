@@ -1,6 +1,6 @@
 package com.bliblifuture.invenger.repository.category;
 
-import com.bliblifuture.invenger.model.inventory.Category;
+import com.bliblifuture.invenger.entity.inventory.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

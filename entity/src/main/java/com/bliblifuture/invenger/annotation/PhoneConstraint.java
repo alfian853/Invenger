@@ -1,6 +1,6 @@
-package com.bliblifuture.invenger.model.annotation;
+package com.bliblifuture.invenger.annotation;
 
-import com.bliblifuture.invenger.model.annotation.imp.PhoneValidator;
+import com.bliblifuture.invenger.annotation.imp.PhoneValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

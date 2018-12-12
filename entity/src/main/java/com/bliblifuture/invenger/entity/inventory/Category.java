@@ -1,7 +1,7 @@
-package com.bliblifuture.invenger.model.inventory;
+package com.bliblifuture.invenger.entity.inventory;
 
 
-import com.bliblifuture.invenger.model.PostgreArrayType;
+import com.bliblifuture.invenger.PostgreArrayType;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,14 +33,15 @@ import java.io.Serializable;
 public class Category implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "category_generator")
+    @SequenceGenerator(name="category_generator", sequenceName = "category_seq")
     Integer id;
 
     @Column(unique = true)
     String name;
 
     @JsonBackReference
-    @JoinColumn(name="parent_id", nullable = true)
+    @JoinColumn(name="parent_id")
     @ManyToOne(fetch = FetchType.LAZY)
     Category parent;
 

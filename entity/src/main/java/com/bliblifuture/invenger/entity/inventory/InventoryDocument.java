@@ -1,4 +1,4 @@
-package com.bliblifuture.invenger.model.inventory;
+package com.bliblifuture.invenger.entity.inventory;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

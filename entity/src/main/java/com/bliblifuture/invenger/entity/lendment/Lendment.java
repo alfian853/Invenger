@@ -1,8 +1,8 @@
-package com.bliblifuture.invenger.model.lendment;
+package com.bliblifuture.invenger.entity.lendment;
 
 
-import com.bliblifuture.invenger.model.AuditModel;
-import com.bliblifuture.invenger.model.user.User;
+import com.bliblifuture.invenger.entity.AuditModel;
+import com.bliblifuture.invenger.entity.user.User;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -20,7 +20,8 @@ import java.util.List;
 public class Lendment extends AuditModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "lendment_generator")
+    @SequenceGenerator(name="lendment_generator", sequenceName = "lendment_seq")
     Integer id;
 
     //for optimize child count() where isReturned = false

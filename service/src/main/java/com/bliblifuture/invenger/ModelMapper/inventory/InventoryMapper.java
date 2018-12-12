@@ -2,7 +2,7 @@ package com.bliblifuture.invenger.ModelMapper.inventory;
 
 import com.bliblifuture.invenger.ModelMapper.CriteriaPathMapper;
 import com.bliblifuture.invenger.ModelMapper.FieldMapper;
-import com.bliblifuture.invenger.model.inventory.Inventory;
+import com.bliblifuture.invenger.entity.inventory.Inventory;
 import com.bliblifuture.invenger.response.jsonResponse.InventoryDataTableResponse;
 import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchItem;
 import com.bliblifuture.invenger.response.viewDto.InventoryDTO;

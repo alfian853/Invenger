@@ -1,6 +1,6 @@
 package com.bliblifuture.invenger.request.formRequest;
 
-import com.bliblifuture.invenger.model.annotation.PhoneConstraint;
+import com.bliblifuture.invenger.annotation.PhoneConstraint;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 

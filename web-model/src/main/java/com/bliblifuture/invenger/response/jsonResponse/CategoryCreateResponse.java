@@ -1,6 +1,6 @@
 package com.bliblifuture.invenger.response.jsonResponse;
 
-import com.bliblifuture.invenger.model.inventory.Category;
+import com.bliblifuture.invenger.entity.inventory.Category;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 

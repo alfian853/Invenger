@@ -1,4 +1,4 @@
-package com.bliblifuture.invenger.model.user;
+package com.bliblifuture.invenger.entity.user;
 
 public enum RoleType {
     ROLE_ADMIN,ROLE_USER;

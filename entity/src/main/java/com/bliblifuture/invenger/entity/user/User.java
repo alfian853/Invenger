@@ -1,7 +1,7 @@
-package com.bliblifuture.invenger.model.user;
+package com.bliblifuture.invenger.entity.user;
 
-import com.bliblifuture.invenger.model.AuditModel;
-import com.bliblifuture.invenger.model.annotation.PhoneConstraint;
+import com.bliblifuture.invenger.entity.AuditModel;
+import com.bliblifuture.invenger.annotation.PhoneConstraint;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -21,7 +21,8 @@ import java.util.List;
 public class User extends AuditModel implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_generator")
+    @SequenceGenerator(name="user_generator", sequenceName = "user_seq")
     private Integer id;
 
     @Column(unique = true)

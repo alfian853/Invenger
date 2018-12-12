@@ -1,7 +1,7 @@
 package com.bliblifuture.invenger.controller;
 
 import com.bliblifuture.invenger.exception.InvalidRequestException;
-import com.bliblifuture.invenger.model.inventory.InventoryType;
+import com.bliblifuture.invenger.entity.inventory.InventoryType;
 import com.bliblifuture.invenger.request.datatables.DataTablesRequest;
 import com.bliblifuture.invenger.request.formRequest.InventoryCreateRequest;
 import com.bliblifuture.invenger.request.formRequest.InventoryEditRequest;

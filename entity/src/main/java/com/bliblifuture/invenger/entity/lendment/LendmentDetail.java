@@ -1,6 +1,6 @@
-package com.bliblifuture.invenger.model.lendment;
+package com.bliblifuture.invenger.entity.lendment;
 
-import com.bliblifuture.invenger.model.inventory.Inventory;
+import com.bliblifuture.invenger.entity.inventory.Inventory;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;

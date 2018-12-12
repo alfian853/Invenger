@@ -1,6 +1,6 @@
 package com.bliblifuture.invenger.controller;
 
-import com.bliblifuture.invenger.model.lendment.LendmentStatus;
+import com.bliblifuture.invenger.entity.lendment.LendmentStatus;
 import com.bliblifuture.invenger.request.jsonRequest.LendmentCreateRequest;
 import com.bliblifuture.invenger.request.jsonRequest.LendmentReturnRequest;
 import com.bliblifuture.invenger.response.jsonResponse.RequestResponse;
@@ -14,7 +14,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @Controller
 public class LendmentController {
