@@ -18,7 +18,7 @@ public interface CategoryRepository extends JpaRepository<Category,Integer>, Cat
     Category findCategoryById(Integer id);
 
     @Query("select c from Category c LEFT JOIN FETCH c.parent")
-    List<Category> findAllFetched();
+    List<Category> findAllFetchParent();
 
     @Modifying(clearAutomatically = true)
     @Query("update Category c set c.name = :new_name where c.id = :id")

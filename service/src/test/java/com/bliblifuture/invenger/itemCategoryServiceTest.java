@@ -9,6 +9,7 @@ import com.bliblifuture.invenger.request.jsonRequest.CategoryEditRequest;
 import com.bliblifuture.invenger.response.jsonResponse.CategoryCreateResponse;
 import com.bliblifuture.invenger.response.jsonResponse.CategoryEditResponse;
 import com.bliblifuture.invenger.response.jsonResponse.RequestResponse;
+import com.bliblifuture.invenger.response.viewDto.CategoryDTO;
 import com.bliblifuture.invenger.service.ItemCategoryService;
 import org.junit.Assert;
 import org.junit.Before;
@@ -18,11 +19,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.springframework.dao.EmptyResultDataAccessException;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 
@@ -44,55 +49,11 @@ public class itemCategoryServiceTest {
     public void initAttribute(){
     }
 
-    @Test
-    public void createCategory_parentFound(){
-        CategoryCreateRequest request = new CategoryCreateRequest();
-        request.setName("child");
-        request.setParentId(PARENT_ID);
+    ////////////////////////////////////////////////////////////////////////////////
+    //public CategoryEditResponse updateCategory(CategoryEditRequest request);//////
+    ////////////////////////////////////////////////////////////////////////////////
+    private String CATEGORY_NEWNAME = "dua";
 
-        Category parent = Category.builder().id(PARENT_ID).name("all/parent").build();
-        when(categoryRepository.findCategoryById(PARENT_ID)).thenReturn(parent);
-
-        CategoryCreateResponse response = categoryService.createCategory(request);
-
-        Assert.assertTrue(response.isSuccess());
-        Assert.assertEquals(response.getCategory().getName(),parent.getName()+"/"+request.getName());
-    }
-
-    @Test
-    public void createCategory_parentNotFound(){
-        CategoryCreateRequest request = new CategoryCreateRequest();
-        request.setName("child");
-        request.setParentId(PARENT_ID);
-
-        when(categoryRepository.findCategoryById(PARENT_ID)).thenReturn(null);
-
-        CategoryCreateResponse response = categoryService.createCategory(request);
-        System.out.println(response);
-        Assert.assertFalse(response.isSuccess());
-    }
-
-    @Test(expected = DataNotFoundException.class)
-    public void deleteCategory_idNotFound() throws Exception {
-//        Not finish yet, need to mock deleteById()
-//        when(categoryRepository.existsByParentId(PARENT_ID)).thenReturn(false);
-//        categoryService.deleteCategory(PARENT_ID);
-    }
-
-    @Test(expected = InvalidRequestException.class)
-    public void deleteCategory_isExistAsParent() throws Exception {
-        when(categoryRepository.existsByParentId(PARENT_ID)).thenReturn(true);
-        categoryService.deleteCategory(PARENT_ID);
-    }
-
-    @Test
-    public void deleteCategory_notExistAsParent() throws Exception {
-        when(categoryRepository.existsByParentId(PARENT_ID)).thenReturn(false);
-
-        RequestResponse response = categoryService.deleteCategory(PARENT_ID);
-
-        Assert.assertTrue(response.isSuccess());
-    }
 
     private List<CategoryWithChildId> mock_getCategoryParentWithChildOrderById(){
         List<CategoryWithChildId> categories = new LinkedList<>();
@@ -118,8 +79,6 @@ public class itemCategoryServiceTest {
 
         return categories;
     }
-
-    private String CATEGORY_NEWNAME = "dua";
 
     private CategoryEditResponse mock_updateCategory_parentNotChanged_result(){
         CategoryEditResponse response = new CategoryEditResponse();
@@ -211,6 +170,146 @@ public class itemCategoryServiceTest {
         Assert.assertFalse(response.isSuccess());
     }
 
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    //public CategoryCreateResponse createCategory(CategoryCreateRequest request);//
+    ////////////////////////////////////////////////////////////////////////////////
+    @Test
+    public void createCategory_parentFound(){
+        CategoryCreateRequest request = new CategoryCreateRequest();
+        request.setName("child");
+        request.setParentId(PARENT_ID);
+
+        Category parent = Category.builder().id(PARENT_ID).name("all/parent").build();
+        when(categoryRepository.findCategoryById(PARENT_ID)).thenReturn(parent);
+
+        CategoryCreateResponse response = categoryService.createCategory(request);
+
+        Assert.assertTrue(response.isSuccess());
+        Assert.assertEquals(response.getCategory().getName(),parent.getName()+"/"+request.getName());
+    }
+
+    @Test
+    public void createCategory_parentNotFound(){
+        CategoryCreateRequest request = new CategoryCreateRequest();
+        request.setName("child");
+        request.setParentId(PARENT_ID);
+
+        when(categoryRepository.findCategoryById(PARENT_ID)).thenReturn(null);
+
+        CategoryCreateResponse response = categoryService.createCategory(request);
+        System.out.println(response);
+        Assert.assertFalse(response.isSuccess());
+    }
+
+
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    //public RequestResponse deleteCategory(int id);////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
+    @Test(expected = DataNotFoundException.class)
+    public void deleteCategory_idNotFound() {
+        when(categoryRepository.existsByParentId(PARENT_ID)).thenReturn(false);
+        when(categoryService.deleteCategory(2000)).thenThrow(EmptyResultDataAccessException.class);
+        categoryService.deleteCategory(2000);
+    }
+
+    @Test(expected = InvalidRequestException.class)
+    public void deleteCategory_isExistAsParent() {
+        when(categoryRepository.existsByParentId(PARENT_ID)).thenReturn(true);
+        categoryService.deleteCategory(PARENT_ID);
+    }
+
+    @Test
+    public void deleteCategory_notExistAsParent() {
+        when(categoryRepository.existsByParentId(PARENT_ID)).thenReturn(false);
+
+        RequestResponse response = categoryService.deleteCategory(PARENT_ID);
+
+        Assert.assertTrue(response.isSuccess());
+    }
+
+
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    //public List<CategoryDTO> getAllItemCategory(boolean fetchParent);/////////////
+    ////////////////////////////////////////////////////////////////////////////////
+
+
+    private List<Category> mock_findAll(boolean fetchParent){
+        List<Category> categories = new ArrayList<>();
+        categories.add(Category.builder()//[0]
+                .id(1).name("one")
+                .build()
+        );
+        categories.add(Category.builder()//[1]
+                .id(2).name("one/two")
+                .build()
+        );
+        categories.add(Category.builder()//[2]
+                .id(3).name("one/three")
+                .build()
+        );
+        categories.add(Category.builder()//[3]
+                .id(4).name("one/two/four")
+                .build());
+
+        if(fetchParent){
+            categories.get(1).setParent(categories.get(0));
+            categories.get(2).setParent(categories.get(1));
+            categories.get(3).setParent(categories.get(2));
+        }
+
+        return categories;
+    }
+
+
+    @Test
+    public void getAllItemCategory_fetchParent(){
+
+        List<Category> categories = mock_findAll(true);
+        when(categoryRepository.findAllFetchParent()).thenReturn(categories);
+
+        List<CategoryDTO> result = categoryService.getAllItemCategory(true);
+        int len = result.size();
+        for(int i=0; i<len ; i++){
+            Category category = categories.get(i);
+            CategoryDTO res = result.get(i);
+            Assert.assertEquals(category.getName(),res.getName());
+            Assert.assertEquals(category.getId(),res.getId());
+
+            if(category.getParent() == null){
+                Assert.assertNull(res.getParent_id());
+            }
+            else{
+                Assert.assertEquals(category.getParent().getId(), res.getParent_id());
+            }
+        }
+
+    }
+
+    @Test
+    public void getAllItemCategory_notFetchParent(){
+
+        List<Category> categories = mock_findAll(false);
+        when(categoryRepository.findAllFetchParent()).thenReturn(categories);
+
+        List<CategoryDTO> result = categoryService.getAllItemCategory(false);
+        int len = result.size();
+        for(int i=0; i<len ; i++){
+            Category category = categories.get(i);
+            Assert.assertEquals(category.getName(),result.get(i).getName());
+            Assert.assertEquals(category.getId(),result.get(i).getId());
+            Assert.assertNull(result.get(i).getParent_id());
+        }
+
+    }
 
 
 

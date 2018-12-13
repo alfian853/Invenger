@@ -203,7 +203,7 @@ public class ItemCategoryService {
 
     public List<CategoryDTO> getAllItemCategory(boolean fetchParent){
         if(fetchParent){
-            return mapper.toCategoryDtoList(categoryRepository.findAllFetched());
+            return mapper.toCategoryDtoList(categoryRepository.findAllFetchParent());
         }
         else{
             return mapper.toCategoryDtoList(categoryRepository.findAll());
