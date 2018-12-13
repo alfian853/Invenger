@@ -178,7 +178,7 @@ public class ItemCategoryService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
-    public RequestResponse deleteCategory(int id) throws Exception {
+    public RequestResponse deleteCategory(int id) {
         RequestResponse response = new RequestResponse();
         if(categoryRepository.existsByParentId(id)){
             throw new InvalidRequestException("Can't delete a record while other records still reference it");

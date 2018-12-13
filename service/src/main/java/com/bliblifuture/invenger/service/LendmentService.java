@@ -53,7 +53,7 @@ public class LendmentService {
 
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public RequestResponse createLendment(LendmentCreateRequest request) throws Exception {
+    public RequestResponse createLendment(LendmentCreateRequest request) {
         RequestResponse response = new RequestResponse();
         Lendment lendment;
         if(userService.currentUserIsAdmin()){
@@ -115,7 +115,7 @@ public class LendmentService {
         );
     }
 
-    public LendmentDTO getById(Integer id) throws Exception {
+    public LendmentDTO getById(Integer id) {
         Lendment lendment = lendmentRepository.findLendmentById(id);
         if(lendment == null){
             throw new DataNotFoundException("Lendment Not Found");
@@ -123,7 +123,7 @@ public class LendmentService {
         return mapper.toLendmentDTO(lendment);
     }
 
-    public LendmentDTO getLendmentDetailById(Integer id) throws Exception {
+    public LendmentDTO getLendmentDetailById(Integer id) {
         Lendment lendment = lendmentRepository.findLendmentById(id);
 
         if(lendment == null){
@@ -145,7 +145,7 @@ public class LendmentService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public RequestResponse returnInventory(LendmentReturnRequest request) throws Exception{
+    public RequestResponse returnInventory(LendmentReturnRequest request) {
 
         LendmentReturnResponse response = new LendmentReturnResponse();
 
@@ -182,7 +182,7 @@ public class LendmentService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public RequestResponse approveLendmentRequest(Integer id) throws Exception {
+    public RequestResponse approveLendmentRequest(Integer id) {
         Lendment lendment = lendmentRepository.findLendmentById(id);
 
         if(lendment == null){
@@ -203,7 +203,7 @@ public class LendmentService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public HandOverResponse handOverOrderItems(Integer id) throws Exception {
+    public HandOverResponse handOverOrderItems(Integer id) {
         Lendment lendment = lendmentRepository.findLendmentById(id);
 
         if(lendment == null){

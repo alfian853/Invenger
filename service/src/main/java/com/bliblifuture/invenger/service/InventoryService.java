@@ -5,7 +5,7 @@ import com.bliblifuture.invenger.Utils.DataTablesUtils;
 import com.bliblifuture.invenger.Utils.MyUtils;
 import com.bliblifuture.invenger.Utils.QuerySpec;
 import com.bliblifuture.invenger.exception.DataNotFoundException;
-import com.bliblifuture.invenger.exception.DefaultException;
+import com.bliblifuture.invenger.exception.DefaultRuntimeException;
 import com.bliblifuture.invenger.exception.DuplicateEntryException;
 import com.bliblifuture.invenger.exception.InvalidRequestException;
 import com.bliblifuture.invenger.entity.inventory.Category;
@@ -74,7 +74,7 @@ public class InventoryService {
     }
 
 
-    public InventoryDTO getById(Integer id) throws DataNotFoundException {
+    public InventoryDTO getById(Integer id) {
         Inventory inventory = inventoryRepository.findInventoryById(id);
         if(inventory == null){
             throw new DataNotFoundException("Inventory Not Found");
@@ -83,7 +83,7 @@ public class InventoryService {
         return mapper.toInventoryDto(inventory);
     }
 
-    public InventoryCreateResponse createInventory(InventoryCreateRequest request) throws DefaultException {
+    public InventoryCreateResponse createInventory(InventoryCreateRequest request){
         InventoryCreateResponse response = new InventoryCreateResponse();
         Category newCategory = new Category();
         newCategory.setId(request.getCategory_id());
@@ -108,7 +108,7 @@ public class InventoryService {
                     imgName,
                     FileStorageService.PathCategory.INVENTORY_PICT)
             ){
-                throw new DefaultException("Error when storing item picture");
+                throw new DefaultRuntimeException("Error when storing item picture");
             }
             newInventory.setImage(imgName);
 
@@ -139,7 +139,7 @@ public class InventoryService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public RequestResponse updateInventory(InventoryEditRequest request) throws DataNotFoundException {
+    public RequestResponse updateInventory(InventoryEditRequest request) {
 
         Inventory inventory = inventoryRepository.getOne(request.getId());
 
@@ -201,7 +201,7 @@ public class InventoryService {
         return response;
     }
 
-    public InventoryDocDownloadResponse downloadItemDetail(Integer id) throws Exception {
+    public InventoryDocDownloadResponse downloadItemDetail(Integer id) {
 
         InventoryDocDownloadResponse response = new InventoryDocDownloadResponse();
 
@@ -300,7 +300,7 @@ public class InventoryService {
         return response;
     }
 
-    public RequestResponse insertInventories(MultipartFile file) throws InvalidRequestException {
+    public RequestResponse insertInventories(MultipartFile file) {
         BufferedReader br;
         List<Inventory> inventories = new LinkedList<>();
         try {

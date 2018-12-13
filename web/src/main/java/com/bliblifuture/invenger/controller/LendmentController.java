@@ -40,7 +40,7 @@ public class LendmentController {
 
     @PostMapping("lendment/create")
     @ResponseBody
-    public RequestResponse assignItemToUser(@Valid @RequestBody LendmentCreateRequest request) throws Exception {
+    public RequestResponse assignItemToUser(@Valid @RequestBody LendmentCreateRequest request) {
         return lendmentService.createLendment(request);
     }
 
@@ -67,12 +67,12 @@ public class LendmentController {
 
     @PostMapping("lendment/approve/{id}")
     @ResponseBody
-    public RequestResponse doApprovement(@PathVariable("id") Integer lendmentId) throws Exception {
+    public RequestResponse doApprovement(@PathVariable("id") Integer lendmentId) {
         return lendmentService.approveLendmentRequest(lendmentId);
     }
 
     @GetMapping("lendment/detail/{id}")
-    public String getLendment(@PathVariable("id") Integer id,Model model) throws Exception {
+    public String getLendment(@PathVariable("id") Integer id,Model model) {
 
         LendmentDTO lendment = lendmentService.getLendmentDetailById(id);
         model.addAttribute("lendment", lendment);
@@ -91,13 +91,13 @@ public class LendmentController {
 
     @PostMapping("lendment/return")
     @ResponseBody
-    public RequestResponse returnInventory(@Valid @RequestBody LendmentReturnRequest request) throws Exception {
+    public RequestResponse returnInventory(@Valid @RequestBody LendmentReturnRequest request) {
         return lendmentService.returnInventory(request);
     }
 
     @PostMapping("lendment/handover/{id}")
     @ResponseBody
-    public RequestResponse doHandOver(@PathVariable("id") Integer lendmentId) throws Exception {
+    public RequestResponse doHandOver(@PathVariable("id") Integer lendmentId) {
         return lendmentService.handOverOrderItems(lendmentId);
     }
 

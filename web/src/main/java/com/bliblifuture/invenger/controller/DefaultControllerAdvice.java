@@ -1,7 +1,7 @@
 package com.bliblifuture.invenger.controller;
 
 import com.bliblifuture.invenger.exception.DataNotFoundException;
-import com.bliblifuture.invenger.exception.DefaultException;
+import com.bliblifuture.invenger.exception.DefaultRuntimeException;
 import com.bliblifuture.invenger.exception.DuplicateEntryException;
 import com.bliblifuture.invenger.exception.InvalidRequestException;
 import com.bliblifuture.invenger.response.jsonResponse.RequestResponse;
@@ -19,7 +19,7 @@ import java.util.Objects;
 @ControllerAdvice
 public class DefaultControllerAdvice {
 
-    @ExceptionHandler(value={Exception.class,DefaultException.class})
+    @ExceptionHandler(value={Exception.class, DefaultRuntimeException.class})
     @RequestMapping(produces = "application/vnd.error+json")
     public ResponseEntity<RequestResponse> DefaultExceptionHandler(Exception exception){
 
@@ -57,7 +57,7 @@ public class DefaultControllerAdvice {
 
     @ExceptionHandler(value = {DuplicateEntryException.class, InvalidRequestException.class})
     @RequestMapping(produces = "application/vnd.error+json")
-    public ResponseEntity<RequestResponse> duplicateEntryExceptionHandler(DefaultException exception){
+    public ResponseEntity<RequestResponse> duplicateEntryExceptionHandler(DefaultRuntimeException exception){
 
         exception.printStackTrace();
 

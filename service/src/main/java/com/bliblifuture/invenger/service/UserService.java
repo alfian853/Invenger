@@ -7,7 +7,7 @@ import com.bliblifuture.invenger.Utils.QuerySpec;
 import com.bliblifuture.invenger.annotation.imp.PasswordValdator;
 import com.bliblifuture.invenger.annotation.imp.PhoneValidator;
 import com.bliblifuture.invenger.exception.DataNotFoundException;
-import com.bliblifuture.invenger.exception.DefaultException;
+import com.bliblifuture.invenger.exception.DefaultRuntimeException;
 import com.bliblifuture.invenger.exception.DuplicateEntryException;
 import com.bliblifuture.invenger.exception.InvalidRequestException;
 import com.bliblifuture.invenger.entity.user.Position;
@@ -69,7 +69,7 @@ public class UserService implements UserDetailsService {
         return mapper.toUserDtoList(userRepository.findAllFetched());
     }
 
-    public UserDTO getById(Integer id) throws Exception {
+    public UserDTO getById(Integer id) {
         User user = userRepository.findUserById(id);
         if(user == null){
             throw new DataNotFoundException("User Not Found");
@@ -77,7 +77,7 @@ public class UserService implements UserDetailsService {
         return mapper.toUserDto(user);
     }
 
-    private void saveUserHandler(User user) throws Exception {
+    private void saveUserHandler(User user) {
         try{
             userRepository.save(user);
         }
@@ -94,7 +94,7 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public UserCreateResponse createUser(UserCreateRequest request) throws Exception {
+    public UserCreateResponse createUser(UserCreateRequest request) {
         UserCreateResponse response = new UserCreateResponse();
         response.setStatusToSuccess();
 
@@ -133,7 +133,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public RequestResponse updateUser(UserEditRequest request) throws Exception {
+    public RequestResponse updateUser(UserEditRequest request) {
 
         User user = userRepository.findUserById(request.getId());
 
@@ -161,7 +161,7 @@ public class UserService implements UserDetailsService {
         return response;
     }
 
-    public RequestResponse deleteUser(Integer id) throws Exception {
+    public RequestResponse deleteUser(Integer id) {
         RequestResponse response = new RequestResponse();
         try{
             userRepository.deleteById(id);
@@ -171,7 +171,7 @@ public class UserService implements UserDetailsService {
                 throw new DataNotFoundException("User Doesn\'t Exists!");
             }
             else{
-                throw new DefaultException(e.getLocalizedMessage());
+                throw new DefaultRuntimeException(e.getLocalizedMessage());
             }
         }
         response.setStatusToSuccess();
@@ -193,7 +193,7 @@ public class UserService implements UserDetailsService {
     * load by username or email for login and auto login purpose
     * */
     @Override
-    public User loadUserByUsername(String s) throws UsernameNotFoundException {
+    public User loadUserByUsername(String s) {
         User user =userRepository.findByUsername(s);
         if(user == null){
             return userRepository.findByEmail(s);
@@ -226,7 +226,7 @@ public class UserService implements UserDetailsService {
                 .build();
     }
 
-    public Map<String,FormFieldResponse> editProfile(ProfileRequest request) throws Exception {
+    public Map<String,FormFieldResponse> editProfile(ProfileRequest request) {
         User user = null;
         Map<String,FormFieldResponse> formResponses = new HashMap<>();
         FormFieldResponse formResponse = null;
@@ -385,7 +385,7 @@ public class UserService implements UserDetailsService {
         return mapper.toPositionDtoList(positionRepository.findAll());
     }
 
-    private void savePositionHandler(Position position) throws DefaultException {
+    private void savePositionHandler(Position position) {
         try{
             positionRepository.save(position);
         }
@@ -394,12 +394,12 @@ public class UserService implements UserDetailsService {
                 if(e.getRootCause().getLocalizedMessage().contains("username")){
                     throw new DuplicateEntryException("Position already exist!");
                 }
-                throw new DefaultException(e.getLocalizedMessage());
+                throw new DefaultRuntimeException(e.getLocalizedMessage());
             }
         }
     }
 
-    public PositionCreateResponse createPosition(PositionDTO newPosition) throws DefaultException {
+    public PositionCreateResponse createPosition(PositionDTO newPosition) {
         Position position = Position.builder()
                 .name(newPosition.getName())
                 .level(newPosition.getLevel())
@@ -423,7 +423,7 @@ public class UserService implements UserDetailsService {
 
     }
 
-    public RequestResponse editPosition(PositionDTO editedPosition) throws DefaultException {
+    public RequestResponse editPosition(PositionDTO editedPosition) {
 
         Position position = positionRepository.getOne(editedPosition.getId());
         if(position == null){
@@ -442,7 +442,7 @@ public class UserService implements UserDetailsService {
         return response;
     }
 
-    public RequestResponse deletePosition(Integer id) throws DefaultException {
+    public RequestResponse deletePosition(Integer id) {
         try{
             positionRepository.deleteById(id);
         }
@@ -451,7 +451,7 @@ public class UserService implements UserDetailsService {
                 throw new DataNotFoundException("Position Doesn\'t Exists!");
             }
             else{
-                throw new DefaultException(e.getLocalizedMessage());
+                throw new DefaultRuntimeException(e.getLocalizedMessage());
             }
         }
         RequestResponse response = new RequestResponse();

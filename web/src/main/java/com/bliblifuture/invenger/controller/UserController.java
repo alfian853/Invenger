@@ -1,7 +1,7 @@
 package com.bliblifuture.invenger.controller;
 
 import com.bliblifuture.invenger.Utils.MyUtils;
-import com.bliblifuture.invenger.exception.DefaultException;
+import com.bliblifuture.invenger.exception.DefaultRuntimeException;
 import com.bliblifuture.invenger.exception.InvalidRequestException;
 import com.bliblifuture.invenger.entity.user.RoleType;
 import com.bliblifuture.invenger.entity.user.User;
@@ -66,7 +66,7 @@ public class UserController {
 
     @PostMapping("/profile")
     @ResponseBody
-    public Map<String,FormFieldResponse> postProfile(@RequestBody ProfileRequest request) throws Exception {
+    public Map<String,FormFieldResponse> postProfile(@RequestBody ProfileRequest request) {
         return userService.editProfile(request);
     }
 
@@ -89,24 +89,24 @@ public class UserController {
 
     @PostMapping("/user/create")
     @ResponseBody
-    public UserCreateResponse addNewUser(@Valid @ModelAttribute UserCreateRequest request) throws Exception {
+    public UserCreateResponse addNewUser(@Valid @ModelAttribute UserCreateRequest request) {
         return userService.createUser(request);
     }
 
     @PostMapping("/user/edit")
     @ResponseBody
-    public RequestResponse editUser(@Valid @ModelAttribute UserEditRequest request) throws Exception {
+    public RequestResponse editUser(@Valid @ModelAttribute UserEditRequest request) {
         return userService.updateUser(request);
     }
 
     @PostMapping("/user/delete/{id}")
     @ResponseBody
-    public RequestResponse removeUser(@PathVariable("id") Integer id) throws Exception {
+    public RequestResponse removeUser(@PathVariable("id") Integer id) {
         return userService.deleteUser(id);
     }
 
     @GetMapping("/user/detail/{id}")
-    public String getUserDetail(Model model, @PathVariable("id") Integer id) throws Exception {
+    public String getUserDetail(Model model, @PathVariable("id") Integer id) {
         model.addAttribute("user", userService.getById(id));
         return "user/user_detail";
     }
@@ -129,13 +129,13 @@ public class UserController {
 
     @PostMapping("/user/positions/create")
     @ResponseBody
-    public PositionCreateResponse createPosition(@Valid @RequestBody PositionDTO positionDTO) throws DefaultException {
+    public PositionCreateResponse createPosition(@Valid @RequestBody PositionDTO positionDTO) {
         return userService.createPosition(positionDTO);
     }
 
     @PostMapping("/user/positions/edit")
     @ResponseBody
-    public RequestResponse editPosition(@RequestBody PositionDTO editedPosition) throws DefaultException {
+    public RequestResponse editPosition(@RequestBody PositionDTO editedPosition) {
         if(editedPosition.getId() == null){
             throw new InvalidRequestException("Id can\'t be null");
         }
@@ -144,7 +144,7 @@ public class UserController {
 
     @PostMapping("/user/positions/delete/{id}")
     @ResponseBody
-    public RequestResponse deletePosition(@PathVariable("id") Integer id) throws DefaultException {
+    public RequestResponse deletePosition(@PathVariable("id") Integer id) {
         return userService.deletePosition(id);
     }
 

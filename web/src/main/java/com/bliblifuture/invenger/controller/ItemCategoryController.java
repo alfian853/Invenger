@@ -39,7 +39,7 @@ public class ItemCategoryController {
 
     @PostMapping("/category/delete/{id}")
     @ResponseBody
-    public RequestResponse deleteCategory(@PathVariable("id") Integer id) throws Exception {
+    public RequestResponse deleteCategory(@PathVariable("id") Integer id) {
         return itemCategoryService.deleteCategory(id);
     }
 

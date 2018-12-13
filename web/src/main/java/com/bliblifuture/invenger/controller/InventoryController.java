@@ -48,13 +48,13 @@ public class InventoryController {
 
     @PostMapping("/inventory/create")
     @ResponseBody
-    public InventoryCreateResponse addNewInventory(@Valid @ModelAttribute InventoryCreateRequest request) throws Exception {
+    public InventoryCreateResponse addNewInventory(@Valid @ModelAttribute InventoryCreateRequest request) {
         return inventoryService.createInventory(request);
     }
 
     @PostMapping("/inventory/edit")
     @ResponseBody
-    public RequestResponse editInventory(@Valid @ModelAttribute InventoryEditRequest request) throws Exception {
+    public RequestResponse editInventory(@Valid @ModelAttribute InventoryEditRequest request) {
         return inventoryService.updateInventory(request);
     }
 
@@ -65,7 +65,7 @@ public class InventoryController {
     }
 
     @GetMapping("/inventory/detail/{id}")
-    public String getInventoryDetail(Model model, @PathVariable("id") Integer id) throws Exception {
+    public String getInventoryDetail(Model model, @PathVariable("id") Integer id) {
         model.addAttribute("inventory", inventoryService.getById(id));
         model.addAttribute("itemTypes", InventoryType.getAllType());
         if(userService.currentUserIsAdmin()){
@@ -77,7 +77,7 @@ public class InventoryController {
     }
 
     @GetMapping("/inventory/detail/{id}/download")
-    public String downloadInventoryDocument(@PathVariable("id") Integer id) throws Exception {
+    public String downloadInventoryDocument(@PathVariable("id") Integer id) {
         InventoryDocDownloadResponse response = inventoryService.downloadItemDetail(id);
         return "redirect:"+response.getInventoryDocUrl();
     }
@@ -101,7 +101,7 @@ public class InventoryController {
 
     @PostMapping("/inventory/upload")
     @ResponseBody
-    public RequestResponse uploadInventories(@RequestParam("file") MultipartFile file) throws InvalidRequestException {
+    public RequestResponse uploadInventories(@RequestParam("file") MultipartFile file) {
         return inventoryService.insertInventories(file);
     }
 
