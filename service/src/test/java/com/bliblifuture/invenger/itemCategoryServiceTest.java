@@ -15,9 +15,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.MockitoRule;
 import org.springframework.dao.EmptyResultDataAccessException;
 
@@ -30,11 +32,8 @@ import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-
+@RunWith(MockitoJUnitRunner.class)
 public class itemCategoryServiceTest {
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
 
     @InjectMocks
     private ItemCategoryService categoryService;
@@ -213,7 +212,6 @@ public class itemCategoryServiceTest {
     ////////////////////////////////////////////////////////////////////////////////
     @Test(expected = DataNotFoundException.class)
     public void deleteCategory_idNotFound() {
-        when(categoryRepository.existsByParentId(PARENT_ID)).thenReturn(false);
         when(categoryService.deleteCategory(2000)).thenThrow(EmptyResultDataAccessException.class);
         categoryService.deleteCategory(2000);
     }
@@ -298,7 +296,7 @@ public class itemCategoryServiceTest {
     public void getAllItemCategory_notFetchParent(){
 
         List<Category> categories = mock_findAll(false);
-        when(categoryRepository.findAllFetchParent()).thenReturn(categories);
+        when(categoryRepository.findAll()).thenReturn(categories);
 
         List<CategoryDTO> result = categoryService.getAllItemCategory(false);
         int len = result.size();
