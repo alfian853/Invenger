@@ -154,8 +154,10 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Superior *</label>
-                        <select style="width: 100%;" name="superior_id">
-                            <option></option>
+                        <select class="form-input" style="width: 100%;" name="superior_id">
+                            <th:block th:each="user2 : ${users}">
+                                <option th:value="${user2.id}" th:text="${user2.username}">Option i</option>
+                            </th:block>
                         </select>
                     </div>
                     <div class="form-group">
@@ -295,6 +297,10 @@
                 listPosition[$(this).val()] = $(this).text();
             });
 
+            $('select[name=\"superior_id\"] option').each(function () {
+                select_superior[$(this).val()] = $(this).text();
+            });
+
             $('select[name=\"role_id\"] option').each(function () {
                 listRole[$(this).val()] = $(this).text();
             });
@@ -312,18 +318,18 @@
 
             });
             //init user as superior
-            let res = tableAccess.getAll();
-            select_superior = $('#create-user-form select[name=\"superior_id\"]');
-            select_superior.select2({
-                selectOnClose : false,
-                placeholder : 'please select superior'
-            });
+            // let res = tableAccess.getAll();
+            // select_superior = $('form#create-user-form select[name=\"superior_id\"]');
+            // select_superior.select2({
+            //     selectOnClose : false,
+            //     placeholder : 'please select superior'
+            // });
 
-            for(let i = 0; i < res.length; i++){
-                select_superior.append(
-                    '<option value=\"'+res[i][0]+'\">'+res[i][1]+'</option>'
-                );
-            }
+            // for(let i = 0; i < res.length; i++){
+            //     select_superior.append(
+            //         '<option value=\"'+res[i][0]+'\">'+res[i][1]+'</option>'
+            //     );
+            // }
 
             // var createItemDZ = new Dropzone('#uploadFile',{
             Dropzone.options.uploadFile = {
