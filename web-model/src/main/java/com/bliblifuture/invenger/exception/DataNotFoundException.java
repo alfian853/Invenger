@@ -8,4 +8,8 @@ public class DataNotFoundException extends DefaultRuntimeException {
     public DataNotFoundException(String message){
         super(message);
     }
+
+    public DataNotFoundException() {
+
+    }
 }

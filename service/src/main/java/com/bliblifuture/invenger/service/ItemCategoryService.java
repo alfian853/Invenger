@@ -73,11 +73,8 @@ public class ItemCategoryService {
         CategoryEditResponse response = new CategoryEditResponse();
 
         if(request.getNewName().contains("/")){
-            response.setStatusToFailed();
-            response.setMessage("category name can't be contain '/' character");
-            return response;
+            throw new InvalidRequestException("category name can't be contain '/' character");
         }
-
 
         categories = categoryRepository.getCategoryParentWithChildIdOrderById();
         int currentIndex = getCategoryIndex(request.getId());
@@ -122,9 +119,7 @@ public class ItemCategoryService {
             }
 
             if(isCircular){
-                response.setStatusToFailed();
-                response.setMessage("can't assign child as new parent");
-                return response;
+                throw new InvalidRequestException("can\'t assign child as new parent");
             }
         }
 
@@ -160,13 +155,11 @@ public class ItemCategoryService {
     public CategoryCreateResponse createCategory(CategoryCreateRequest request){
         CategoryCreateResponse response = new CategoryCreateResponse();
         if(request.getName().contains("/") || request.getName().length() == 0){
-            response.setStatusToFailed();
-            return response;
+            throw new InvalidRequestException("Name can\'t be contain \'/\'");
         }
         Category parent = categoryRepository.findCategoryById(request.getParentId());
         if(parent == null){
-            response.setStatusToFailed();
-            return response;
+            throw new InvalidRequestException("Parent ID can\'t be null");
         }
         Category newCategory = new Category();
         newCategory.setParent(parent);
