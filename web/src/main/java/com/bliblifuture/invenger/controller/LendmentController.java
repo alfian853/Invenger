@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @Controller
+@RequestMapping("/lendment")
 public class LendmentController {
 
     @Autowired
@@ -27,7 +28,7 @@ public class LendmentController {
     @Autowired
     InventoryService inventoryService;
 
-    @GetMapping("lendment/create")
+    @GetMapping("/create")
     public String getAssignItemForm(Model model){
         if(userService.currentUserIsAdmin()){
             return "lendment/lendment_create";
@@ -38,13 +39,13 @@ public class LendmentController {
         }
     }
 
-    @PostMapping("lendment/create")
+    @PostMapping("/create")
     @ResponseBody
     public RequestResponse assignItemToUser(@Valid @RequestBody LendmentCreateRequest request) {
         return lendmentService.createLendment(request);
     }
 
-    @GetMapping("lendment/all")
+    @GetMapping("/all")
     public String getLendmentTable(Model model){
         model.addAttribute("status",LendmentStatus.getMap());
         if(userService.currentUserIsAdmin()){
@@ -57,7 +58,7 @@ public class LendmentController {
         }
     }
 
-    @GetMapping("lendment/requests")
+    @GetMapping("/requests")
     public String getLendmentQueueTable(Model model){
         model.addAttribute("status",LendmentStatus.getMap());
         model.addAttribute("lendments",lendmentService.getAllLendmentRequest());
@@ -65,13 +66,13 @@ public class LendmentController {
         return "lendment/lendment_request_list";
     }
 
-    @PostMapping("lendment/approve/{id}")
+    @PostMapping("/approve/{id}")
     @ResponseBody
     public RequestResponse doApprovement(@PathVariable("id") Integer lendmentId) {
         return lendmentService.approveLendmentRequest(lendmentId);
     }
 
-    @GetMapping("lendment/detail/{id}")
+    @GetMapping("/detail/{id}")
     public String getLendment(@PathVariable("id") Integer id,Model model) {
 
         LendmentDTO lendment = lendmentService.getLendmentDetailById(id);
@@ -89,19 +90,19 @@ public class LendmentController {
 
     }
 
-    @PostMapping("lendment/return")
+    @PostMapping("/return")
     @ResponseBody
     public RequestResponse returnInventory(@Valid @RequestBody LendmentReturnRequest request) {
         return lendmentService.returnInventory(request);
     }
 
-    @PostMapping("lendment/handover/{id}")
+    @PostMapping("/handover/{id}")
     @ResponseBody
     public RequestResponse doHandOver(@PathVariable("id") Integer lendmentId) {
         return lendmentService.handOverOrderItems(lendmentId);
     }
 
-    @GetMapping("/lendment")
+    @GetMapping
     public String trackInventory(Model model,@RequestParam("having-item-id") Integer inventoryId){
         model.addAttribute("lendments",lendmentService.getInventoryLendment(inventoryId));
         return "lendment/lendment_inventory";

@@ -261,8 +261,9 @@
                                 }
                                 $('.iziModal-button-close').click();
                             },
-                            error : function () {
-                                toastMessage('error','Error','Something Wrong :(');
+                            error : function (response) {
+                                response = JSON.parse(response.responseText);
+                                toastMessage('error','Error',response['message']);
                                 $('.iziModal-button-close').click();
                             }
                         });

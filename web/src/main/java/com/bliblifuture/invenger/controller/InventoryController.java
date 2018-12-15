@@ -1,6 +1,5 @@
 package com.bliblifuture.invenger.controller;
 
-import com.bliblifuture.invenger.exception.InvalidRequestException;
 import com.bliblifuture.invenger.entity.inventory.InventoryType;
 import com.bliblifuture.invenger.request.datatables.DataTablesRequest;
 import com.bliblifuture.invenger.request.formRequest.InventoryCreateRequest;
@@ -21,6 +20,7 @@ import javax.validation.Valid;
 
 
 @Controller
+@RequestMapping("/inventory")
 public class InventoryController {
 
     @Autowired
@@ -32,7 +32,7 @@ public class InventoryController {
     @Autowired
     UserService userService;
 
-    @GetMapping("/inventory/all")
+    @GetMapping("/all")
     public String getInventoryTable(Model model){
         model.addAttribute("categories",itemCategoryService.getAllItemCategory(false));
         model.addAttribute("itemTypes", InventoryType.getAllType());
@@ -46,25 +46,25 @@ public class InventoryController {
         }
     }
 
-    @PostMapping("/inventory/create")
+    @PostMapping("/create")
     @ResponseBody
     public InventoryCreateResponse addNewInventory(@Valid @ModelAttribute InventoryCreateRequest request) {
         return inventoryService.createInventory(request);
     }
 
-    @PostMapping("/inventory/edit")
+    @PostMapping("/edit")
     @ResponseBody
     public RequestResponse editInventory(@Valid @ModelAttribute InventoryEditRequest request) {
         return inventoryService.updateInventory(request);
     }
 
-    @PostMapping("/inventory/delete/{id}")
+    @PostMapping("/delete/{id}")
     @ResponseBody
     public RequestResponse removeInventory(@PathVariable("id") Integer id){
         return inventoryService.deleteInventory(id);
     }
 
-    @GetMapping("/inventory/detail/{id}")
+    @GetMapping("/detail/{id}")
     public String getInventoryDetail(Model model, @PathVariable("id") Integer id) {
         model.addAttribute("inventory", inventoryService.getById(id));
         model.addAttribute("itemTypes", InventoryType.getAllType());
@@ -76,13 +76,13 @@ public class InventoryController {
         }
     }
 
-    @GetMapping("/inventory/detail/{id}/download")
+    @GetMapping("/detail/{id}/download")
     public String downloadInventoryDocument(@PathVariable("id") Integer id) {
         InventoryDocDownloadResponse response = inventoryService.downloadItemDetail(id);
         return "redirect:"+response.getInventoryDocUrl();
     }
 
-    @GetMapping("/datatables/inventory")
+    @GetMapping("/datatables")
     @ResponseBody
     public DataTablesResult<InventoryDataTableResponse> getPaginatedInventories(
             HttpServletRequest servletRequest){
@@ -90,7 +90,7 @@ public class InventoryController {
         return inventoryService.getPaginatedDatatablesInventoryList(request);
     }
 
-    @GetMapping("/inventory/search")
+    @GetMapping("/search")
     @ResponseBody
     public SearchResponse searchInventory(@RequestParam("search")String query,
                                           @RequestParam("page")Integer page,
@@ -99,7 +99,7 @@ public class InventoryController {
         return inventoryService.getSearchedInventory(query,page,length);
     }
 
-    @PostMapping("/inventory/upload")
+    @PostMapping("/upload")
     @ResponseBody
     public RequestResponse uploadInventories(@RequestParam("file") MultipartFile file) {
         return inventoryService.insertInventories(file);

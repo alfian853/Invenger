@@ -148,7 +148,7 @@ public class UserController {
         return userService.deletePosition(id);
     }
 
-    @GetMapping("/datatables/user")
+    @GetMapping("/user/datatables")
     @ResponseBody
     public DataTablesResult<UserDataTableResponse> getPaginatedInventories(
             HttpServletRequest servletRequest){
