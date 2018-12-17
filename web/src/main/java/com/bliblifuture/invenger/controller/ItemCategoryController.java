@@ -4,6 +4,7 @@ package com.bliblifuture.invenger.controller;
 import com.bliblifuture.invenger.request.jsonRequest.CategoryCreateRequest;
 import com.bliblifuture.invenger.request.jsonRequest.CategoryEditRequest;
 import com.bliblifuture.invenger.response.jsonResponse.RequestResponse;
+import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchResponse;
 import com.bliblifuture.invenger.service.ItemCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -43,6 +44,13 @@ public class ItemCategoryController {
         return "inventory/inventory_category_list";
     }
 
+    @GetMapping("/search")
+    @ResponseBody
+    public SearchResponse searchCategory(@RequestParam("search")String query,
+                                         @RequestParam("page")Integer page,
+                                         @RequestParam("length")Integer length){
+        return itemCategoryService.getSearchCategory(query, page, length);
+    }
 
 
 }

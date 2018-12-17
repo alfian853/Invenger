@@ -1,6 +1,7 @@
 package com.bliblifuture.invenger.ModelMapper.category;
 
 import com.bliblifuture.invenger.entity.inventory.Category;
+import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchItem;
 import com.bliblifuture.invenger.response.viewDto.CategoryDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
@@ -14,4 +15,5 @@ public interface CategoryMapper {
 
     List<CategoryDTO> toCategoryDtoList(List<Category> categories);
 
+    List<SearchItem> toSearchResultList(List<Category> categories);
 }

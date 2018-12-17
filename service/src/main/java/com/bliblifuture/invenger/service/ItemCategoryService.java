@@ -2,6 +2,8 @@ package com.bliblifuture.invenger.service;
 
 import com.bliblifuture.invenger.ModelMapper.category.CategoryMapper;
 import com.bliblifuture.invenger.ModelMapper.category.CategoryMapperImpl;
+import com.bliblifuture.invenger.Utils.QuerySpec;
+import com.bliblifuture.invenger.entity.inventory.Inventory;
 import com.bliblifuture.invenger.exception.DataNotFoundException;
 import com.bliblifuture.invenger.exception.InvalidRequestException;
 import com.bliblifuture.invenger.entity.inventory.Category;
@@ -12,13 +14,19 @@ import com.bliblifuture.invenger.request.jsonRequest.CategoryEditRequest;
 import com.bliblifuture.invenger.response.jsonResponse.CategoryCreateResponse;
 import com.bliblifuture.invenger.response.jsonResponse.CategoryEditResponse;
 import com.bliblifuture.invenger.response.jsonResponse.RequestResponse;
+import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchResponse;
 import com.bliblifuture.invenger.response.viewDto.CategoryDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.criteria.Predicate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,11 +35,12 @@ public class ItemCategoryService {
 
 
     @Autowired
-    protected CategoryRepository categoryRepository;
+    private CategoryRepository categoryRepository;
 
     private List<CategoryWithChildId> categories;
 
     final private CategoryMapper mapper = new CategoryMapperImpl();
+
 
     // Get category index in categories by category id using Binary Search algorithm
     private int getCategoryIndex(int id){
@@ -203,4 +212,21 @@ public class ItemCategoryService {
         }
     }
 
+    public SearchResponse getSearchCategory(String query,Integer pageNum, Integer length){
+        PageRequest pageRequest = PageRequest.of(pageNum,length);
+        Specification<Category> specification = (root, criteriaQuery, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("name")), "%" + query.toLowerCase() + "%")
+            );
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+
+        Page<Category> page = categoryRepository.findAll(specification, pageRequest);
+        SearchResponse response = new SearchResponse();
+        response.setResults(mapper.toSearchResultList(page.getContent()));
+        response.setRecordsFiltered((int) page.getTotalElements());
+
+        return response;
+    }
 }
