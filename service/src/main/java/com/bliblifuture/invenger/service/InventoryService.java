@@ -76,6 +76,7 @@ public class InventoryService {
 
     public InventoryDTO getById(Integer id) {
         Inventory inventory = inventoryRepository.findInventoryById(id);
+        System.out.println(inventory);
         if(inventory == null){
             throw new DataNotFoundException("Inventory Not Found");
         }
@@ -98,7 +99,7 @@ public class InventoryService {
         newInventory.setType(request.getType().toString());
 
         String imgName = null;
-        System.out.println(request.getPhoto_file());
+
         if(request.getPhoto_file() != null) {
             imgName = UUID.randomUUID().toString().replace("-", "") +
                     "." + FilenameUtils.getExtension(request.getPhoto_file().getOriginalFilename());
@@ -113,8 +114,7 @@ public class InventoryService {
             newInventory.setImage(imgName);
 
         }
-        System.out.println("save");
-        System.out.println(newInventory);
+
         try{
             inventoryRepository.save(newInventory);
         }
@@ -126,7 +126,7 @@ public class InventoryService {
                         FileStorageService.PathCategory.INVENTORY_PICT
                 );
             }
-            if(e.getRootCause().getLocalizedMessage().contains("duplicate")){
+            if(e.getLocalizedMessage().contains("duplicate")){
                 throw new DuplicateEntryException("Inventory name already exist");
             }
         }
@@ -169,6 +169,7 @@ public class InventoryService {
             Category category = categoryRepository.getOne(request.getCategory_id());
             inventory.setCategory(category);
         }
+
         if(request.getPict() != null){
 
             String newFileName = myUtils.getRandomFileName(request.getPict());
@@ -181,8 +182,7 @@ public class InventoryService {
                 inventory.setImage(newFileName);
             }
             else {
-                response.setStatusToFailed();
-                response.setMessage("Internal server error");
+                throw new DefaultRuntimeException("Internal Server Error!");
             }
 
         }
@@ -213,7 +213,7 @@ public class InventoryService {
 
         if(doc == null || !doc.getInventoryLastUpdate().equals(inventory.getUpdatedAt()) ){
 
-            InventoryDTO inventoryDTO = this.getById(id);
+            InventoryDTO inventoryDTO = mapper.toInventoryDto(inventory);
 
             ObjectMapper oMapper = new ObjectMapper();
             Map templateMap = oMapper.convertValue(inventoryDTO, Map.class);
@@ -225,6 +225,7 @@ public class InventoryService {
             );
 
             if(filename != null){
+                //update doc
                 if(doc != null){
                     fileStorageService.deleteFile(
                             doc.getFileName(),
@@ -233,7 +234,7 @@ public class InventoryService {
                     doc.setFileName(filename);
                     doc.setInventoryLastUpdate(inventory.getUpdatedAt());
                 }
-                else{
+                else{//create doc
                     doc = InventoryDocument.builder()
                             .inventory(inventoryRepository.getOne(id))
                             .fileName(filename)
@@ -282,7 +283,7 @@ public class InventoryService {
         return result;
     }
 
-    public SearchResponse getSearchedInventory(String query, Integer pageNum, Integer length){
+    public SearchResponse getSearchedInventory(String query, int pageNum, int length){
         PageRequest pageRequest = PageRequest.of(pageNum,length);
         Specification<Inventory> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
