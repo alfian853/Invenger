@@ -175,6 +175,14 @@ public class itemCategoryServiceTest {
      //public CategoryCreateResponse createCategory(CategoryCreateRequest request)//
     ///////////////////////////////////////////////////////////////////////////////
 
+    @Test(expected = InvalidRequestException.class)
+    public void createCategory_invalidRequest(){
+        CategoryCreateRequest request = new CategoryCreateRequest();
+        request.setName("chi/ld");
+        request.setParentId(PARENT_ID);
+        categoryService.createCategory(request);
+    }
+
     @Test
     public void createCategory_parentFound(){
 
@@ -198,8 +206,7 @@ public class itemCategoryServiceTest {
         request.setParentId(PARENT_ID);
 
         when(categoryRepository.findCategoryById(PARENT_ID)).thenReturn(null);
-
-        CategoryCreateResponse response = categoryService.createCategory(request);
+        categoryService.createCategory(request);
     }
 
 
@@ -209,7 +216,6 @@ public class itemCategoryServiceTest {
 
     @Test(expected = DataNotFoundException.class)
     public void deleteCategory_idNotFound() {
-
         when(categoryService.deleteCategory(2000)).thenThrow(EmptyResultDataAccessException.class);
         categoryService.deleteCategory(2000);
     }

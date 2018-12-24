@@ -6,6 +6,7 @@ import com.bliblifuture.invenger.exception.InvalidRequestException;
 import com.bliblifuture.invenger.response.jsonResponse.CategoryCreateResponse;
 import com.bliblifuture.invenger.response.jsonResponse.CategoryEditResponse;
 import com.bliblifuture.invenger.response.jsonResponse.RequestResponse;
+import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchResponse;
 import com.bliblifuture.invenger.response.viewDto.CategoryDTO;
 import com.bliblifuture.invenger.service.ItemCategoryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,8 +21,10 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import javax.naming.directory.SearchResult;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -72,14 +75,13 @@ public class ItemCategoryControllerTest {
 
         when(categoryService.createCategory(any())).thenReturn(mockedResponse);
 
-        System.out.println(mvc.perform(post("/category/create")
+        mvc.perform(post("/category/create")
             .contentType(MediaType.APPLICATION_JSON_UTF8)
             .content(objectMapper.writeValueAsString(content))
             ).andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(jsonPath("$.success").value(true))
-            .andExpect(jsonPath("$.new-category").value(category)).andReturn().getResponse());
-
+            .andExpect(jsonPath("$.new-category").value(category));
         verify(categoryService,times(1)).createCategory(any());
 
     }
@@ -213,13 +215,36 @@ public class ItemCategoryControllerTest {
         list.add(CategoryDTO.builder().id(1).build());
         when(categoryService.getAllItemCategory(anyBoolean())).thenReturn(list);
 
-        MockHttpServletResponse response = mvc.perform(get("/category/all"))
+        mvc.perform(get("/category/all"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("categories",list)).andReturn().getResponse();
 
     }
 
+        ////////////////////////////////////////////////////////////////////////////////
+       //public SearchResponse searchCategory(@RequestParam("search")String query,/////
+      //                                      @RequestParam("page")Integer page,//////
+     //                                     @RequestParam("length")Integer length)///
+    ////////////////////////////////////////////////////////////////////////////////
 
+    @Test
+    public void searchCategory_test() throws Exception {
+        SearchResponse response = new SearchResponse();
+        response.setRecordsFiltered(4000);
+        response.setResults(new LinkedList<>());
+
+        when(categoryService.getSearchCategory(anyString(),any(),any())).thenReturn(response);
+
+        mvc.perform(get("/category/search")
+                .param("search","all")
+                .param("page","2")
+                .param("length","10"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.results").value(response.getResults()))
+        .andExpect(jsonPath("$.recordsFiltered").value(response.getRecordsFiltered()));
+
+        verify(categoryService,times(1)).getSearchCategory(anyString(),any(),any());
+    }
 
 
 }
