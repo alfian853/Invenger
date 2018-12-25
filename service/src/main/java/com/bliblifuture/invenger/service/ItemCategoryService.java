@@ -16,6 +16,7 @@ import com.bliblifuture.invenger.response.jsonResponse.CategoryEditResponse;
 import com.bliblifuture.invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchResponse;
 import com.bliblifuture.invenger.response.viewDto.CategoryDTO;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
@@ -39,7 +40,7 @@ public class ItemCategoryService {
 
     private List<CategoryWithChildId> categories;
 
-    final private CategoryMapper mapper = new CategoryMapperImpl();
+    final private CategoryMapper mapper = Mappers.getMapper(CategoryMapper.class);
 
 
     // Get category index in categories by category id using Binary Search algorithm

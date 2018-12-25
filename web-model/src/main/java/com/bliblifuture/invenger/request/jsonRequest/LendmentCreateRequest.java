@@ -2,6 +2,7 @@ package com.bliblifuture.invenger.request.jsonRequest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,6 +16,7 @@ import java.util.List;
 public class LendmentCreateRequest {
 
     @Data
+    @Builder
     @AllArgsConstructor
     @NoArgsConstructor
     public static class Item{

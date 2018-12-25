@@ -115,14 +115,6 @@ public class LendmentService {
         );
     }
 
-    public LendmentDTO getById(Integer id) {
-        Lendment lendment = lendmentRepository.findLendmentById(id);
-        if(lendment == null){
-            throw new DataNotFoundException("Lendment Not Found");
-        }
-        return mapper.toLendmentDTO(lendment);
-    }
-
     public LendmentDTO getLendmentDetailById(Integer id) {
         Lendment lendment = lendmentRepository.findLendmentById(id);
 
@@ -172,7 +164,8 @@ public class LendmentService {
             detail.setReturnDate(date);
             detail.setReturned(true);
             Inventory inventory = detail.getInventory();
-            inventory.setQuantity(inventory.getQuantity() + detail.getQuantity());
+            inventory.setQuantity(inventory.getQuantity() +
+                    detail.getQuantity());
             lendmentDetailRepository.save(detail);
         }
 

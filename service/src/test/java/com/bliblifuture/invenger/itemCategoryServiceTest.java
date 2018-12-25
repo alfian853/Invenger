@@ -154,7 +154,7 @@ public class itemCategoryServiceTest {
         Assert.assertTrue(response.isSuccess());
     }
 
-    @Test
+    @Test(expected = InvalidRequestException.class)
     public void updateCategory_notValidParentChanged(){
 
         when(categoryRepository.getCategoryParentWithChildIdOrderById())
