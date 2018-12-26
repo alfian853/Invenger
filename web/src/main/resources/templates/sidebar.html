@@ -7,7 +7,7 @@
 	<a class="icon sidebar-selected" href="/inventory/all">
 		<i class="fas fa-drafting-compass"></i><div class="text">Inventories</div>
 	</a>
-	<a class="icon" href="/category/all">
+	<a class="icon" href="/category/all" sec:authorize="hasRole('ADMIN')">
 		<i class="fas fa-sitemap"></i><div class="text">Item Categories</div>
 	</a>
 	<a class="icon" href="/lendment/all">

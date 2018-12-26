@@ -93,7 +93,7 @@
                 <thead>
                 <tr>
                     <th><input type="text" style="width: 60px" placeholder="name" target-col="id"/></th>
-                    <th><input type="text" placeholder="email" target-col="username"/></th>
+                    <th><input type="text" placeholder="username" target-col="username"/></th>
                     <th></th>
                     <th>
                         <select target-col="status">
@@ -114,22 +114,6 @@
                 </tr>
                 </thead>
                 <tbody>
-                <!--<th:block th:each="lendment : ${lendments}">-->
-                    <!--<tr th:id="|lendment-${lendment.id}|">-->
-                        <!--<td col="id" th:text="${lendment.id}"></td>-->
-                        <!--<td col="username" th:text="${lendment.username}"></td>-->
-                        <!--<td col="order-date" th:text="${lendment.orderDate}"></td>-->
-                        <!--<td col="status" th:text="${lendment.status}"></td>-->
-                        <!--<td>-->
-                            <!--<button class="submit" type="submit" th:onclick="|loadLendmentDetail(${lendment.id})|">Detail</button>-->
-                            <!--<th:block th:switch="${lendment.status}">-->
-                                <!--<th:block th:case="${status.get('WaitingForPickUp')}">-->
-                                    <!--<button class="btn btn-warning btn-sm" th:onclick="|doHandOver(this,${lendment.id})|">Handover Ordered Item</button>-->
-                                <!--</th:block>-->
-                            <!--</th:block>-->
-                        <!--</td>-->
-                    <!--</tr>-->
-                <!--</th:block>-->
                 </tbody>
             </table>
         </div>

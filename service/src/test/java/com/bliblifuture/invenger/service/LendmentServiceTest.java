@@ -16,9 +16,8 @@ import com.bliblifuture.invenger.repository.UserRepository;
 import com.bliblifuture.invenger.request.jsonRequest.LendmentCreateRequest;
 import com.bliblifuture.invenger.request.jsonRequest.LendmentReturnRequest;
 import com.bliblifuture.invenger.response.viewDto.LendmentDTO;
-import com.bliblifuture.invenger.service.LendmentService;
-import com.bliblifuture.invenger.service.UserService;
-import javassist.NotFoundException;
+import com.bliblifuture.invenger.service.impl.LendmentServiceImpl;
+import com.bliblifuture.invenger.service.impl.UserServiceImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,12 +28,12 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,7 +42,7 @@ import java.util.List;
 public class LendmentServiceTest {
 
     @InjectMocks
-    LendmentService lendmentService;
+    LendmentServiceImpl lendmentService;
 
     @Mock
     LendmentRepository lendmentRepository;
@@ -90,8 +89,8 @@ public class LendmentServiceTest {
 
         LENDMENTS.add(LENDMENT);
 
-        LENDMENTS_DTO_WITH_DETAIL = mapper.toLendmentDtoList(LENDMENTS,true);
-        LENDMENTS_DTO_WITHOUT_DETAIL = mapper.toLendmentDtoList(LENDMENTS,false);
+        LENDMENTS_DTO_WITH_DETAIL = mapper.toDtoList(LENDMENTS,true);
+        LENDMENTS_DTO_WITHOUT_DETAIL = mapper.toDtoList(LENDMENTS,false);
     }
 
 
@@ -176,7 +175,7 @@ public class LendmentServiceTest {
         when(lendmentRepository.findAll()).thenReturn(LENDMENTS);
         Assert.assertEquals(
                 lendmentService.getAll().get(0),
-                mapper.toLendmentDTO(LENDMENTS.get(0))
+                mapper.toDto(LENDMENTS.get(0))
         );
     }
 
