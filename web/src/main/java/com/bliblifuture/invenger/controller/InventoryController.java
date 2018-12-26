@@ -87,7 +87,7 @@ public class InventoryController {
     public DataTablesResult<InventoryDataTableResponse> getPaginatedInventories(
             HttpServletRequest servletRequest){
         DataTablesRequest request = new DataTablesRequest(servletRequest);
-        return inventoryService.getPaginatedDatatablesInventoryList(request);
+        return inventoryService.getDatatablesData(request);
     }
 
     @GetMapping("/search")
@@ -96,7 +96,7 @@ public class InventoryController {
                                           @RequestParam("page")Integer page,
                                           @RequestParam("length")Integer length){
 
-        return inventoryService.getSearchedInventory(query,page,length);
+        return inventoryService.getSearchResult(query,page,length);
     }
 
     @PostMapping("/upload")

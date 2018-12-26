@@ -35,8 +35,7 @@ public class InventoryMapperImpl implements InventoryMapper{
         return inventories.stream().map(this::toInventoryDto).collect(Collectors.toList());
     }
 
-    @Override
-    public List<InventoryDataTableResponse> toInventoryDatatables(List<Inventory> inventories) {
+    public List<InventoryDataTableResponse> toDatatablesDtoList(List<Inventory> inventories) {
 
         List<InventoryDataTableResponse> responses = new LinkedList<>();
 
