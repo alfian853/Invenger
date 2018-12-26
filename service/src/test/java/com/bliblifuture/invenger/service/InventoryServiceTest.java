@@ -1,4 +1,4 @@
-package com.bliblifuture.invenger;
+package com.bliblifuture.invenger.service;
 
 import com.bliblifuture.invenger.ModelMapper.inventory.InventoryMapper;
 import com.bliblifuture.invenger.ModelMapper.inventory.InventoryMapperImpl;
@@ -17,12 +17,12 @@ import com.bliblifuture.invenger.repository.category.CategoryRepository;
 import com.bliblifuture.invenger.request.datatables.DataTablesRequest;
 import com.bliblifuture.invenger.request.formRequest.InventoryCreateRequest;
 import com.bliblifuture.invenger.request.formRequest.InventoryEditRequest;
+import com.bliblifuture.invenger.request.jsonRequest.SearchRequest;
 import com.bliblifuture.invenger.response.jsonResponse.InventoryCreateResponse;
 import com.bliblifuture.invenger.response.jsonResponse.InventoryDocDownloadResponse;
 import com.bliblifuture.invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.invenger.response.viewDto.InventoryDTO;
-import com.bliblifuture.invenger.service.FileStorageService;
-import com.bliblifuture.invenger.service.InventoryService;
+import com.bliblifuture.invenger.service.impl.InventoryServiceImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -49,7 +49,7 @@ import static org.mockito.Mockito.*;
 public class InventoryServiceTest {
 
     @InjectMocks
-    private InventoryService inventoryService;
+    private InventoryServiceImpl inventoryService;
 
     @Mock
     private InventoryRepository inventoryRepository;
@@ -96,7 +96,7 @@ public class InventoryServiceTest {
                 .image(IMAGE)
                 .type(TYPE)
                 .build();
-        INVENTORY_DTO = mapper.toInventoryDto(INVENTORY);
+        INVENTORY_DTO = mapper.toDto(INVENTORY);
     }
 
       ///////////////////////////////////////////
@@ -275,7 +275,7 @@ public class InventoryServiceTest {
 
     }
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-     //public DataTablesResult<InventoryDataTableResponse> getPaginatedDatatablesInventoryList(DataTablesRequest request)//
+     //public DataTablesResult<InventoryDataTableResponse> getDatatablesData(DataTablesRequest request)//
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private MockHttpServletRequest mock_datatableServletRequest(boolean hasSearchValue) {
@@ -304,7 +304,7 @@ public class InventoryServiceTest {
 
         when(inventoryRepository.findAll(any(PageRequest.class))).thenReturn(page);
 
-        inventoryService.getPaginatedDatatablesInventoryList(request);
+        inventoryService.getDatatablesData(request);
 
         verify(inventoryRepository, times(1)).findAll(any(PageRequest.class));
 
@@ -319,7 +319,7 @@ public class InventoryServiceTest {
         Page<Inventory> page = new PageImpl<>(new ArrayList<>());
         when(inventoryRepository.findAll(any(Specification.class), any(PageRequest.class))).thenReturn(page);
 
-        inventoryService.getPaginatedDatatablesInventoryList(request);
+        inventoryService.getDatatablesData(request);
 
         verify(inventoryRepository, times(1))
                 .findAll(any(Specification.class), any(PageRequest.class));
@@ -335,7 +335,9 @@ public class InventoryServiceTest {
 
         when(inventoryRepository.findAll(any(Specification.class), any(PageRequest.class))).thenReturn(page);
 
-        inventoryService.getSearchedInventory("query", 1, 10);
+        inventoryService.getSearchResult(SearchRequest.builder()
+                .query("query").pageNum(1).length(10).build()
+        );
 
         verify(inventoryRepository, times(1)).findAll(any(Specification.class), any(PageRequest.class));
     }

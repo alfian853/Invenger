@@ -4,11 +4,12 @@ import com.bliblifuture.invenger.entity.inventory.InventoryType;
 import com.bliblifuture.invenger.request.datatables.DataTablesRequest;
 import com.bliblifuture.invenger.request.formRequest.InventoryCreateRequest;
 import com.bliblifuture.invenger.request.formRequest.InventoryEditRequest;
+import com.bliblifuture.invenger.request.jsonRequest.SearchRequest;
 import com.bliblifuture.invenger.response.jsonResponse.*;
 import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchResponse;
 import com.bliblifuture.invenger.service.InventoryService;
 import com.bliblifuture.invenger.service.ItemCategoryService;
-import com.bliblifuture.invenger.service.UserService;
+import com.bliblifuture.invenger.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,7 +31,7 @@ public class InventoryController {
     InventoryService inventoryService;
 
     @Autowired
-    UserService userService;
+    UserServiceImpl userService;
 
     @GetMapping("/all")
     public String getInventoryTable(Model model){
@@ -96,7 +97,8 @@ public class InventoryController {
                                           @RequestParam("page")Integer page,
                                           @RequestParam("length")Integer length){
 
-        return inventoryService.getSearchResult(query,page,length);
+        return inventoryService.getSearchResult(SearchRequest.builder()
+                .query(query).pageNum(page).length(length).build());
     }
 
     @PostMapping("/upload")

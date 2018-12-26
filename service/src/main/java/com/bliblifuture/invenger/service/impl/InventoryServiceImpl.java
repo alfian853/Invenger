@@ -17,6 +17,7 @@ import com.bliblifuture.invenger.repository.category.CategoryRepository;
 import com.bliblifuture.invenger.request.datatables.DataTablesRequest;
 import com.bliblifuture.invenger.request.formRequest.InventoryCreateRequest;
 import com.bliblifuture.invenger.request.formRequest.InventoryEditRequest;
+import com.bliblifuture.invenger.request.jsonRequest.SearchRequest;
 import com.bliblifuture.invenger.response.jsonResponse.*;
 import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchResponse;
 import com.bliblifuture.invenger.response.viewDto.InventoryDTO;
@@ -74,7 +75,7 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public List<InventoryDTO> getAll(){
-        return mapper.toInventoryDtoList(inventoryRepository.findAllFetchCategory());
+        return mapper.toDtoList(inventoryRepository.findAllFetchCategory());
     }
 
     @Override
@@ -85,7 +86,7 @@ public class InventoryServiceImpl implements InventoryService {
             throw new DataNotFoundException("Inventory Not Found");
         }
 
-        return mapper.toInventoryDto(inventory);
+        return mapper.toDto(inventory);
     }
 
     @Override
@@ -221,7 +222,7 @@ public class InventoryServiceImpl implements InventoryService {
 
         if(doc == null || !doc.getInventoryLastUpdate().equals(inventory.getUpdatedAt()) ){
 
-            InventoryDTO inventoryDTO = mapper.toInventoryDto(inventory);
+            InventoryDTO inventoryDTO = mapper.toDto(inventory);
 
             ObjectMapper oMapper = new ObjectMapper();
             Map templateMap = oMapper.convertValue(inventoryDTO, Map.class);
@@ -284,7 +285,7 @@ public class InventoryServiceImpl implements InventoryService {
             page = inventoryRepository.findAll(spec.getSpecification(),spec.getPageRequest());
         }
         
-        result.setListOfDataObjects(mapper.toDatatablesDtoList(page.getContent()));
+        result.setListOfDataObjects(mapper.toDataTablesDtoList(page.getContent()));
         result.setDraw(Integer.parseInt(request.getDraw()));
         result.setRecordsFiltered((int) page.getTotalElements());
         result.setRecordsTotal((int) inventoryRepository.count());
@@ -292,13 +293,14 @@ public class InventoryServiceImpl implements InventoryService {
         return result;
     }
 
-    @Override
-    public SearchResponse getSearchResult(String query, int pageNum, int length){
-        PageRequest pageRequest = PageRequest.of(pageNum,length);
+    @Override//String query, int pageNum, int length
+    public SearchResponse getSearchResult(SearchRequest request){
+        PageRequest pageRequest = PageRequest.of(request.getPageNum(), request.getLength());
         Specification<Inventory> specification = (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(criteriaBuilder.like(
-                    criteriaBuilder.lower(root.get("name")), "%" + query.toLowerCase() + "%")
+                    criteriaBuilder.lower(root.get("name")), "%" +
+                            request.getQuery().toLowerCase() + "%")
             );
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
