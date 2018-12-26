@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class LendmentMapperImpl implements LendmentMapper {
 
     @Override
-    public LendmentDTO toLendmentDTO(Lendment lendment) {
+    public LendmentDTO toDto(Lendment lendment) {
         return LendmentDTO
                 .builder()
                 .id(lendment.getId())
@@ -53,17 +53,22 @@ public class LendmentMapperImpl implements LendmentMapper {
         return result;
     }
 
-
     @Override
-    public List<LendmentDTO> toLendmentDtoList(List<Lendment> lendments, boolean isWithDetails) {
-
-        return lendments.stream().map(
-                (isWithDetails) ? this::toLendmentWithDetailDTO : this::toLendmentDTO)
-                .collect(Collectors.toList());
+    public List<LendmentDTO> toDtoList(List<Lendment> lendments) {
+        return lendments.stream().map(this::toDto).collect(Collectors.toList());
     }
 
     @Override
-    public List<LendmentDatatableResponse> toLendmentDatatable(List<Lendment> lendments) {
+    public List<LendmentDTO> toDtoList(List<Lendment> lendments, boolean isWithDetails) {
+        if(isWithDetails) {
+            return lendments.stream().map(this::toLendmentWithDetailDTO)
+                    .collect(Collectors.toList());
+        }
+        return toDtoList(lendments);
+    }
+
+    @Override
+    public List<LendmentDatatableResponse> toDataTablesDtoList(List<Lendment> lendments) {
         List<LendmentDatatableResponse> responses = new LinkedList<>();
 
         for(Lendment lendment : lendments){

@@ -14,7 +14,7 @@ public class CategoryMapperImpl implements CategoryMapper{
 
 
     @Override
-    public CategoryDTO toCategoryDTO(Category category) {
+    public CategoryDTO toDto(Category category) {
         return CategoryDTO.builder()
                 .id(category.getId())
                 .name(category.getName())
@@ -23,8 +23,8 @@ public class CategoryMapperImpl implements CategoryMapper{
     }
 
     @Override
-    public List<CategoryDTO> toCategoryDtoList(List<Category> categories) {
-        return categories.stream().map(this::toCategoryDTO).collect(Collectors.toList());
+    public List<CategoryDTO> toDtoList(List<Category> categories) {
+        return categories.stream().map(this::toDto).collect(Collectors.toList());
     }
 
     @Override
