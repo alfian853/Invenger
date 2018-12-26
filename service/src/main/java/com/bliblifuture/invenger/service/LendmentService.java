@@ -1,6 +1,9 @@
 package com.bliblifuture.invenger.service;
 
 import com.bliblifuture.invenger.ModelMapper.lendment.LendmentMapper;
+import com.bliblifuture.invenger.Utils.DataTablesUtils;
+import com.bliblifuture.invenger.Utils.QuerySpec;
+import com.bliblifuture.invenger.entity.user.User;
 import com.bliblifuture.invenger.exception.DataNotFoundException;
 import com.bliblifuture.invenger.exception.InvalidRequestException;
 import com.bliblifuture.invenger.entity.inventory.Inventory;
@@ -12,18 +15,20 @@ import com.bliblifuture.invenger.repository.InventoryRepository;
 import com.bliblifuture.invenger.repository.LendmentDetailRepository;
 import com.bliblifuture.invenger.repository.LendmentRepository;
 import com.bliblifuture.invenger.repository.UserRepository;
+import com.bliblifuture.invenger.request.datatables.DataTablesRequest;
 import com.bliblifuture.invenger.request.jsonRequest.LendmentCreateRequest;
 import com.bliblifuture.invenger.request.jsonRequest.LendmentReturnRequest;
-import com.bliblifuture.invenger.response.jsonResponse.HandOverResponse;
-import com.bliblifuture.invenger.response.jsonResponse.LendmentReturnResponse;
-import com.bliblifuture.invenger.response.jsonResponse.RequestResponse;
+import com.bliblifuture.invenger.response.jsonResponse.*;
 import com.bliblifuture.invenger.response.viewDto.LendmentDTO;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.management.Query;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -32,7 +37,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Service
-public class LendmentService {
+public class LendmentService implements DatatablesService {
 
     @Autowired
     LendmentRepository lendmentRepository;
@@ -49,8 +54,14 @@ public class LendmentService {
     @Autowired
     UserService userService;
 
+
+    private DataTablesUtils<Lendment> dataTablesUtils;
+
     private final LendmentMapper mapper = Mappers.getMapper(LendmentMapper.class);
 
+    public LendmentService(){
+        dataTablesUtils = new DataTablesUtils<>(mapper);
+    }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public RequestResponse createLendment(LendmentCreateRequest request) {
@@ -223,4 +234,26 @@ public class LendmentService {
         );
     }
 
+    @Override
+    public DataTablesResult<LendmentDatatableResponse> getDatatablesData(DataTablesRequest request) {
+        QuerySpec<Lendment> spec = dataTablesUtils.getQuerySpec(request);
+
+        Page<Lendment> page;
+
+        DataTablesResult<LendmentDatatableResponse> result = new DataTablesResult<>();
+
+        if(spec.getSpecification() == null){
+            page = lendmentRepository.findAll(spec.getPageRequest());
+        }
+        else{
+            page = lendmentRepository.findAll(spec.getSpecification(),spec.getPageRequest());
+        }
+
+        result.setListOfDataObjects(mapper.toLendmentDatatable(page.getContent()));
+        result.setDraw(Integer.parseInt(request.getDraw()));
+        result.setRecordsFiltered((int) page.getTotalElements());
+        result.setRecordsTotal((int)lendmentRepository.count());
+
+        return result;
+    }
 }

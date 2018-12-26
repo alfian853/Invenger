@@ -2,8 +2,11 @@ package com.bliblifuture.invenger.ModelMapper.lendment;
 
 import com.bliblifuture.invenger.entity.lendment.Lendment;
 import com.bliblifuture.invenger.entity.lendment.LendmentDetail;
+import com.bliblifuture.invenger.response.jsonResponse.LendmentDatatableResponse;
 import com.bliblifuture.invenger.response.viewDto.LendmentDTO;
 
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
 import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,4 +62,31 @@ public class LendmentMapperImpl implements LendmentMapper {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<LendmentDatatableResponse> toLendmentDatatable(List<Lendment> lendments) {
+        List<LendmentDatatableResponse> responses = new LinkedList<>();
+
+        for(Lendment lendment : lendments){
+            responses.add(LendmentDatatableResponse.builder()
+                    .id(lendment.getId())
+                    .rowId("row_"+lendment.getId())
+                    .username(lendment.getUser().getUsername())
+                    .createdAt(lendment.getCreatedAt().toString())
+                    .status(lendment.getStatus())
+                    .build()
+            );
+        }
+
+        return responses;
+    }
+
+    @Override
+    public Path getPathFrom(Root root, String field) {
+        switch (field){
+            case "username":
+                return root.get("user").get("username");
+            default:
+                return root.get(field);
+        }
+    }
 }

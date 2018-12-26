@@ -1,11 +1,14 @@
 package com.bliblifuture.invenger.controller;
 
 import com.bliblifuture.invenger.entity.lendment.LendmentStatus;
+import com.bliblifuture.invenger.request.datatables.DataTablesRequest;
 import com.bliblifuture.invenger.request.jsonRequest.LendmentCreateRequest;
 import com.bliblifuture.invenger.request.jsonRequest.LendmentReturnRequest;
+import com.bliblifuture.invenger.response.jsonResponse.DataTablesResult;
+import com.bliblifuture.invenger.response.jsonResponse.LendmentDatatableResponse;
 import com.bliblifuture.invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.invenger.response.viewDto.LendmentDTO;
-import com.bliblifuture.invenger.service.InventoryService;
+import com.bliblifuture.invenger.service.impl.InventoryServiceImpl;
 import com.bliblifuture.invenger.service.LendmentService;
 import com.bliblifuture.invenger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @Controller
@@ -26,7 +30,7 @@ public class LendmentController {
     UserService userService;
 
     @Autowired
-    InventoryService inventoryService;
+    InventoryServiceImpl inventoryService;
 
     @GetMapping("/create")
     public String getAssignItemForm(Model model){
@@ -47,7 +51,7 @@ public class LendmentController {
 
     @GetMapping("/all")
     public String getLendmentTable(Model model){
-        model.addAttribute("status",LendmentStatus.getMap());
+        model.addAttribute("statusList",LendmentStatus.getMap());
         if(userService.currentUserIsAdmin()){
           model.addAttribute("lendments",lendmentService.getAll());
           return "lendment/lendment_list_admin";
@@ -106,6 +110,13 @@ public class LendmentController {
     public String trackInventory(Model model,@RequestParam("having-item-id") Integer inventoryId){
         model.addAttribute("lendments",lendmentService.getInventoryLendment(inventoryId));
         return "lendment/lendment_inventory";
+    }
+
+    @GetMapping("/datatables")
+    @ResponseBody
+    public DataTablesResult<LendmentDatatableResponse> getPaginatedLendments(HttpServletRequest servletRequest){
+        DataTablesRequest request = new DataTablesRequest(servletRequest);
+        return lendmentService.getDatatablesData(request);
     }
 
 }

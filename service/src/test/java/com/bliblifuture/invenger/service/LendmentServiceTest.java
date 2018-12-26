@@ -1,4 +1,4 @@
-package com.bliblifuture.invenger;
+package com.bliblifuture.invenger.service;
 
 import com.bliblifuture.invenger.ModelMapper.lendment.LendmentMapper;
 import com.bliblifuture.invenger.entity.inventory.Inventory;
