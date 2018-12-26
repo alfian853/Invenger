@@ -3,9 +3,11 @@ package com.bliblifuture.invenger.controller;
 
 import com.bliblifuture.invenger.request.jsonRequest.CategoryCreateRequest;
 import com.bliblifuture.invenger.request.jsonRequest.CategoryEditRequest;
+import com.bliblifuture.invenger.request.jsonRequest.SearchRequest;
 import com.bliblifuture.invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchResponse;
 import com.bliblifuture.invenger.service.ItemCategoryService;
+import com.bliblifuture.invenger.service.impl.ItemCategoryServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -49,7 +51,9 @@ public class ItemCategoryController {
     public SearchResponse searchCategory(@RequestParam("search")String query,
                                          @RequestParam("page")Integer page,
                                          @RequestParam("length")Integer length){
-        return itemCategoryService.getSearchCategory(query, page, length);
+        return itemCategoryService.getSearchResult(
+                SearchRequest.builder().query(query).pageNum(page).length(length).build()
+        );
     }
 
 

@@ -10,8 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SearchRequest {
-
     String query;
-    Integer pageNum;
-    Integer length;
+    int pageNum;
+    int length;
 }

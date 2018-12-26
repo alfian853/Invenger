@@ -8,7 +8,7 @@ import com.bliblifuture.invenger.response.jsonResponse.CategoryEditResponse;
 import com.bliblifuture.invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchResponse;
 import com.bliblifuture.invenger.response.viewDto.CategoryDTO;
-import com.bliblifuture.invenger.service.ItemCategoryService;
+import com.bliblifuture.invenger.service.impl.ItemCategoryServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,11 +17,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import javax.naming.directory.SearchResult;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -38,7 +36,7 @@ public class ItemCategoryControllerTest {
     private MockMvc mvc;
 
     @Mock
-    ItemCategoryService categoryService;
+    ItemCategoryServiceImpl categoryService;
 
     @InjectMocks
     ItemCategoryController controller;

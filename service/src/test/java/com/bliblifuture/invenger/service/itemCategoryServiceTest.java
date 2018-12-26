@@ -1,4 +1,4 @@
-package com.bliblifuture.invenger;
+package com.bliblifuture.invenger.service;
 import com.bliblifuture.invenger.entity.inventory.Category;
 import com.bliblifuture.invenger.entity.inventory.CategoryWithChildId;
 import com.bliblifuture.invenger.exception.DataNotFoundException;
@@ -11,6 +11,7 @@ import com.bliblifuture.invenger.response.jsonResponse.CategoryEditResponse;
 import com.bliblifuture.invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.invenger.response.viewDto.CategoryDTO;
 import com.bliblifuture.invenger.service.ItemCategoryService;
+import com.bliblifuture.invenger.service.impl.ItemCategoryServiceImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +32,7 @@ import static org.mockito.Mockito.when;
 public class itemCategoryServiceTest {
 
     @InjectMocks
-    private ItemCategoryService categoryService;
+    private ItemCategoryServiceImpl categoryService;
 
     @Mock
     private CategoryRepository categoryRepository;
