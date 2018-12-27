@@ -231,7 +231,7 @@ public class ItemCategoryControllerTest {
         response.setRecordsFiltered(4000);
         response.setResults(new LinkedList<>());
 
-        when(categoryService.getSearchCategory(anyString(),any(),any())).thenReturn(response);
+        when(categoryService.getSearchResult(any())).thenReturn(response);
 
         mvc.perform(get("/category/search")
                 .param("search","all")
@@ -241,7 +241,7 @@ public class ItemCategoryControllerTest {
         .andExpect(jsonPath("$.results").value(response.getResults()))
         .andExpect(jsonPath("$.recordsFiltered").value(response.getRecordsFiltered()));
 
-        verify(categoryService,times(1)).getSearchCategory(anyString(),any(),any());
+        verify(categoryService,times(1)).getSearchResult(any());
     }
 
 

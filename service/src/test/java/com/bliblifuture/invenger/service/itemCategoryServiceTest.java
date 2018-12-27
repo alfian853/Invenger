@@ -6,9 +6,11 @@ import com.bliblifuture.invenger.exception.InvalidRequestException;
 import com.bliblifuture.invenger.repository.category.CategoryRepository;
 import com.bliblifuture.invenger.request.jsonRequest.CategoryCreateRequest;
 import com.bliblifuture.invenger.request.jsonRequest.CategoryEditRequest;
+import com.bliblifuture.invenger.request.jsonRequest.SearchRequest;
 import com.bliblifuture.invenger.response.jsonResponse.CategoryCreateResponse;
 import com.bliblifuture.invenger.response.jsonResponse.CategoryEditResponse;
 import com.bliblifuture.invenger.response.jsonResponse.RequestResponse;
+import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchResponse;
 import com.bliblifuture.invenger.response.viewDto.CategoryDTO;
 import com.bliblifuture.invenger.service.ItemCategoryService;
 import com.bliblifuture.invenger.service.impl.ItemCategoryServiceImpl;
@@ -20,12 +22,20 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -99,6 +109,13 @@ public class itemCategoryServiceTest {
         return response;
     }
 
+    @Test(expected = InvalidRequestException.class)
+    public void updateCategory_invalidRequest(){
+        CategoryEditRequest request = new CategoryEditRequest();
+        request.setId(1);
+        request.setNewName("tidak/valid");
+        categoryService.updateCategory(request);
+    }
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void updateCategory_idNotFound(){
@@ -110,6 +127,23 @@ public class itemCategoryServiceTest {
         request.setId(-1);
         request.setNewName(CATEGORY_NEWNAME);
         categoryService.updateCategory(request);
+    }
+
+    @Test
+    public void updateCategory_dataNotChanged(){
+        List<CategoryWithChildId> categories = this.mock_getCategoryParentWithChildOrderById();
+
+        when(categoryRepository.getCategoryParentWithChildIdOrderById())
+                .thenReturn(categories);
+
+        CategoryEditRequest request = new CategoryEditRequest();
+        request.setId(categories.get(1).getId());
+        request.setNewName("two");
+        request.setNewParentId(categories.get(1).getParentId());
+        RequestResponse response = categoryService.updateCategory(request);
+
+        Assert.assertTrue(response.isSuccess());
+        Assert.assertEquals(response.getMessage(),"no data changed");
     }
 
     @Test
@@ -315,6 +349,31 @@ public class itemCategoryServiceTest {
 
     }
 
+      ////////////////////////////////////////////////////////////////
+     //public SearchResponse getSearchResult(SearchRequest request)//
+    ////////////////////////////////////////////////////////////////
+
+    @Test
+    public void getSearchResult_test(){
+        Page page = new PageImpl<>(this.mock_findAll(false));
+        System.out.println(page.getContent());
+
+        when(categoryRepository.findAll(any(Specification.class), any(PageRequest.class)))
+                .thenReturn(page);
+
+        SearchResponse response = categoryService.getSearchResult(SearchRequest.builder()
+                .query("test").length(10).pageNum(1).build()
+        );
+
+        verify(categoryRepository,times(1))
+                .findAll(any(Specification.class), any(PageRequest.class));
+
+
+
+
+
+
+    }
 
 
 }

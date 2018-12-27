@@ -219,7 +219,6 @@ public class InventoryServiceImpl implements InventoryService {
             throw new DataNotFoundException("Inventory Not Found");
         }
         InventoryDocument doc = inventoryDocRepository.findInventoryDocumentById(id);
-
         if(doc == null || !doc.getInventoryLastUpdate().equals(inventory.getUpdatedAt()) ){
 
             InventoryDTO inventoryDTO = mapper.toDto(inventory);
@@ -287,8 +286,8 @@ public class InventoryServiceImpl implements InventoryService {
         
         result.setListOfDataObjects(mapper.toDataTablesDtoList(page.getContent()));
         result.setDraw(Integer.parseInt(request.getDraw()));
-        result.setRecordsFiltered((int) page.getTotalElements());
-        result.setRecordsTotal((int) inventoryRepository.count());
+        result.setRecordsFiltered(page.getNumberOfElements());
+        result.setRecordsTotal((int) page.getTotalElements());
 
         return result;
     }

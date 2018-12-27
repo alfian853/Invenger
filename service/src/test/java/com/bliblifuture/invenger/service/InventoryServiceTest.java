@@ -23,6 +23,7 @@ import com.bliblifuture.invenger.response.jsonResponse.InventoryDocDownloadRespo
 import com.bliblifuture.invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.invenger.response.viewDto.InventoryDTO;
 import com.bliblifuture.invenger.service.impl.InventoryServiceImpl;
+import org.assertj.core.util.DateUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -96,6 +97,10 @@ public class InventoryServiceTest {
                 .image(IMAGE)
                 .type(TYPE)
                 .build();
+
+        INVENTORY.setCreatedAt(now());
+        INVENTORY.setUpdatedAt(INVENTORY.getCreatedAt());
+
         INVENTORY_DTO = mapper.toDto(INVENTORY);
     }
 
@@ -256,25 +261,64 @@ public class InventoryServiceTest {
     }
 
     @Test
-    public void downloadItemDetail_documentOldVersion() {
+    public void downloadItemDetail_documentAlreadyExist(){
         when(inventoryRepository.findInventoryById(any())).thenReturn(INVENTORY);
         InventoryDocument document = InventoryDocument.builder()
-                .fileName("filename.jpg")
-                .inventoryLastUpdate(now())
+                .fileName("filename.pdf")
+                .inventoryLastUpdate(INVENTORY.getUpdatedAt())
                 .build();
 
         when(inventoryDocRepository.findInventoryDocumentById(INVENTORY.getId())).thenReturn(document);
-        when(fileStorageService.createPdfFromTemplate(any(), any(), any())).thenReturn("filename.pdf");
 
         InventoryDocDownloadResponse response = inventoryService.downloadItemDetail(INVENTORY.getId());
 
         Assert.assertTrue(response.isSuccess());
         Assert.assertEquals(response.getInventoryDocUrl(), "/inventory/document/" + "filename.pdf");
 
-        verify(inventoryDocRepository, times(1)).save(any());
-
+        verify(inventoryDocRepository, times(0)).save(any());
     }
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Test
+    public void downloadItemDetail_documentOldVersion_successCreateNew() {
+        when(inventoryRepository.findInventoryById(any())).thenReturn(INVENTORY);
+        InventoryDocument document = InventoryDocument.builder()
+                .fileName("filename_lama.pdf")
+                .inventoryLastUpdate(DateUtil.tomorrow())
+                .build();
+
+        when(inventoryDocRepository.findInventoryDocumentById(INVENTORY.getId())).thenReturn(document);
+        when(fileStorageService.createPdfFromTemplate(any(), any(), any())).thenReturn("filename_baru.pdf");
+
+        InventoryDocDownloadResponse response = inventoryService.downloadItemDetail(INVENTORY.getId());
+
+        Assert.assertTrue(response.isSuccess());
+        Assert.assertEquals(response.getInventoryDocUrl(), "/inventory/document/" + "filename_baru.pdf");
+        verify(fileStorageService,times(1)).createPdfFromTemplate(any(), any(), any());
+        verify(inventoryDocRepository, times(1)).save(any());
+    }
+
+    @Test
+    public void downloadItemDetail_documentOldVersion_failedCreateNew() {
+        when(inventoryRepository.findInventoryById(any())).thenReturn(INVENTORY);
+        InventoryDocument document = InventoryDocument.builder()
+                .fileName("filename_lama.pdf")
+                .inventoryLastUpdate(DateUtil.tomorrow())
+                .build();
+
+        when(inventoryDocRepository.findInventoryDocumentById(INVENTORY.getId())).thenReturn(document);
+        when(fileStorageService.createPdfFromTemplate(any(), any(), any())).thenReturn(null);
+
+        InventoryDocDownloadResponse response = inventoryService.downloadItemDetail(INVENTORY.getId());
+
+        Assert.assertFalse(response.isSuccess());
+        Assert.assertNull(response.getInventoryDocUrl());
+
+        verify(fileStorageService,times(1)).createPdfFromTemplate(any(), any(), any());
+    }
+
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
      //public DataTablesResult<InventoryDataTableResponse> getDatatablesData(DataTablesRequest request)//
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
