@@ -234,12 +234,12 @@ public class LendmentServiceImpl implements LendmentService {
     }
 
     @Override
-    public DataTablesResult<LendmentDatatableResponse> getDatatablesData(DataTablesRequest request) {
+    public DataTablesResult<LendmentDataTableResponse> getDatatablesData(DataTablesRequest request) {
         QuerySpec<Lendment> spec = dataTablesUtils.getQuerySpec(request);
 
         Page<Lendment> page;
 
-        DataTablesResult<LendmentDatatableResponse> result = new DataTablesResult<>();
+        DataTablesResult<LendmentDataTableResponse> result = new DataTablesResult<>();
 
         if(spec.getSpecification() == null){
             page = lendmentRepository.findAll(spec.getPageRequest());
@@ -250,8 +250,8 @@ public class LendmentServiceImpl implements LendmentService {
 
         result.setListOfDataObjects(mapper.toDataTablesDtoList(page.getContent()));
         result.setDraw(Integer.parseInt(request.getDraw()));
-        result.setRecordsFiltered((int) page.getTotalElements());
-        result.setRecordsTotal((int)lendmentRepository.count());
+        result.setRecordsFiltered(page.getNumberOfElements());
+        result.setRecordsTotal((int) page.getTotalElements());
 
         return result;
     }

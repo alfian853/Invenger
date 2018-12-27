@@ -13,6 +13,7 @@ import com.bliblifuture.invenger.repository.InventoryRepository;
 import com.bliblifuture.invenger.repository.LendmentDetailRepository;
 import com.bliblifuture.invenger.repository.LendmentRepository;
 import com.bliblifuture.invenger.repository.UserRepository;
+import com.bliblifuture.invenger.request.datatables.DataTablesRequest;
 import com.bliblifuture.invenger.request.jsonRequest.LendmentCreateRequest;
 import com.bliblifuture.invenger.request.jsonRequest.LendmentReturnRequest;
 import com.bliblifuture.invenger.response.viewDto.LendmentDTO;
@@ -29,11 +30,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.mock.web.MockHttpServletRequest;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -344,5 +352,61 @@ public class LendmentServiceTest {
                 lendmentService.getInventoryLendment(LENDMENT.getId()),
                 LENDMENTS_DTO_WITH_DETAIL);
     }
+
+      ////////////////////////////////////////////////////////////////////////////////////////////
+     //DataTablesResult<LendmentDataTableResponse> getDatatablesData(DataTablesRequest request)//
+    ////////////////////////////////////////////////////////////////////////////////////////////
+
+    private MockHttpServletRequest mock_datatableServletRequest(boolean hasSearchValue) {
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        servletRequest.addParameter("columns[0][data]", "id");
+        servletRequest.addParameter("columns[0][name]", "id");
+        servletRequest.addParameter("columns[0][orderable]", "true");
+        servletRequest.addParameter("columns[0][search][regex]", "false");
+        servletRequest.addParameter("columns[0][search][value]", (hasSearchValue) ? "123" : "");
+        servletRequest.addParameter("columns[0][searchable]", "true");
+        servletRequest.addParameter("draw", "1");
+        servletRequest.addParameter("length", "10");
+        servletRequest.addParameter("order[0][column]", "0");
+        servletRequest.addParameter("order[0][dir]", "asc");
+        servletRequest.addParameter("search[regex]", "false");
+        servletRequest.addParameter("search[value]", "");
+        servletRequest.addParameter("start", "0");
+        return servletRequest;
+    }
+
+    @Test
+    public void getPaginatedDatatablesLendmentList_onlySortByColumn() {
+
+        DataTablesRequest request = new DataTablesRequest(this.mock_datatableServletRequest(false));
+        Page<Lendment> page = new PageImpl<>(new ArrayList<>());
+
+        when(lendmentRepository.findAll(any(PageRequest.class))).thenReturn(page);
+
+        lendmentService.getDatatablesData(request);
+
+        verify(lendmentRepository, times(1)).findAll(any(PageRequest.class));
+
+    }
+
+    @Test
+    public void getPaginatedDatatablesLendmentList_sortAndSearchByColumn() {
+
+        MockHttpServletRequest servletRequest = this.mock_datatableServletRequest(true);
+        DataTablesRequest request = new DataTablesRequest(servletRequest);
+
+        Page<Lendment> page = new PageImpl<>(new ArrayList<>());
+        when(lendmentRepository.findAll(any(Specification.class), any(PageRequest.class))).thenReturn(page);
+
+        lendmentService.getDatatablesData(request);
+
+        verify(lendmentRepository, times(1))
+                .findAll(any(Specification.class), any(PageRequest.class));
+
+    }
+
+
+
+
 
 }

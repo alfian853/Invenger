@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Builder
 @Data
-public class LendmentDatatableResponse {
+public class LendmentDataTableResponse {
     @Builder
     @Data
     public static class RowData{

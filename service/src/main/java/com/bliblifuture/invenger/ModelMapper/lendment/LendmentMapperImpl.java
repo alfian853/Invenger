@@ -2,7 +2,7 @@ package com.bliblifuture.invenger.ModelMapper.lendment;
 
 import com.bliblifuture.invenger.entity.lendment.Lendment;
 import com.bliblifuture.invenger.entity.lendment.LendmentDetail;
-import com.bliblifuture.invenger.response.jsonResponse.LendmentDatatableResponse;
+import com.bliblifuture.invenger.response.jsonResponse.LendmentDataTableResponse;
 import com.bliblifuture.invenger.response.viewDto.LendmentDTO;
 
 import javax.persistence.criteria.Path;
@@ -68,11 +68,11 @@ public class LendmentMapperImpl implements LendmentMapper {
     }
 
     @Override
-    public List<LendmentDatatableResponse> toDataTablesDtoList(List<Lendment> lendments) {
-        List<LendmentDatatableResponse> responses = new LinkedList<>();
+    public List<LendmentDataTableResponse> toDataTablesDtoList(List<Lendment> lendments) {
+        List<LendmentDataTableResponse> responses = new LinkedList<>();
 
         for(Lendment lendment : lendments){
-            responses.add(LendmentDatatableResponse.builder()
+            responses.add(LendmentDataTableResponse.builder()
                     .id(lendment.getId())
                     .rowId("row_"+lendment.getId())
                     .username(lendment.getUser().getUsername())

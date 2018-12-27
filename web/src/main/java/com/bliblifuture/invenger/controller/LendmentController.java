@@ -5,7 +5,7 @@ import com.bliblifuture.invenger.request.datatables.DataTablesRequest;
 import com.bliblifuture.invenger.request.jsonRequest.LendmentCreateRequest;
 import com.bliblifuture.invenger.request.jsonRequest.LendmentReturnRequest;
 import com.bliblifuture.invenger.response.jsonResponse.DataTablesResult;
-import com.bliblifuture.invenger.response.jsonResponse.LendmentDatatableResponse;
+import com.bliblifuture.invenger.response.jsonResponse.LendmentDataTableResponse;
 import com.bliblifuture.invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.invenger.response.viewDto.LendmentDTO;
 import com.bliblifuture.invenger.service.impl.InventoryServiceImpl;
@@ -114,7 +114,7 @@ public class LendmentController {
 
     @GetMapping("/datatables")
     @ResponseBody
-    public DataTablesResult<LendmentDatatableResponse> getPaginatedLendments(HttpServletRequest servletRequest){
+    public DataTablesResult<LendmentDataTableResponse> getPaginatedLendments(HttpServletRequest servletRequest){
         DataTablesRequest request = new DataTablesRequest(servletRequest);
         return lendmentService.getDatatablesData(request);
     }
