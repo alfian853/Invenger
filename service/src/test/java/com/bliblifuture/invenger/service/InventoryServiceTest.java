@@ -40,6 +40,8 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.assertj.core.util.DateUtil.now;
 import static org.mockito.ArgumentMatchers.any;
@@ -120,6 +122,25 @@ public class InventoryServiceTest {
         Assert.assertEquals(INVENTORY_DTO, inventoryService.getById(ID));
     }
 
+
+      ///////////////////////////////
+     //List<InventoryDTO> getAll()//
+    ///////////////////////////////
+
+    @Test
+    public void getAll_test(){
+        Category category = Category.builder().id(1).name("/test").build();
+        LinkedList<Inventory> inventories = new LinkedList<>();
+        inventories.push(Inventory.builder().category(category).build());
+        when(inventoryRepository.findAllFetchCategory())
+                .thenReturn(inventories);
+
+        Assert.assertEquals(inventoryService.getAll(),mapper.toDtoList(inventories));
+    }
+
+
+
+
       //////////////////////////////////////////////////////////////////////////////////
      //public InventoryCreateResponse createInventory(InventoryCreateRequest request)//
     //////////////////////////////////////////////////////////////////////////////////
@@ -130,7 +151,7 @@ public class InventoryServiceTest {
         request.setCategory_id(1);
         request.setPrice(200);
         request.setDescription("");
-        request.setQuantity(20);
+        request.setQuantity(209);
         request.setType(InventoryType.Stockable);
         if (!fileIsNull) {
             request.setPhoto_file(
@@ -182,6 +203,11 @@ public class InventoryServiceTest {
         request.setId(INVENTORY.getId());
         request.setName(INVENTORY.getName());
         request.setCategory_id(INVENTORY.getCategory().getId());
+        request.setPrice(INVENTORY.getPrice());
+        request.setQuantity(209);
+        request.setType(InventoryType.Stockable);
+        request.setDescription(INVENTORY.getDescription());
+
         if (withFile) {
             request.setPict(new MockMultipartFile("file", "orig", null, "bar".getBytes()));
         }
