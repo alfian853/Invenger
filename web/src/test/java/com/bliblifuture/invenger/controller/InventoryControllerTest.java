@@ -1,30 +1,49 @@
 package com.bliblifuture.invenger.controller;
 
+import com.bliblifuture.invenger.entity.inventory.Category;
+import com.bliblifuture.invenger.entity.inventory.Inventory;
+import com.bliblifuture.invenger.entity.inventory.InventoryType;
+import com.bliblifuture.invenger.entity.user.User;
 import com.bliblifuture.invenger.exception.DataNotFoundException;
 import com.bliblifuture.invenger.exception.InvalidRequestException;
 import com.bliblifuture.invenger.request.formRequest.InventoryCreateRequest;
+import com.bliblifuture.invenger.request.formRequest.InventoryEditRequest;
 import com.bliblifuture.invenger.response.jsonResponse.InventoryCreateResponse;
 import com.bliblifuture.invenger.response.jsonResponse.RequestResponse;
+import com.bliblifuture.invenger.response.viewDto.CategoryDTO;
+import com.bliblifuture.invenger.response.viewDto.InventoryDTO;
 import com.bliblifuture.invenger.service.InventoryService;
+import com.bliblifuture.invenger.service.ItemCategoryService;
+import com.bliblifuture.invenger.service.UserService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.ui.Model;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class InventoryControllerTest {
@@ -32,7 +51,10 @@ public class InventoryControllerTest {
     private MockMvc mvc;
 
     @Mock
-    public InventoryService inventoryService;
+    private UserService userService;
+
+    @Mock
+    private InventoryService inventoryService;
 
     @InjectMocks
     private InventoryController controller;
@@ -46,70 +68,125 @@ public class InventoryControllerTest {
 
     }
 
-      ////////////////////////////////////////////////
-     //public String getInventoryTable(Model model)//
+    ////////////////////////////////////////////////
+    //public String getInventoryTable(Model model)//
     ////////////////////////////////////////////////
 
     @Test
-    public void getInventoryTable() throws Exception{
+    public void getInventoryTable() throws Exception {
     }
 
-      /////////////////////////////////////////////////////////////////////////////////////////////////////////
-     //public InventoryCreateResponse addNewInventory(@Valid @ModelAttribute InventoryCreateRequest request)//
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //public InventoryCreateResponse addNewInventory(@Valid @ModelAttribute InventoryCreateRequest request)//
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Test
     public void addNewInventory_success() throws Exception {
-        InventoryCreateResponse createResponse = new InventoryCreateResponse();
-        createResponse.setInventory_id(1);
+        Category category = new Category().builder().id(1).name("/all").build();
+        Inventory inventory = new Inventory().builder()
+                .id(1)
+                .name("name")
+                .category(category)
+                .type(InventoryType.Consumable.toString())
+                .quantity(4)
+                .build();
 
-        InventoryCreateRequest request = new InventoryCreateRequest();
-        request.setCategory_id(1);
+        System.out.println(inventory);
 
-        when(inventoryService.createInventory(any())).thenReturn(createResponse);
-        MockHttpServletResponse response = mvc.perform(
-                post("/inventory/create")
-                        .accept(MediaType.APPLICATION_JSON).content("")
-                ).andReturn().getResponse();
+        InventoryCreateResponse response = new InventoryCreateResponse();
+        response.setInventory_id(inventory.getId());
+        response.setStatusToSuccess();
 
+        when(inventoryService.createInventory(any())).thenReturn(response);
 
-        System.out.println(response);
-
+        mvc.perform(post("/inventory/create")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("name","name")
+                .param("category_id", "1")
+                .param("type","Consumable")
+                .param("quantity","4")
+                .sessionAttr("inventory", new Inventory())
+        )
+                .andExpect(status().isOk());
     }
 
     @Test
     public void addNewInventory_invalidRequest() throws Exception {
+        Category category = new Category().builder().id(1).name("/all").build();
+        Inventory inventory = new Inventory().builder()
+                .id(1)
+                .name("name")
+                .category(category)
+                .type("string")
+                .quantity(4)
+                .build();
+
+        System.out.println(inventory);
+
+        InventoryCreateResponse response = new InventoryCreateResponse();
+        response.setInventory_id(inventory.getId());
+        response.setStatusToSuccess();
+
         when(inventoryService.createInventory(any())).thenThrow(new InvalidRequestException());
 
-        mvc.perform(
-                post("/inventory/create")
-                        .accept(MediaType.APPLICATION_JSON).content("")
-        ).andExpect(status().isInternalServerError());
-
+        mvc.perform(post("/inventory/create")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("name","name")
+                .param("category_id", "1")
+                .param("type","string")
+                .param("quantity","4")
+                .sessionAttr("inventory", new Inventory())
+        )
+                .andExpect(status().isInternalServerError());
     }
 
     @Test
     public void editInventory_success() throws Exception {
-        RequestResponse editResponse = new RequestResponse();
-        editResponse.setStatusToSuccess();
+        InventoryEditRequest request = new InventoryEditRequest();
+        request.setId(1);
+        request.setName("name2");
+        request.setCategory_id(1);
+        request.setType(InventoryType.Consumable);
+        request.setQuantity(4);
 
-        when(inventoryService.updateInventory(any())).thenReturn(editResponse);
+        RequestResponse response = new RequestResponse();
+        response.setStatusToSuccess();
+        when(inventoryService.updateInventory(request)).thenReturn(response);
 
-        MockHttpServletResponse response = mvc.perform(
-                post("/inventory/edit")
-                        .accept(MediaType.APPLICATION_JSON).content("")
-        ).andReturn().getResponse();
+        mvc.perform(post("/inventory/edit")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("id", "1")
+                .param("name","name2")
+                .param("category_id", "1")
+                .param("type","Consumable")
+                .param("quantity","4")
+        )
+                .andExpect(status().isOk());
 
     }
 
     @Test
     public void editInventory_invalidRequest() throws Exception {
-        when(inventoryService.updateInventory(any())).thenThrow(new InvalidRequestException());
+        InventoryEditRequest request = new InventoryEditRequest();
+        request.setId(1);
+        request.setName("name2");
+        request.setCategory_id(1);
+        request.setType(InventoryType.Consumable);
+        request.setQuantity(4);
 
-        mvc.perform(
-                post("/inventory/edit")
-                        .accept(MediaType.APPLICATION_JSON).content("")
-        ).andExpect(status().isBadRequest());
+        RequestResponse response = new RequestResponse();
+        response.setStatusToSuccess();
+        when(inventoryService.updateInventory(request)).thenThrow(new InvalidRequestException());
+
+        mvc.perform(post("/inventory/edit")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("id", "1")
+                .param("name","name2")
+                .param("category_id", "1")
+                .param("type","Consumable")
+                .param("quantity","4")
+        )
+                .andExpect(status().isBadRequest());
 
     }
 
@@ -152,4 +229,40 @@ public class InventoryControllerTest {
 
     }
 
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void getInventoryDetail_success() throws Exception{
+        Category category = new Category().builder().id(1).name("/all").build();
+        InventoryDTO inventory = InventoryDTO.builder()
+                .id(1)
+                .name("name")
+                .quantity(2)
+                .type(InventoryType.Consumable.toString())
+                .category(category.getName())
+                .category_id(category.getId())
+                .build();
+
+        System.out.println(inventory);
+
+        when(inventoryService.getById(1)).thenReturn(inventory);
+        when(userService.currentUserIsAdmin()).thenReturn(true);
+
+        mvc.perform(get("/inventory/detail/{id}", 1)
+        )
+                .andExpect(status().isOk());
+
+        verify(inventoryService, times(1)).getById(1);
+        Mockito.verifyZeroInteractions(userService);
+    }
+
+    @Test
+    public void getInventoryDetail_dataNotFound() throws Exception{
+        when(inventoryService.getById(1)).thenThrow(new DataNotFoundException());
+
+        mvc.perform(get("/inventory/detail/{id}", 1))
+                .andExpect(status().isNotFound());
+
+        verify(inventoryService, times(1)).getById(1);
+        Mockito.verifyZeroInteractions(userService);
+    }
 }
