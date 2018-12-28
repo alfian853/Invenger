@@ -3,11 +3,12 @@ package com.bliblifuture.invenger.controller;
 import com.bliblifuture.invenger.entity.user.Position;
 import com.bliblifuture.invenger.entity.user.User;
 import com.bliblifuture.invenger.request.formRequest.UserEditRequest;
-import com.bliblifuture.invenger.response.jsonResponse.PositionCreateResponse;
-import com.bliblifuture.invenger.response.jsonResponse.RequestResponse;
-import com.bliblifuture.invenger.response.jsonResponse.UserCreateResponse;
+import com.bliblifuture.invenger.response.jsonResponse.*;
+import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchResponse;
 import com.bliblifuture.invenger.response.viewDto.PositionDTO;
+import com.bliblifuture.invenger.response.viewDto.ProfileDTO;
 import com.bliblifuture.invenger.response.viewDto.UserDTO;
+import com.bliblifuture.invenger.service.FileStorageService;
 import com.bliblifuture.invenger.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
@@ -23,9 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -51,9 +50,9 @@ public class UserControllerTest {
                 .build();
     }
 
-    //////////////////////////////////////////////
-    //public String getUserTablePage(Model model//
-    //////////////////////////////////////////////
+    ///////////////////////////////////////////////
+    //public String getUserTablePage(Model model)//
+    ///////////////////////////////////////////////
 
     @Test
     public void getUserTablePage_test() throws Exception {
@@ -64,6 +63,7 @@ public class UserControllerTest {
 
         MockHttpServletResponse response = mvc.perform(get("/user/all"))
                 .andExpect(status().isOk())
+                .andExpect(view().name("user/user_list"))
                 .andExpect(model().attribute("users",users)).andReturn().getResponse();
 
     }
@@ -185,7 +185,8 @@ public class UserControllerTest {
 
         mvc.perform(get("/user/detail/{id}", 1)
         )
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(view().name("user/user_detail"));
 
         verify(userService, times(1)).getById(1);
     }
@@ -203,6 +204,7 @@ public class UserControllerTest {
 
         MockHttpServletResponse response = mvc.perform(get("/user/positions"))
                 .andExpect(status().isOk())
+                .andExpect(view().name("user/position_list"))
                 .andExpect(model().attribute("positions",positions)).andReturn().getResponse();
     }
 
@@ -295,5 +297,98 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.success").value(true));
 
         verify(userService,times(1)).deletePosition(anyInt());
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //public SearchResponse searchUser(@RequestParam("search")String query, @RequestParam("page")Integer page, @RequestParam("length")Integer length, @RequestParam(value = "min_level",required = false) Integer minLevel)//
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Test
+    public void searchUser_test() throws Exception {
+        SearchResponse response = new SearchResponse();
+        response.setRecordsFiltered(4000);
+        response.setResults(new LinkedList<>());
+
+        when(userService.getSearchResult(any())).thenReturn(response);
+
+        mvc.perform(get("/user/search")
+                .param("search","all")
+                .param("page","2")
+                .param("min_level", "1")
+                .param("length","10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results").value(response.getResults()))
+                .andExpect(jsonPath("$.recordsFiltered").value(response.getRecordsFiltered()));
+
+        verify(userService,times(1)).getSearchResult(any());
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //public UploadProfilePictResponse uploadProfilePict(@RequestParam("file") MultipartFile file)//
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Test
+    public void uploadProfilePict_test() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", "filename.png","image/png", "".getBytes());
+
+        UploadProfilePictResponse response = new UploadProfilePictResponse();
+        response.setNew_pict_src(file.getOriginalFilename());
+        response.setStatusToSuccess();
+
+        when(userService.changeProfilePict(file)).thenReturn(response);
+
+        mvc.perform(MockMvcRequestBuilders.multipart("/profile/upload-pict")
+                .file(file))
+                .andExpect(status().isOk());
+    }
+
+    /////////////////////////////////////////
+    //public String getProfile(Model model)//
+    /////////////////////////////////////////
+
+    @Test
+    public void getProfile_test() throws Exception {
+        ProfileDTO user = ProfileDTO.builder().id(1).build();
+
+        when(userService.getProfile()).thenReturn(user);
+
+        MockHttpServletResponse response = mvc.perform(get("/profile"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("user/profile"))
+                .andExpect(model().attribute("user",user)).andReturn().getResponse();
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////
+    //public Map<String,FormFieldResponse> postProfile(@RequestBody ProfileRequest request)//
+    /////////////////////////////////////////////////////////////////////////////////////////
+
+    @Test
+    public void postProfile_test() throws Exception {
+        HashMap<String, Object> request = new HashMap<>();
+        request.put("new-telp", "12345678910");
+        request.put("old-pwd", "old");
+        request.put("new-pwd1", "new");
+        request.put("new-pwd2", "new");
+
+        Map<String,FormFieldResponse> formResponses = new HashMap<>();
+        FormFieldResponse formResponse = new FormFieldResponse();
+        formResponse.setField_name("new-telp");
+        formResponse.setStatusToSuccess();
+        formResponses.put("new-telp", formResponse);
+        formResponse = new FormFieldResponse();
+        formResponse.setField_name("new-pwd2");
+        formResponse.setStatusToSuccess();
+        formResponses.put("password", formResponse);
+
+
+        when(userService.editProfile(any())).thenReturn(formResponses);
+
+        mvc.perform(post("/profile")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(objectMapper.writeValueAsString(request))
+        ).andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+
+        verify(userService,times(1)).editProfile(any());
     }
 }
