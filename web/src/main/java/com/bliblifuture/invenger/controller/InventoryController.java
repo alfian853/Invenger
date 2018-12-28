@@ -32,7 +32,7 @@ public class InventoryController {
     InventoryService inventoryService;
 
     @Autowired
-    UserService userService;
+    UserServiceImpl userService;
 
     @GetMapping("/all")
     public String getInventoryTable(Model model){
