@@ -119,16 +119,12 @@ public class InventoryControllerTest {
 
     @Test
     public void addNewInventory_invalidRequest() throws Exception {
-        Category category = new Category().builder().id(1).name("/all").build();
-        Inventory inventory = new Inventory().builder()
+        Inventory inventory = Inventory.builder()
                 .id(1)
                 .name("name")
-                .category(category)
-                .type("string")
+                .type("Consumbale")
                 .quantity(4)
                 .build();
-
-        System.out.println(inventory);
 
         InventoryCreateResponse response = new InventoryCreateResponse();
         response.setInventory_id(inventory.getId());
@@ -140,11 +136,10 @@ public class InventoryControllerTest {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("name","name")
                 .param("category_id", "1")
-                .param("type","string")
+                .param("type","Consumable")
                 .param("quantity","4")
-                .sessionAttr("inventory", new Inventory())
         )
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -237,9 +232,8 @@ public class InventoryControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     public void getInventoryDetail_success() throws Exception{
-        Category category = new Category().builder().id(1).name("/all").build();
+        Category category = Category.builder().id(1).name("/all").build();
         InventoryDTO inventory = InventoryDTO.builder()
                 .id(1)
                 .name("name")
@@ -293,7 +287,7 @@ public class InventoryControllerTest {
 
     @Test
     public void downloadInventoryDocument_test() throws Exception {
-        Category category = new Category().builder().id(1).name("/all").build();
+        Category category = Category.builder().id(1).name("/all").build();
         InventoryDTO inventory = InventoryDTO.builder()
                 .id(1)
                 .name("name")
@@ -312,7 +306,7 @@ public class InventoryControllerTest {
 
         mvc.perform(get("/inventory/detail/{id}/download", 1)
         )
-                .andExpect(status().isMovedTemporarily())
+                .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:"+response.getInventoryDocUrl()));
 
     }
