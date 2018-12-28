@@ -10,6 +10,7 @@ import com.bliblifuture.invenger.request.formRequest.InventoryCreateRequest;
 import com.bliblifuture.invenger.request.formRequest.InventoryEditRequest;
 import com.bliblifuture.invenger.response.jsonResponse.InventoryCreateResponse;
 import com.bliblifuture.invenger.response.jsonResponse.RequestResponse;
+import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchResponse;
 import com.bliblifuture.invenger.response.viewDto.CategoryDTO;
 import com.bliblifuture.invenger.response.viewDto.InventoryDTO;
 import com.bliblifuture.invenger.service.InventoryService;
@@ -31,6 +32,7 @@ import org.springframework.ui.Model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
@@ -264,5 +266,24 @@ public class InventoryControllerTest {
 
         verify(inventoryService, times(1)).getById(1);
         Mockito.verifyZeroInteractions(userService);
+    }
+
+    @Test
+    public void searchInventory_test() throws Exception {
+        SearchResponse response = new SearchResponse();
+        response.setRecordsFiltered(4000);
+        response.setResults(new LinkedList<>());
+
+        when(inventoryService.getSearchResult(any())).thenReturn(response);
+
+        mvc.perform(get("/inventory/search")
+                .param("search","all")
+                .param("page","2")
+                .param("length","10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results").value(response.getResults()))
+                .andExpect(jsonPath("$.recordsFiltered").value(response.getRecordsFiltered()));
+
+        verify(inventoryService,times(1)).getSearchResult(any());
     }
 }
