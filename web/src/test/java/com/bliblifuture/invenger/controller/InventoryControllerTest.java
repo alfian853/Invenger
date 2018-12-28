@@ -113,9 +113,36 @@ public class InventoryControllerTest {
                 .andExpect(jsonPath("$.success").value(true));
     }
 
+<<<<<<< HEAD
     /////////////////////////////////////////////////////////////////////////////////////////////
     //public RequestResponse editInventory(@Valid @ModelAttribute InventoryEditRequest request)//
     /////////////////////////////////////////////////////////////////////////////////////////////
+=======
+    @Test
+    public void addNewInventory_invalidRequest() throws Exception {
+        Inventory inventory = Inventory.builder()
+                .id(1)
+                .name("name")
+                .type("Consumbale")
+                .quantity(4)
+                .build();
+
+        InventoryCreateResponse response = new InventoryCreateResponse();
+        response.setInventory_id(inventory.getId());
+        response.setStatusToSuccess();
+
+        when(inventoryService.createInventory(any())).thenThrow(new InvalidRequestException());
+
+        mvc.perform(post("/inventory/create")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("name","name")
+                .param("category_id", "1")
+                .param("type","Consumable")
+                .param("quantity","4")
+        )
+                .andExpect(status().isBadRequest());
+    }
+>>>>>>> dea66e7b685d3949f9409f27e3b809cc0678f56d
 
     @Test
     public void editInventory_test() throws Exception {
@@ -161,9 +188,70 @@ public class InventoryControllerTest {
 
     }
 
+<<<<<<< HEAD
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //public SearchResponse searchInventory(@RequestParam("search")String query, @RequestParam("page")Integer page, @RequestParam("length")Integer length)//
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+=======
+    @Test
+    public void deleteInventory_invalidRequest() throws Exception {
+        when(inventoryService.deleteInventory(anyInt())).thenThrow(new InvalidRequestException());
+
+        mvc.perform(post("/inventory/delete/1"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false));
+
+        verify(inventoryService,times(1)).deleteInventory(anyInt());
+
+    }
+
+    @Test
+    public void deleteInventory_dataNotFound() throws Exception {
+        when(inventoryService.deleteInventory(anyInt())).thenThrow(new DataNotFoundException());
+
+        mvc.perform(post("/inventory/delete/1"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.success").value(false));
+
+        verify(inventoryService,times(1)).deleteInventory(anyInt());
+
+    }
+
+    @Test
+    public void getInventoryDetail_success() throws Exception{
+        Category category = Category.builder().id(1).name("/all").build();
+        InventoryDTO inventory = InventoryDTO.builder()
+                .id(1)
+                .name("name")
+                .quantity(2)
+                .type(InventoryType.Consumable.toString())
+                .category(category.getName())
+                .category_id(category.getId())
+                .build();
+
+        System.out.println(inventory);
+
+        when(inventoryService.getById(1)).thenReturn(inventory);
+        when(userService.currentUserIsAdmin()).thenReturn(true);
+
+        mvc.perform(get("/inventory/detail/{id}", 1)
+        )
+                .andExpect(status().isOk());
+
+        verify(inventoryService, times(1)).getById(1);
+    }
+
+    @Test
+    public void getInventoryDetail_dataNotFound() throws Exception{
+        when(inventoryService.getById(1)).thenThrow(new DataNotFoundException());
+
+        mvc.perform(get("/inventory/detail/{id}", 1))
+                .andExpect(status().isNotFound());
+
+        verify(inventoryService, times(1)).getById(1);
+        Mockito.verifyZeroInteractions(inventoryService);
+    }
+>>>>>>> dea66e7b685d3949f9409f27e3b809cc0678f56d
 
     @Test
     public void searchInventory_test() throws Exception {
@@ -190,7 +278,7 @@ public class InventoryControllerTest {
 
     @Test
     public void downloadInventoryDocument_test() throws Exception {
-        Category category = new Category().builder().id(1).name("/all").build();
+        Category category = Category.builder().id(1).name("/all").build();
         InventoryDTO inventory = InventoryDTO.builder()
                 .id(1)
                 .name("name")
@@ -209,7 +297,7 @@ public class InventoryControllerTest {
 
         mvc.perform(get("/inventory/detail/{id}/download", 1)
         )
-                .andExpect(status().isMovedTemporarily())
+                .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:"+response.getInventoryDocUrl()));
 
     }
