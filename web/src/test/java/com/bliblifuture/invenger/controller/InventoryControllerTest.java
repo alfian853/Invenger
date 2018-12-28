@@ -9,7 +9,9 @@ import com.bliblifuture.invenger.exception.InvalidRequestException;
 import com.bliblifuture.invenger.request.formRequest.InventoryCreateRequest;
 import com.bliblifuture.invenger.request.formRequest.InventoryEditRequest;
 import com.bliblifuture.invenger.response.jsonResponse.InventoryCreateResponse;
+import com.bliblifuture.invenger.response.jsonResponse.InventoryDocDownloadResponse;
 import com.bliblifuture.invenger.response.jsonResponse.RequestResponse;
+import com.bliblifuture.invenger.response.jsonResponse.UploadProfilePictResponse;
 import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchResponse;
 import com.bliblifuture.invenger.response.viewDto.CategoryDTO;
 import com.bliblifuture.invenger.response.viewDto.InventoryDTO;
@@ -25,10 +27,13 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.Model;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -254,7 +259,6 @@ public class InventoryControllerTest {
                 .andExpect(status().isOk());
 
         verify(inventoryService, times(1)).getById(1);
-        Mockito.verifyZeroInteractions(userService);
     }
 
     @Test
@@ -265,7 +269,7 @@ public class InventoryControllerTest {
                 .andExpect(status().isNotFound());
 
         verify(inventoryService, times(1)).getById(1);
-        Mockito.verifyZeroInteractions(userService);
+        Mockito.verifyZeroInteractions(inventoryService);
     }
 
     @Test
@@ -285,5 +289,51 @@ public class InventoryControllerTest {
                 .andExpect(jsonPath("$.recordsFiltered").value(response.getRecordsFiltered()));
 
         verify(inventoryService,times(1)).getSearchResult(any());
+    }
+
+    @Test
+    public void downloadInventoryDocument_test() throws Exception {
+        Category category = new Category().builder().id(1).name("/all").build();
+        InventoryDTO inventory = InventoryDTO.builder()
+                .id(1)
+                .name("name")
+                .quantity(2)
+                .type(InventoryType.Consumable.toString())
+                .category(category.getName())
+                .category_id(category.getId())
+                .build();
+
+        System.out.println(inventory);
+
+        InventoryDocDownloadResponse response = new InventoryDocDownloadResponse();
+        response.setInventoryDocUrl("some_url");
+
+        when(inventoryService.downloadItemDetail(1)).thenReturn(response);
+
+        mvc.perform(get("/inventory/detail/{id}/download", 1)
+        )
+                .andExpect(status().isMovedTemporarily())
+                .andExpect(view().name("redirect:"+response.getInventoryDocUrl()));
+
+    }
+
+    @Test
+    public void uploadInventories_test() throws Exception {
+        String content = "name,price,quantity,type,description\n" +
+                "barang1,999,100,Stockable\n" +
+                "barang2,200,59,Consumable\n" +
+                "barang3,100,300,Consumable\n";
+
+        MockMultipartFile file = new MockMultipartFile("file", "orig", null, content.getBytes());
+
+        RequestResponse response = new RequestResponse();
+        response.setStatusToSuccess();
+
+        when(inventoryService.insertInventories(file)).thenReturn(response);
+
+        mvc.perform(MockMvcRequestBuilders.multipart("/inventory/upload")
+                .file(file))
+                .andExpect(status().isOk());
+
     }
 }
