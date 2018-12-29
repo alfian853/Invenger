@@ -56,6 +56,7 @@
                         <select id="item-detail-category" class="btn-outline-primary form-input" style="width: 100%;"
                             th:name="category_id" onchange="update(this);">
                             <!--option initialize in the script below-->
+                            <option th:value="${inventory.category_id}" th:text="${inventory.category}"></option>
                         </select>
                     </div>
                 </div>
@@ -112,6 +113,7 @@
         'description' : '[[${inventory.description}]]',
         'pict' : ''
     };
+
 
     function update(field){
         var attr = $(field).attr('name');
@@ -195,7 +197,7 @@
 
                         for(var field in changedData){
                             if(field !== 'pict'){
-                                form.append(field, changedData[field])
+                                form.append(field, changedData[field]);
                             }
                             else{
                                 form.append('pict',

@@ -68,7 +68,7 @@ public class InventoryController {
     @GetMapping("/detail/{id}")
     public String getInventoryDetail(Model model, @PathVariable("id") Integer id) {
         model.addAttribute("inventory", inventoryService.getById(id));
-        model.addAttribute("itemTypes", InventoryType.getAllType());
+        model.addAttribute("itemTypes", InventoryType.getAllTypeAsString());
         if(userService.currentUserIsAdmin()){
             return "inventory/inventory_detail_admin";
         }

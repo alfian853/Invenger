@@ -47,7 +47,7 @@
                                 let tmp ='<button class=\"submit\" type=\"submit\" onclick=\"loadLendmentDetail('+ref[i].id+')\">Detail</button>';
                                 if(ref[i].status === 'Waiting for pickup'){
                                     tmp+='<button class=\"btn btn-warning btn-sm\" ' +
-                                        'onclick=\"doHandOver('+ref[i].id+')\">Handover Ordered Item</button>'
+                                        'onclick=\"doHandOver(this,'+ref[i].id+')\">Handover Ordered Item</button>'
                                 }
                                 ref[i]['action'] = tmp;
                             }
@@ -70,7 +70,7 @@
                     });
                 }
 
-                tableAccess = new DTAccess(datatables,'lendment-',5);
+                tableAccess = new DTAccess(datatables,'row_',5);
             });
         </script>
 
@@ -89,6 +89,7 @@
         <div th:replace="navbar :: navbar"></div>
         <div class="user-text">Lendment</div>
         <div style="padding: 50px;">
+            <button class="btn" id="assignItemBtn">Assign Item to User</button>
             <table id="lendmentsTable" class="display" style="width:100%;">
                 <thead>
                 <tr>
@@ -120,6 +121,7 @@
     </div>
 
     <div id="lendment-detail-modal"></div>
+    <div id="assign-item-modal"></div>
 
     <script>
 
@@ -173,7 +175,6 @@
                 buttons: [
                     ['<button><b>YES</b></button>', function (instance, toast) {
                         instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
-                        console.log('try');
                         $.ajax({
                             type: "POST",
                             url: "/lendment/handover/"+id,
@@ -204,6 +205,33 @@
 
         }
 
+        $(document).ready(function() {
+
+            $('#assignItemBtn').click(function () {
+                $('#assign-item-modal').iziModal({
+                    title: 'Assign Item to User',
+                    width: screen.width * 0.6,
+                    height: screen.height,
+                    closeButton: true,
+                    fullScreen: true,
+                    history: false,
+                    onOpening: function (modal) {
+                        modal.startLoading();
+                        $.get('/lendment/create', function (html) {
+                            $('#assign-item-modal .iziModal-content').html(html);
+                            modal.stopLoading();
+                        }).fail(function () {
+                            modal.stopLoading();
+                            toastMessage('error', 'Failed', 'Something wrong :(');
+                            $('.iziModal-button-close').click();
+                        });
+                    }
+                });
+
+                $('#assign-item-modal').iziModal('open');
+            });
+
+        });
 
 
 
