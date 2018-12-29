@@ -1,8 +1,10 @@
 package com.bliblifuture.invenger.controller;
 
+import com.bliblifuture.invenger.ModelMapper.inventory.InventoryMapper;
 import com.bliblifuture.invenger.entity.inventory.Category;
 import com.bliblifuture.invenger.entity.inventory.Inventory;
 import com.bliblifuture.invenger.entity.inventory.InventoryType;
+import com.bliblifuture.invenger.request.datatables.DataTablesRequest;
 import com.bliblifuture.invenger.request.formRequest.InventoryEditRequest;
 import com.bliblifuture.invenger.response.jsonResponse.*;
 import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchResponse;
@@ -14,12 +16,15 @@ import com.bliblifuture.invenger.service.UserService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -62,8 +67,8 @@ public class InventoryControllerTest {
 
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //public InventoryCreateResponse addNewInventory(@Valid @ModelAttribute InventoryCreateRequest request)//
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////
+     //public InventoryCreateResponse addNewInventory(@Valid @ModelAttribute InventoryCreateRequest request)//
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Test
@@ -96,8 +101,8 @@ public class InventoryControllerTest {
                 .andExpect(jsonPath("$.success").value(true));
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////
-    //public RequestResponse editInventory(@Valid @ModelAttribute InventoryEditRequest request)//
+      /////////////////////////////////////////////////////////////////////////////////////////////
+     //public RequestResponse editInventory(@Valid @ModelAttribute InventoryEditRequest request)//
     /////////////////////////////////////////////////////////////////////////////////////////////
 
     @Test
@@ -125,8 +130,8 @@ public class InventoryControllerTest {
 
     }
 
-    //////////////////////////////////////////////////////////////////////////
-    //public RequestResponse removeInventory(@PathVariable("id") Integer id)//
+      //////////////////////////////////////////////////////////////////////////
+     //public RequestResponse removeInventory(@PathVariable("id") Integer id)//
     //////////////////////////////////////////////////////////////////////////
 
     @Test
@@ -144,8 +149,8 @@ public class InventoryControllerTest {
 
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //public SearchResponse searchInventory(@RequestParam("search")String query, @RequestParam("page")Integer page, @RequestParam("length")Integer length)//
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+     //public SearchResponse searchInventory(@RequestParam("search")String query, @RequestParam("page")Integer page, @RequestParam("length")Integer length)//
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Test
@@ -167,8 +172,8 @@ public class InventoryControllerTest {
         verify(inventoryService,times(1)).getSearchResult(any());
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    //public String downloadInventoryDocument(@PathVariable("id") Integer id)//
+      ///////////////////////////////////////////////////////////////////////////
+     //public String downloadInventoryDocument(@PathVariable("id") Integer id)//
     ///////////////////////////////////////////////////////////////////////////
 
     @Test
@@ -197,8 +202,8 @@ public class InventoryControllerTest {
 
     }
 
-    //////////////////////////////////////////////////////////////////////////////////////
-    //public RequestResponse uploadInventories(@RequestParam("file") MultipartFile file)//
+      //////////////////////////////////////////////////////////////////////////////////////
+     //public RequestResponse uploadInventories(@RequestParam("file") MultipartFile file)//
     //////////////////////////////////////////////////////////////////////////////////////
 
     @Test
@@ -220,14 +225,13 @@ public class InventoryControllerTest {
                 .andExpect(status().isOk());
     }
 
-    /////////////////////////////////////////////////////////////////////////////////
-    //public String getInventoryDetail(Model model, @PathVariable("id") Integer id)//
+      /////////////////////////////////////////////////////////////////////////////////
+     //public String getInventoryDetail(Model model, @PathVariable("id") Integer id)//
     /////////////////////////////////////////////////////////////////////////////////
 
     @Test
-    @WithMockUser(roles = "ADMIN")
-    public void getInventoryDetail_test() throws Exception{
-        Category category = new Category().builder().id(1).name("/all").build();
+    public void getInventoryDetail_userIsAdmin() throws Exception{
+        Category category = Category.builder().id(1).name("/all").build();
         InventoryDTO inventory = InventoryDTO.builder()
                 .id(1)
                 .name("name")
@@ -244,17 +248,45 @@ public class InventoryControllerTest {
 
         mvc.perform(get("/inventory/detail/{id}", 1)
         )
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("inventory",inventory))
+                .andExpect(view().name("inventory/inventory_detail_admin"));
 
         verify(inventoryService, times(1)).getById(1);
     }
 
-    ////////////////////////////////////////////////
-    //public String getInventoryTable(Model model)//
+    @Test
+    public void getInventoryDetail_userIsNotAdmin() throws Exception{
+        Category category = Category.builder().id(1).name("/all").build();
+        InventoryDTO inventory = InventoryDTO.builder()
+                .id(1)
+                .name("name")
+                .quantity(2)
+                .type(InventoryType.Consumable.toString())
+                .category(category.getName())
+                .category_id(category.getId())
+                .build();
+
+        System.out.println(inventory);
+
+        when(inventoryService.getById(1)).thenReturn(inventory);
+        when(userService.currentUserIsAdmin()).thenReturn(false);
+
+        mvc.perform(get("/inventory/detail/{id}", 1)
+        )
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("inventory",inventory))
+                .andExpect(view().name("inventory/inventory_detail_basic"));
+
+        verify(inventoryService, times(1)).getById(1);
+    }
+
+      ////////////////////////////////////////////////
+     //public String getInventoryTable(Model model)//
     ////////////////////////////////////////////////
 
     @Test
-    public void getInventoryTable_test() throws Exception {
+    public void getInventoryTable_userIsAdmin() throws Exception {
         List<CategoryDTO> categoryDTOS = new ArrayList<>();
         categoryDTOS.add(CategoryDTO.builder().id(1).name("/all").build());
         List<InventoryDTO> list = new ArrayList<>();
@@ -269,20 +301,82 @@ public class InventoryControllerTest {
 
         System.out.println(list);
 
-        when(inventoryService.getAll()).thenReturn(list);
         when(itemCategoryService.getAllItemCategory(anyBoolean())).thenReturn(categoryDTOS);
+        when(userService.currentUserIsAdmin()).thenReturn(true);
 
         mvc.perform(get("/inventory/all")
         )
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("categories",categoryDTOS))
+                .andExpect(view().name("inventory/inventory_list_admin"));
     }
 
+    @Test
+    public void getInventoryTable_userIsNotAdmin() throws Exception {
+        List<CategoryDTO> categoryDTOS = new ArrayList<>();
+        categoryDTOS.add(CategoryDTO.builder().id(1).name("/all").build());
+        List<InventoryDTO> list = new ArrayList<>();
+        list.add(InventoryDTO.builder()
+                .id(1)
+                .name("name")
+                .quantity(2)
+                .type(InventoryType.Consumable.toString())
+                .category("/all")
+                .category_id(1)
+                .build());
+
+        System.out.println(list);
+
+        when(itemCategoryService.getAllItemCategory(anyBoolean())).thenReturn(categoryDTOS);
+        when(userService.currentUserIsAdmin()).thenReturn(false);
+
+        mvc.perform(get("/inventory/all")
+        )
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("categories",categoryDTOS))
+                .andExpect(view().name("inventory/inventory_list_basic"));
+    }
+
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+     //public DataTablesResult<InventoryDataTableResponse> getPaginatedInventories(HttpServletRequest servletRequest)//
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //public DataTablesResult<InventoryDataTableResponse> getPaginatedInventories(HttpServletRequest servletRequest)//
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private MockHttpServletRequest mock_datatableServletRequest(boolean hasSearchValue) {
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        servletRequest.addParameter("columns[0][data]", "id");
+        servletRequest.addParameter("columns[0][name]", "id");
+        servletRequest.addParameter("columns[0][orderable]", "true");
+        servletRequest.addParameter("columns[0][search][regex]", "false");
+        servletRequest.addParameter("columns[0][search][value]", (hasSearchValue) ? "123" : "");
+        servletRequest.addParameter("columns[0][searchable]", "true");
+        servletRequest.addParameter("draw", "1");
+        servletRequest.addParameter("length", "10");
+        servletRequest.addParameter("order[0][column]", "0");
+        servletRequest.addParameter("order[0][dir]", "asc");
+        servletRequest.addParameter("search[regex]", "false");
+        servletRequest.addParameter("search[value]", "");
+        servletRequest.addParameter("start", "0");
+        return servletRequest;
+    }
 
     @Test
     public void testGetPaginatedInventories_test() throws Exception {
+        MockHttpServletRequest mockHttpServletRequest = this.mock_datatableServletRequest(true);
+        DataTablesRequest request = new DataTablesRequest(mockHttpServletRequest);
+
+        InventoryMapper mapper = Mappers.getMapper(InventoryMapper.class);
+
+        Page<Inventory> page = new PageImpl<>(new ArrayList<>());
+
+        DataTablesResult<InventoryDataTableResponse> dataTablesResult = new DataTablesResult<>();
+        dataTablesResult.setListOfDataObjects(mapper.toDataTablesDtoList(page.getContent()));
+        dataTablesResult.setDraw(Integer.parseInt(request.getDraw()));
+        dataTablesResult.setRecordsFiltered(page.getNumberOfElements());
+        dataTablesResult.setRecordsTotal((int) page.getTotalElements());
+
+        mvc.perform(get("/inventory/datatables")
+        )
+                .andExpect(status().isOk());
     }
 
 }
