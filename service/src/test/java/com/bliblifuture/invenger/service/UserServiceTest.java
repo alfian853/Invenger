@@ -1,4 +1,4 @@
-package com.bliblifuture.invenger;
+package com.bliblifuture.invenger.service;
 
 
 import com.bliblifuture.invenger.Utils.MyUtils;
@@ -8,16 +8,17 @@ import com.bliblifuture.invenger.repository.PositionRepository;
 import com.bliblifuture.invenger.repository.UserRepository;
 import com.bliblifuture.invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.invenger.response.jsonResponse.UploadProfilePictResponse;
-import com.bliblifuture.invenger.service.FileStorageService;
-import com.bliblifuture.invenger.service.UserService;
+import com.bliblifuture.invenger.service.impl.UserServiceImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.MockitoRule;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.Authentication;
@@ -29,15 +30,12 @@ import org.springframework.web.multipart.MultipartFile;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.mockito.Mockito.*;
 
-
+@RunWith(MockitoJUnitRunner.class)
 public class UserServiceTest {
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
 
     @Spy
     @InjectMocks
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @Mock
     private UserRepository userRepository;

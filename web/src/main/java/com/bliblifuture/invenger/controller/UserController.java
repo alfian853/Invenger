@@ -1,14 +1,14 @@
 package com.bliblifuture.invenger.controller;
 
 import com.bliblifuture.invenger.Utils.MyUtils;
-import com.bliblifuture.invenger.exception.DefaultRuntimeException;
-import com.bliblifuture.invenger.exception.InvalidRequestException;
 import com.bliblifuture.invenger.entity.user.RoleType;
 import com.bliblifuture.invenger.entity.user.User;
+import com.bliblifuture.invenger.exception.InvalidRequestException;
 import com.bliblifuture.invenger.request.datatables.DataTablesRequest;
 import com.bliblifuture.invenger.request.formRequest.UserCreateRequest;
 import com.bliblifuture.invenger.request.formRequest.UserEditRequest;
 import com.bliblifuture.invenger.request.jsonRequest.ProfileRequest;
+import com.bliblifuture.invenger.request.jsonRequest.UserSearchRequest;
 import com.bliblifuture.invenger.response.jsonResponse.*;
 import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchResponse;
 import com.bliblifuture.invenger.response.viewDto.PositionDTO;
@@ -118,7 +118,13 @@ public class UserController {
                                      @RequestParam("length")Integer length,
                                      @RequestParam(value = "min_level",required = false) Integer minLevel) {
 
-        return userService.getSearchedUser(query,page,length,minLevel);
+        UserSearchRequest request = new UserSearchRequest();
+        request.setQuery(query);
+        request.setPageNum(page);
+        request.setLength(length);
+        request.setLength(minLevel);
+
+        return userService.getSearchResult(request);
     }
 
     @GetMapping("/user/positions")
@@ -148,12 +154,12 @@ public class UserController {
         return userService.deletePosition(id);
     }
 
-    @GetMapping("/datatables/user")
+    @GetMapping("/user/datatables")
     @ResponseBody
     public DataTablesResult<UserDataTableResponse> getPaginatedInventories(
             HttpServletRequest servletRequest){
         DataTablesRequest request = new DataTablesRequest(servletRequest);
-        return userService.getPaginatedDatatablesUserList(request);
+        return userService.getDatatablesData(request);
     }
 
 }

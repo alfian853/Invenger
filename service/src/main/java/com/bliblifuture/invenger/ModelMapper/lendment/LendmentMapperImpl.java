@@ -2,8 +2,11 @@ package com.bliblifuture.invenger.ModelMapper.lendment;
 
 import com.bliblifuture.invenger.entity.lendment.Lendment;
 import com.bliblifuture.invenger.entity.lendment.LendmentDetail;
+import com.bliblifuture.invenger.response.jsonResponse.LendmentDataTableResponse;
 import com.bliblifuture.invenger.response.viewDto.LendmentDTO;
 
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
 import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,7 +15,7 @@ import java.util.stream.Collectors;
 public class LendmentMapperImpl implements LendmentMapper {
 
     @Override
-    public LendmentDTO toLendmentDTO(Lendment lendment) {
+    public LendmentDTO toDto(Lendment lendment) {
         return LendmentDTO
                 .builder()
                 .id(lendment.getId())
@@ -50,13 +53,45 @@ public class LendmentMapperImpl implements LendmentMapper {
         return result;
     }
 
-
     @Override
-    public List<LendmentDTO> toLendmentDtoList(List<Lendment> lendments, boolean isWithDetails) {
-
-        return lendments.stream().map(
-                (isWithDetails) ? this::toLendmentWithDetailDTO : this::toLendmentDTO)
-                .collect(Collectors.toList());
+    public List<LendmentDTO> toDtoList(List<Lendment> lendments) {
+        return lendments.stream().map(this::toDto).collect(Collectors.toList());
     }
 
+    @Override
+    public List<LendmentDTO> toDtoList(List<Lendment> lendments, boolean isWithDetails) {
+        if(isWithDetails) {
+            return lendments.stream().map(this::toLendmentWithDetailDTO)
+                    .collect(Collectors.toList());
+        }
+        return toDtoList(lendments);
+    }
+
+    @Override
+    public List<LendmentDataTableResponse> toDataTablesDtoList(List<Lendment> lendments) {
+        List<LendmentDataTableResponse> responses = new LinkedList<>();
+
+        for(Lendment lendment : lendments){
+            responses.add(LendmentDataTableResponse.builder()
+                    .id(lendment.getId())
+                    .rowId("row_"+lendment.getId())
+                    .username(lendment.getUser().getUsername())
+                    .createdAt(lendment.getCreatedAt().toString())
+                    .status(lendment.getStatus())
+                    .build()
+            );
+        }
+
+        return responses;
+    }
+
+    @Override
+    public Path getPathFrom(Root root, String field) {
+        switch (field){
+            case "username":
+                return root.get("user").get("username");
+            default:
+                return root.get(field);
+        }
+    }
 }

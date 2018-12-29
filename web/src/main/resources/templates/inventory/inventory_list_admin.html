@@ -39,7 +39,7 @@
                 serverSide : true,
                 ajax : {
                     'type' : 'GET',
-                    'url' : '/datatables/inventory',
+                    'url' : '/inventory/datatables',
                     'dataSrc' : function (response) {
                         let len = response.data.length;
                         let ref = response.data;
@@ -78,8 +78,6 @@
             tableAccess = new DTAccess(datatables,'row_',7);
 
         });
-        /*[- will be initilize in the next script below -]*/
-        var listCategory = {};
     </script>
     <title>Inventory</title>
 
@@ -177,9 +175,6 @@
                 <div class="form-group">
                     <label class="form-label">Item Category</label><br>
                     <select class="form-input" style="width: 100%;" name="category_id">
-                        <th:block th:each="category : ${categories}">
-                            <option th:value="${category.id}" th:text="${category.name}">Option i</option>
-                        </th:block>
                     </select>
                 </div>
                 <div class="form-group">
@@ -331,10 +326,6 @@
             var file_upload = null;
             var uploadFileDZ = null;
 
-            // init listCategory
-            $('select[name=\"category_id\"] option').each(function () {
-                listCategory[$(this).val()] = $(this).text();
-            });
 
             $('#assignItemBtn').click(function () {
                 console.log('clicked');
@@ -370,6 +361,33 @@
                 closeButton : true,
                 fullScreen : true,
                 history: false,
+                onOpening : function(){
+                    $('select[name=\"category_id\"]').select2({
+                        placeholder : 'Please select item category',
+                        ajax : {
+                            url : '/category/search',
+                            params : null,
+                            delay : 350,
+                            data : function (params) {
+                                let query = {
+                                    search : (params.term != null)?params.term:"",
+                                    page : (params.page)?params.page:0,
+                                    length : 10
+                                };
+                                this.params = query;
+                                return query;
+                            },
+                            processResults : function (result) {
+                                let params = this['$element'].params;
+                                result.pagination = {
+                                    more : params.length*params.page < result['recordsFiltered']
+                                };
+                                return result;
+                            }
+                        },
+                        cache : true
+                    });
+                },
                 onClosed : function (modal) {
                     $('#create-item-form')[0].reset();
                 }

@@ -25,9 +25,51 @@
 
         <script th:inline = "javascript">
             var tableAccess = null;
+            let preparedCol = DTAccess.generateColumnSpec([
+                {'col':'id'},
+                {'col':'username',"orderable" : false},
+                {'col':'createdAt','searchable' : false},
+                {'col':'status'},
+                {'col':'action','searchable' : false,'orderable':false}
+            ]);
 
             $(document).ready(function(){
-                var datatables = $('#lendmentsTable').DataTable();
+                var datatables = $('#lendmentsTable').DataTable({
+                    processing: true,
+                    serverSide : true,
+                    ajax : {
+                        'type' : 'GET',
+                        'url' : '/lendment/datatables',
+                        'dataSrc' : function (response) {
+                            let len = response.data.length;
+                            let ref = response.data;
+                            for(let i = 0; i<len; i++){
+                                let tmp ='<button class=\"submit\" type=\"submit\" onclick=\"loadLendmentDetail('+ref[i].id+')\">Detail</button>';
+                                if(ref[i].status === 'Waiting for pickup'){
+                                    tmp+='<button class=\"btn btn-warning btn-sm\" ' +
+                                        'onclick=\"doHandOver('+ref[i].id+')\">Handover Ordered Item</button>'
+                                }
+                                ref[i]['action'] = tmp;
+                            }
+                            return ref;
+                        }
+                    },
+                    columns : preparedCol.column,
+                    columnDefs : preparedCol.columnDefs
+                });
+
+                var searchableList = ['id','username','status'];
+
+                for(let i=0;i<searchableList.length;i++){
+                    let input = $('#lendmentsTable [target-col=\"'+searchableList[i]+'\"]');
+                    let target = datatables.column('#lendmentsTable th[col=\"'+searchableList[i]+'\"]');
+                    input.on('keyup change',function () {
+                        if(target.search() !== input.val()){
+                            target.search(input.val()).draw();
+                        }
+                    });
+                }
+
                 tableAccess = new DTAccess(datatables,'lendment-',5);
             });
         </script>
@@ -50,30 +92,28 @@
             <table id="lendmentsTable" class="display" style="width:100%;">
                 <thead>
                 <tr>
-                    <th>Lendment Id</th>
-                    <th>Username</th>
-                    <th>Order date</th>
-                    <th>Status</th>
-                    <th>Action</th>
+                    <th><input type="text" style="width: 60px" placeholder="name" target-col="id"/></th>
+                    <th><input type="text" placeholder="username" target-col="username"/></th>
+                    <th></th>
+                    <th>
+                        <select target-col="status">
+                        <option selected value="">&lt;Filter by status&gt;</option>
+                        <th:block th:each="status : ${statusList}">
+                            <option th:value="${status.value}" th:text="${status.value}">Option i</option>
+                        </th:block>
+                        </select>
+                    </th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <th col="id">Lendment Id</th>
+                    <th col="username">Username</th>
+                    <th col="createdAt">Order date</th>
+                    <th col="status">Status</th>
+                    <th col="action">Action</th>
                 </tr>
                 </thead>
                 <tbody>
-                <th:block th:each="lendment : ${lendments}">
-                    <tr th:id="|lendment-${lendment.id}|">
-                        <td col="id" th:text="${lendment.id}"></td>
-                        <td col="username" th:text="${lendment.username}"></td>
-                        <td col="order-date" th:text="${lendment.orderDate}"></td>
-                        <td col="status" th:text="${lendment.status}"></td>
-                        <td>
-                            <button class="submit" type="submit" th:onclick="|loadLendmentDetail(${lendment.id})|">Detail</button>
-                            <th:block th:switch="${lendment.status}">
-                                <th:block th:case="${status.get('WaitingForPickUp')}">
-                                    <button class="btn btn-warning btn-sm" th:onclick="|doHandOver(this,${lendment.id})|">Handover Ordered Item</button>
-                                </th:block>
-                            </th:block>
-                        </td>
-                    </tr>
-                </th:block>
                 </tbody>
             </table>
         </div>

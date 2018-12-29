@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class InventoryMapperImpl implements InventoryMapper{
 
     @Override
-    public InventoryDTO toInventoryDto(Inventory inventory) {
+    public InventoryDTO toDto(Inventory inventory) {
         return InventoryDTO.builder()
                 .id(inventory.getId())
                 .name(inventory.getName())
@@ -31,12 +31,12 @@ public class InventoryMapperImpl implements InventoryMapper{
     }
 
     @Override
-    public List<InventoryDTO> toInventoryDtoList(List<Inventory> inventories) {
-        return inventories.stream().map(this::toInventoryDto).collect(Collectors.toList());
+    public List<InventoryDTO> toDtoList(List<Inventory> inventories) {
+        return inventories.stream().map(this::toDto).collect(Collectors.toList());
     }
 
     @Override
-    public List<InventoryDataTableResponse> toInventoryDatatables(List<Inventory> inventories) {
+    public List<InventoryDataTableResponse> toDataTablesDtoList(List<Inventory> inventories) {
 
         List<InventoryDataTableResponse> responses = new LinkedList<>();
 

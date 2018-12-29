@@ -56,10 +56,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/login","/**").permitAll()
+                .antMatchers("/login").permitAll()
+                .antMatchers("/profile/*","/inventory/*","/lendment/*").authenticated()
                 .antMatchers(
-                        "/profile",
-                        "/profile/upload-pict").hasAnyRole("ADMIN","USER")
+                        "/user/*",
+                        "/inventory/(create|edit|delete|upload|/detail/\\d+/download)",
+                        "/lendment/(return|handover/*)"
+                ).hasRole("ADMIN")
                 .and()
                 .formLogin()
                 .loginPage("/login")
@@ -67,14 +70,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .failureHandler(loginFailureHandler())
                 .and()
                 .logout().permitAll()
-                .logoutSuccessUrl("/login")
                 .and()
                 .rememberMe().tokenRepository(this.persistentTokenRepository())
-                // .and()
-                .and().logout()    //logout configuration
-                .logoutUrl("/logout") 
+                .and().logout()
+                .logoutUrl("/logout")
                 .logoutSuccessUrl("/login")
-                // .logout().logoutUrl("/logout").logoutSuccessUrl("/login")
                 .and()
                 .csrf();
 //                .csrf().disable();

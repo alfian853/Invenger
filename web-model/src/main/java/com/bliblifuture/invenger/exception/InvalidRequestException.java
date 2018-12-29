@@ -9,4 +9,7 @@ public class InvalidRequestException extends DefaultRuntimeException {
         super(message);
     }
 
+    public InvalidRequestException() {
+
+    }
 }

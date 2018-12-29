@@ -101,15 +101,6 @@
     <button id="item-detail-close-btn" type="button" class="btn btn-secondary">Close</button>
 </div>
 
-<!--/*
-Documentation
-
-        list of global variable usage
-        [
-            tableAccess => global access for dataTables, initialize in inventory_list_admin.html,
-            listCategory => list of all category, initialize in inventory_list_admin.html
-        ]
-*/-->
 <script>
     var inventory_id = '[[${inventory.id}]]';
     var listOfField = {
@@ -121,8 +112,6 @@ Documentation
         'description' : '[[${inventory.description}]]',
         'pict' : ''
     };
-
-    var upload_file = null;
 
     function update(field){
         var attr = $(field).attr('name');
@@ -146,20 +135,36 @@ Documentation
         }
     });
 
+    var select2Category = null;
+
     $(document).ready(function() {
 
-        for(var key in listCategory){
-            if(key == '[[${inventory.category_id}]]'){
-                $('#item-detail-category').append(
-                    '<option selected=\"selected\" value=\"'+key+'\" >'+listCategory[key]+'</option>'
-                );
-            }
-            else{
-                $('#item-detail-category').append(
-                    '<option value=\"'+key+'\" >'+listCategory[key]+'</option>'
-                );
-            }
-        }
+        select2Category = $('#item-detail-category').select2({
+            placeholder : '[[${inventory.category}]]',
+            ajax : {
+                url : '/category/search',
+                params : null,
+                delay : 350,
+                data : function (params) {
+                    let query = {
+                        search : (params.term != null)?params.term:"",
+                        page : (params.page)?params.page:0,
+                        length : 10
+                    };
+                    this.params = query;
+                    return query;
+                },
+                processResults : function (result) {
+                    let params = this['$element'].params;
+                    result.pagination = {
+                        more : params.length*params.page < result['recordsFiltered']
+                    };
+                    return result;
+                }
+            },
+            cache : true
+        });
+
 
 
         $('#item-detail-save-btn').click(function () {
@@ -202,26 +207,18 @@ Documentation
                             type: "POST",
                             url: "[[@{/inventory/edit}]]",
                             data: form,
-                            success: function(data){
-                                console.log(data);
-                                for(let field in changedData){
-                                    if(field === 'category_id'){
-                                        window.tableAccess.setColValueByRowId(inventory_id, 'category',
-                                            listCategory[changedData[field]]
-                                        );
-                                    }
-                                    else{
-                                        window.tableAccess.setColValueByRowId(inventory_id, field,
-                                            changedData[field]
-                                        );
-                                    }
+                            success: function(response){
+                                if(response['success']){
+                                    toastMessage('success','Success',response['message']);
+                                }
+                                else{
+                                    toastMessage('error','Error',response['message']);
                                 }
                             },
                             cache: false,
                             contentType: false,
                             processData: false
                         });
-                        toastMessage('success','Update Success','.');
                         $('.iziModal-button-close').click();
 
                     }, true],
@@ -232,7 +229,6 @@ Documentation
                     }]
                 ]
             });// end iziToast
-
 
 
         });// end click listener

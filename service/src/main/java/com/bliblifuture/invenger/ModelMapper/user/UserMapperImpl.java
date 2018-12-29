@@ -14,8 +14,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class UserMapperImpl implements UserMapper {
+
     @Override
-    public UserDTO toUserDto(User user) {
+    public UserDTO toDto(User user) {
         return UserDTO.builder()
                 .id(user.getId())
                 .email(user.getEmail())
@@ -32,8 +33,8 @@ public class UserMapperImpl implements UserMapper {
     }
 
     @Override
-    public List<UserDTO> toUserDtoList(List<User> users) {
-        return users.stream().map(this::toUserDto).collect(Collectors.toList());
+    public List<UserDTO> toDtoList(List<User> users) {
+        return users.stream().map(this::toDto).collect(Collectors.toList());
     }
 
     @Override
@@ -63,7 +64,7 @@ public class UserMapperImpl implements UserMapper {
     }
 
     @Override
-    public List<UserDataTableResponse> toUserDatatables(List<User> users) {
+    public List<UserDataTableResponse> toDataTablesDtoList(List<User> users) {
 
         List<UserDataTableResponse> responses = new LinkedList<>();
 
