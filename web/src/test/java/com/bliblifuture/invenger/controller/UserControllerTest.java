@@ -431,7 +431,8 @@ public class UserControllerTest {
         DataTablesResult<UserDataTableResponse> dataTablesResult = new DataTablesResult<>();
         dataTablesResult.setListOfDataObjects(mapper.toDataTablesDtoList(page.getContent()));
         dataTablesResult.setDraw(Integer.parseInt(request.getDraw()));
-        dataTablesResult.setRecordsFiltered((int) page.getTotalElements());
+        dataTablesResult.setRecordsFiltered(page.getNumberOfElements());
+        dataTablesResult.setRecordsTotal((int) page.getTotalElements());
 
         mvc.perform(get("/user/datatables")
         )
