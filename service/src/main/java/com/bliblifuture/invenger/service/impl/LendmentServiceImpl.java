@@ -135,7 +135,7 @@ public class LendmentServiceImpl implements LendmentService {
         return mapper.toLendmentWithDetailDTO(lendment);
     }
 
-    public List<LendmentDTO> getAllLendmentRequest(){
+    public List<LendmentDTO> getAllLendmentRequestOfSuperior(){
 
         return mapper.toDtoList(
                 lendmentRepository.findAllBySuperiorIdAndStatus(
@@ -157,6 +157,11 @@ public class LendmentServiceImpl implements LendmentService {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
         Lendment lendment = lendmentRepository.findLendmentById(request.getLendmentId());
+
+        if(!lendment.getStatus().equals(LendmentStatus.InLending.getDesc())){
+            throw new InvalidRequestException("Invalid Request!");
+        }
+
         lendment.setNotReturnedCount(lendment.getNotReturnedCount() - request.getInventoriesId().size());
         if(lendment.getNotReturnedCount() <= 0){
             lendment.setStatus(LendmentStatus.Finished.getDesc());

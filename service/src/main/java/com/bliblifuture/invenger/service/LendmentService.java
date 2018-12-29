@@ -18,7 +18,7 @@ public interface LendmentService extends
     List<LendmentDTO> getAll();
     List<LendmentDTO> getAllByUser();
     LendmentDTO getLendmentDetailById(Integer id);
-    List<LendmentDTO> getAllLendmentRequest();
+    List<LendmentDTO> getAllLendmentRequestOfSuperior();
     RequestResponse returnInventory(LendmentReturnRequest request);
     RequestResponse approveLendmentRequest(Integer id);
     HandOverResponse handOverOrderItems(Integer id);

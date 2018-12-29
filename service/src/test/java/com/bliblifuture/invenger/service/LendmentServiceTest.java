@@ -18,7 +18,6 @@ import com.bliblifuture.invenger.request.jsonRequest.LendmentCreateRequest;
 import com.bliblifuture.invenger.request.jsonRequest.LendmentReturnRequest;
 import com.bliblifuture.invenger.response.viewDto.LendmentDTO;
 import com.bliblifuture.invenger.service.impl.LendmentServiceImpl;
-import com.bliblifuture.invenger.service.impl.UserServiceImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,22 +28,19 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.mock.web.MockHttpServletRequest;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LendmentServiceTest {
@@ -222,17 +218,17 @@ public class LendmentServiceTest {
     }
 
 
-      ////////////////////////////////////////////////////
-     //public List<LendmentDTO> getAllLendmentRequest()//
-    ////////////////////////////////////////////////////
+      //////////////////////////////////////////////////////////////
+     //public List<LendmentDTO> getAllLendmentRequestOfSuperior()//
+    //////////////////////////////////////////////////////////////
 
     @Test
-    public void getAllLendmentRequest_test(){
+    public void getAllLendmentRequestOfSuperior_test(){
         when(userService.getSessionUser()).thenReturn(USER);
         when(lendmentRepository.findAllBySuperiorIdAndStatus(any(),any())).thenReturn(LENDMENTS);
 
         Assert.assertEquals(
-                lendmentService.getAllLendmentRequest(),
+                lendmentService.getAllLendmentRequestOfSuperior(),
                 LENDMENTS_DTO_WITHOUT_DETAIL
         );
     }
@@ -249,6 +245,17 @@ public class LendmentServiceTest {
                 Collections.singletonList( LENDMENT.getLendmentDetails().get(0).getCmpId().getInventoryId() )
         );
         return request;
+    }
+
+    @Test(expected = InvalidRequestException.class)
+    public void returnInventory_invalidRequest(){
+        LendmentReturnRequest request = this.mock_lendmentReturnRequest();
+        LENDMENT.setNotReturnedCount(1);
+        LENDMENT.setStatus(LendmentStatus.WaitingForApproval.getDesc());
+        when(lendmentRepository.findLendmentById(request.getLendmentId())).thenReturn(LENDMENT);
+
+        lendmentService.returnInventory(request);
+
     }
 
     @Test
@@ -296,6 +303,7 @@ public class LendmentServiceTest {
     }
 
 
+
       /////////////////////////////////////////////////////////////
      //public RequestResponse approveLendmentRequest(Integer id)//
     /////////////////////////////////////////////////////////////
@@ -322,6 +330,8 @@ public class LendmentServiceTest {
         );
     }
 
+
+
       //////////////////////////////////////////////////////////
      //public HandOverResponse handOverOrderItems(Integer id)//
     //////////////////////////////////////////////////////////
@@ -341,6 +351,8 @@ public class LendmentServiceTest {
         );
     }
 
+
+
       /////////////////////////////////////////////////////////////
      //public List<LendmentDTO> getInventoryLendment(Integer id)//
     /////////////////////////////////////////////////////////////
@@ -352,6 +364,8 @@ public class LendmentServiceTest {
                 lendmentService.getInventoryLendment(LENDMENT.getId()),
                 LENDMENTS_DTO_WITH_DETAIL);
     }
+
+
 
       ////////////////////////////////////////////////////////////////////////////////////////////
      //DataTablesResult<LendmentDataTableResponse> getDatatablesData(DataTablesRequest request)//

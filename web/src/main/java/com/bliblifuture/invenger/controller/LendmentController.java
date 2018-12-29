@@ -65,7 +65,7 @@ public class LendmentController {
     @GetMapping("/requests")
     public String getLendmentQueueTable(Model model){
         model.addAttribute("status",LendmentStatus.getMap());
-        model.addAttribute("lendments",lendmentService.getAllLendmentRequest());
+        model.addAttribute("lendments",lendmentService.getAllLendmentRequestOfSuperior());
 
         return "lendment/lendment_request_list";
     }
