@@ -1,23 +1,28 @@
 package com.bliblifuture.invenger.controller;
 
+import com.bliblifuture.invenger.ModelMapper.user.UserMapper;
 import com.bliblifuture.invenger.entity.user.Position;
 import com.bliblifuture.invenger.entity.user.User;
+import com.bliblifuture.invenger.request.datatables.DataTablesRequest;
 import com.bliblifuture.invenger.request.formRequest.UserEditRequest;
 import com.bliblifuture.invenger.response.jsonResponse.*;
 import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchResponse;
 import com.bliblifuture.invenger.response.viewDto.PositionDTO;
 import com.bliblifuture.invenger.response.viewDto.ProfileDTO;
 import com.bliblifuture.invenger.response.viewDto.UserDTO;
-import com.bliblifuture.invenger.service.FileStorageService;
 import com.bliblifuture.invenger.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
@@ -50,8 +55,8 @@ public class UserControllerTest {
                 .build();
     }
 
-    ///////////////////////////////////////////////
-    //public String getUserTablePage(Model model)//
+      ///////////////////////////////////////////////
+     //public String getUserTablePage(Model model)//
     ///////////////////////////////////////////////
 
     @Test
@@ -68,8 +73,8 @@ public class UserControllerTest {
 
     }
 
-    //////////////////////////////////////////////////////////////////////////////////////////
-    //public UserCreateResponse addNewUser(@Valid @ModelAttribute UserCreateRequest request)//
+      //////////////////////////////////////////////////////////////////////////////////////////
+     //public UserCreateResponse addNewUser(@Valid @ModelAttribute UserCreateRequest request)//
     //////////////////////////////////////////////////////////////////////////////////////////
 
     @Test
@@ -114,8 +119,8 @@ public class UserControllerTest {
 
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////
-    //public RequestResponse editUser(@Valid @ModelAttribute UserEditRequest request)//
+      ///////////////////////////////////////////////////////////////////////////////////
+     //public RequestResponse editUser(@Valid @ModelAttribute UserEditRequest request)//
     ///////////////////////////////////////////////////////////////////////////////////
 
     @Test
@@ -144,8 +149,8 @@ public class UserControllerTest {
 
     }
 
-    /////////////////////////////////////////////////////////////////////
-    //public RequestResponse removeUser(@PathVariable("id") Integer id)//
+      /////////////////////////////////////////////////////////////////////
+     //public RequestResponse removeUser(@PathVariable("id") Integer id)//
     /////////////////////////////////////////////////////////////////////
 
     @Test
@@ -162,8 +167,8 @@ public class UserControllerTest {
         verify(userService,times(1)).deleteUser(anyInt());
     }
 
-    ////////////////////////////////////////////////////////////////////////////
-    //public String getUserDetail(Model model, @PathVariable("id") Integer id)//
+      ////////////////////////////////////////////////////////////////////////////
+     //public String getUserDetail(Model model, @PathVariable("id") Integer id)//
     ////////////////////////////////////////////////////////////////////////////
 
     @Test
@@ -191,8 +196,8 @@ public class UserControllerTest {
         verify(userService, times(1)).getById(1);
     }
 
-    ///////////////////////////////////////////////
-    //public String getPositionTable(Model model)//
+      ///////////////////////////////////////////////
+     //public String getPositionTable(Model model)//
     ///////////////////////////////////////////////
 
     @Test
@@ -208,8 +213,8 @@ public class UserControllerTest {
                 .andExpect(model().attribute("positions",positions)).andReturn().getResponse();
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////
-    //public PositionCreateResponse createPosition(@Valid @RequestBody PositionDTO positionDTO)//
+      /////////////////////////////////////////////////////////////////////////////////////////////
+     //public PositionCreateResponse createPosition(@Valid @RequestBody PositionDTO positionDTO)//
     /////////////////////////////////////////////////////////////////////////////////////////////
 
     @Test
@@ -235,8 +240,8 @@ public class UserControllerTest {
         verify(userService,times(1)).createPosition(any());
     }
 
-    ////////////////////////////////////////////////////////////////////////////////
-    //public RequestResponse editPosition(@RequestBody PositionDTO editedPosition)//
+      ////////////////////////////////////////////////////////////////////////////////
+     //public RequestResponse editPosition(@RequestBody PositionDTO editedPosition)//
     ////////////////////////////////////////////////////////////////////////////////
 
     @Test
@@ -281,8 +286,8 @@ public class UserControllerTest {
         verify(userService,times(0)).editPosition(any());
     }
 
-    /////////////////////////////////////////////////////////////////////////
-    //public RequestResponse deletePosition(@PathVariable("id") Integer id)//
+      /////////////////////////////////////////////////////////////////////////
+     //public RequestResponse deletePosition(@PathVariable("id") Integer id)//
     /////////////////////////////////////////////////////////////////////////
 
     @Test
@@ -299,8 +304,8 @@ public class UserControllerTest {
         verify(userService,times(1)).deletePosition(anyInt());
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //public SearchResponse searchUser(@RequestParam("search")String query, @RequestParam("page")Integer page, @RequestParam("length")Integer length, @RequestParam(value = "min_level",required = false) Integer minLevel)//
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+     //public SearchResponse searchUser(@RequestParam("search")String query, @RequestParam("page")Integer page, @RequestParam("length")Integer length, @RequestParam(value = "min_level",required = false) Integer minLevel)//
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Test
@@ -323,8 +328,8 @@ public class UserControllerTest {
         verify(userService,times(1)).getSearchResult(any());
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    //public UploadProfilePictResponse uploadProfilePict(@RequestParam("file") MultipartFile file)//
+      ////////////////////////////////////////////////////////////////////////////////////////////////
+     //public UploadProfilePictResponse uploadProfilePict(@RequestParam("file") MultipartFile file)//
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Test
@@ -342,8 +347,8 @@ public class UserControllerTest {
                 .andExpect(status().isOk());
     }
 
-    /////////////////////////////////////////
-    //public String getProfile(Model model)//
+      /////////////////////////////////////////
+     //public String getProfile(Model model)//
     /////////////////////////////////////////
 
     @Test
@@ -358,8 +363,8 @@ public class UserControllerTest {
                 .andExpect(model().attribute("user",user)).andReturn().getResponse();
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////
-    //public Map<String,FormFieldResponse> postProfile(@RequestBody ProfileRequest request)//
+      /////////////////////////////////////////////////////////////////////////////////////////
+     //public Map<String,FormFieldResponse> postProfile(@RequestBody ProfileRequest request)//
     /////////////////////////////////////////////////////////////////////////////////////////
 
     @Test
@@ -391,4 +396,59 @@ public class UserControllerTest {
 
         verify(userService,times(1)).editProfile(any());
     }
+
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+     //public DataTablesResult<UserDataTableResponse> getPaginatedInventories(HttpServletRequest servletRequest)//
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private MockHttpServletRequest mock_datatableServletRequest(boolean hasSearchValue) {
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        servletRequest.addParameter("columns[0][data]", "id");
+        servletRequest.addParameter("columns[0][name]", "id");
+        servletRequest.addParameter("columns[0][orderable]", "true");
+        servletRequest.addParameter("columns[0][search][regex]", "false");
+        servletRequest.addParameter("columns[0][search][value]", (hasSearchValue) ? "123" : "");
+        servletRequest.addParameter("columns[0][searchable]", "true");
+        servletRequest.addParameter("draw", "1");
+        servletRequest.addParameter("length", "10");
+        servletRequest.addParameter("order[0][column]", "0");
+        servletRequest.addParameter("order[0][dir]", "asc");
+        servletRequest.addParameter("search[regex]", "false");
+        servletRequest.addParameter("search[value]", "");
+        servletRequest.addParameter("start", "0");
+        return servletRequest;
+    }
+
+    @Test
+    public void getPaginatedInventories_test() throws Exception {
+        MockHttpServletRequest mockHttpServletRequest = this.mock_datatableServletRequest(true);
+        DataTablesRequest request = new DataTablesRequest(mockHttpServletRequest);
+
+        UserMapper mapper = Mappers.getMapper(UserMapper.class);
+
+        Page<User> page = new PageImpl<>(new ArrayList<>());
+
+        DataTablesResult<UserDataTableResponse> dataTablesResult = new DataTablesResult<>();
+        dataTablesResult.setListOfDataObjects(mapper.toDataTablesDtoList(page.getContent()));
+        dataTablesResult.setDraw(Integer.parseInt(request.getDraw()));
+        dataTablesResult.setRecordsFiltered((int) page.getTotalElements());
+
+        mvc.perform(get("/user/datatables")
+        )
+                .andExpect(status().isOk());
+    }
+
+      ///////////////////////////////////////////////////////////////////
+     //public String getLogin(Model model, HttpServletRequest request)//
+    ///////////////////////////////////////////////////////////////////
+
+    @Test
+    public void getLogin_sessionIsNotNull() throws Exception {
+        User user = User.builder().id(1).build();
+        when(userService.getSessionUser()).thenReturn(user);
+        mvc.perform(get("/login"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/profile"));
+    }
+
 }
