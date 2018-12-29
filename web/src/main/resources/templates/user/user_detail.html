@@ -11,6 +11,17 @@
         <div class="col-md-6" style="padding-left: 0px">
             <div class="row my-2">
                 <div class="col-md-5">
+                    <label>Full Name* :</label>
+                </div>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" name="fullname" th:value="${user.fullName}" class="form-control"
+                               placeholder="Username" disabled="disabled">
+                    </div>
+                </div>
+            </div>
+            <div class="row my-2">
+                <div class="col-md-5">
                     <label>Username* :</label>
                 </div>
                 <div class="col-md-6">
@@ -211,33 +222,20 @@ Documentation
                             type: "POST",
                             url: "[[@{/user/edit}]]",
                             data: form,
-                            success: function(data){
-                                console.log(data);
-                                for(let field in changedData){
-                                    if(field === 'position_id'){
-                                        window.tableAccess.setColValueByRowId(user_id, 'position',
-                                            listPosition[changedData[field]]
-                                        );
-                                    }
-                                    else{
-                                        window.tableAccess.setColValueByRowId(user_id, field,
-                                            changedData[field]
-                                        );
-                                    }
+                            success: function(response){
+                                if(response['success']){
+                                    tableAccess.datatables.ajax.reload(null, false);
+                                    toastMessage('success','Update Success','');
                                 }
-                                for(let field in changedData){
-                                    window.tableAccess.setColValueByRowId(user_id, field,
-                                        changedData[field]
-                                    );
+                                else{
+                                    toastMessage('error','Error',response['message']);
                                 }
+                                $('.iziModal-button-close').click();
                             },
                             cache: false,
                             contentType: false,
                             processData: false
                         });
-                        toastMessage('success','Update Success','.');
-                        $('.iziModal-button-close').click();
-
                     }, true],
                     ['<button>NO</button>', function (instance, toast) {
 

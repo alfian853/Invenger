@@ -232,6 +232,7 @@
 
                             success: function (response) {
                                 if(response['success']){
+                                    tableAccess.datatables.ajax.reload(null, false);
                                     toastMessage('success', 'Success', response['message']);
                                 }
                                 else{
@@ -317,21 +318,7 @@
                 }
 
             });
-            //init user as superior
-            // let res = tableAccess.getAll();
-            // select_superior = $('form#create-user-form select[name=\"superior_id\"]');
-            // select_superior.select2({
-            //     selectOnClose : false,
-            //     placeholder : 'please select superior'
-            // });
 
-            // for(let i = 0; i < res.length; i++){
-            //     select_superior.append(
-            //         '<option value=\"'+res[i][0]+'\">'+res[i][1]+'</option>'
-            //     );
-            // }
-
-            // var createItemDZ = new Dropzone('#uploadFile',{
             Dropzone.options.uploadFile = {
                 headers : { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } ,
                 maxFiles : 1,
@@ -366,48 +353,24 @@
                     url: "[[@{/user/create}]]",
                     data: form,
                     success: function(response){
-                        tableAccess.addData(
-                            response['user_id'],
-                            [
-                                response['user_id'],
-                                form.get('username'),
-                                form.get('email'),
-                                form.get('telp'),
-                                listPosition[form.get('position_id')],
-                                select_superior[form.get('superior_id')],
-                                '<button class=\"submit\" type=\"submit\" onclick=loadDetail('+response['user_id']+') >More</button>'+
-                                '<button class=\"submit\" type=\"submit\" onclick=deleteUser('+response['user_id']+') style=\"background-color: #BB281A;\"><i class=\"fas fa-trash\"></i></button>'
-                            ],
-                            [
-                                'user-id',
-                                'username',
-                                'email',
-                                'telp',
-                                'position',
-                                'superior',
-                                'action'
-                            ]
-                        );
-                        toastMessage('success','Success','New user added to table');
-                        $('#create-user-modal').iziModal('close');
-                        uploadFileDZ.removeFile(file_upload);
+                        if(response['success']){
+                            tableAccess.datatables.ajax.reload(null, false);
+                            toastMessage('success','Success','New user added to table');
+                            $('#create-user-modal').iziModal('close');
+                            uploadFileDZ.removeFile(file_upload);
+                        }
+                        else{
+                            toastMessage('error','Error',response['message']);
+                        }
+                        console.log(response);
                     },
                     error : function(response){
-                        let errors = response['responseJSON']['errors'];
-                        let len = errors.length;
-                        let errorsData = {};
-
-                        for(let i = 0; i < len; i++){
-                            $('#create-user-form [name=\"'+errors[i]['field']+'\"]').prev('label')
-                                .after('<span class=\"error-field\">'+errors[i]['defaultMessage']+'</span>');
-                        }
+                        toastMessage('error','Error',response.responseJSON.message);
                     },
                     cache: false,
                     contentType: false,
                     processData: false
-                }).fail(function (e) {
-                    toastMessage('error','Error',e);
-                });;
+                });
 
             });
 
