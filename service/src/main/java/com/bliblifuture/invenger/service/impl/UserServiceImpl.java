@@ -489,8 +489,8 @@ public class UserServiceImpl implements UserService {
 
         result.setListOfDataObjects(mapper.toDataTablesDtoList(page.getContent()));
         result.setDraw(Integer.parseInt(request.getDraw()));
-        result.setRecordsFiltered((int) page.getTotalElements());
-        result.setRecordsTotal((int) this.userRepository.count());
+        result.setRecordsFiltered(page.getNumberOfElements());
+        result.setRecordsTotal((int) page.getTotalElements());
         return result;
     }
 

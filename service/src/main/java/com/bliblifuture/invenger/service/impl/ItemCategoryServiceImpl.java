@@ -1,14 +1,11 @@
 package com.bliblifuture.invenger.service.impl;
 
 import com.bliblifuture.invenger.ModelMapper.category.CategoryMapper;
-import com.bliblifuture.invenger.ModelMapper.category.CategoryMapperImpl;
-import com.bliblifuture.invenger.Utils.QuerySpec;
-import com.bliblifuture.invenger.entity.inventory.Inventory;
+import com.bliblifuture.invenger.entity.inventory.Category;
+import com.bliblifuture.invenger.entity.inventory.CategoryWithChildId;
 import com.bliblifuture.invenger.exception.DataNotFoundException;
 import com.bliblifuture.invenger.exception.InvalidRequestException;
-import com.bliblifuture.invenger.entity.inventory.Category;
 import com.bliblifuture.invenger.repository.category.CategoryRepository;
-import com.bliblifuture.invenger.entity.inventory.CategoryWithChildId;
 import com.bliblifuture.invenger.request.jsonRequest.CategoryCreateRequest;
 import com.bliblifuture.invenger.request.jsonRequest.CategoryEditRequest;
 import com.bliblifuture.invenger.request.jsonRequest.SearchRequest;
