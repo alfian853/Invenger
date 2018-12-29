@@ -83,9 +83,9 @@ public class UserControllerTest {
                 ("data", "filename.png",
                         "image/png", "".getBytes()
                 );
-        Position position = new Position().builder().id(1).build();
-        User superUser = new User().builder().id(1).build();
-        User user = new User().builder()
+        Position position = Position.builder().id(1).build();
+        User superUser = User.builder().id(1).build();
+        User user = User.builder()
                 .id(2)
                 .superior(superUser)
                 .position(position)
@@ -125,8 +125,8 @@ public class UserControllerTest {
 
     @Test
     public void editUser_test() throws Exception {
-        Position position = new Position().builder().id(1).build();
-        User superUser = new User().builder().id(1).build();
+        Position position = Position.builder().id(1).build();
+        User superUser = User.builder().id(1).build();
         UserEditRequest request = new UserEditRequest();
         request.setId(2);
         request.setSuperior_id(superUser.getId());
@@ -173,8 +173,8 @@ public class UserControllerTest {
 
     @Test
     public void getUserDetail_test() throws Exception {
-        Position position = new Position().builder().id(1).name("position").build();
-        User superUser = new User().builder().id(1).fullName("super").build();
+        Position position = Position.builder().id(1).name("position").build();
+        User superUser = User.builder().id(1).fullName("super").build();
         UserDTO userDTO = UserDTO.builder()
                 .id(1)
                 .superior(superUser.getFullName())

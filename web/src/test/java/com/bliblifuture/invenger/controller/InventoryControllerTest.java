@@ -72,9 +72,9 @@ public class InventoryControllerTest {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Test
-    public void addNewInventory_test() throws Exception {
-        Category category = new Category().builder().id(1).name("/all").build();
-        Inventory inventory = new Inventory().builder()
+    public void addNewInventory_success() throws Exception {
+        Category category = Category.builder().id(1).name("/all").build();
+        Inventory inventory = Inventory.builder()
                 .id(1)
                 .name("name")
                 .category(category)
@@ -360,7 +360,7 @@ public class InventoryControllerTest {
     }
 
     @Test
-    public void testGetPaginatedInventories_test() throws Exception {
+    public void getPaginatedInventories_test() throws Exception {
         MockHttpServletRequest mockHttpServletRequest = this.mock_datatableServletRequest(true);
         DataTablesRequest request = new DataTablesRequest(mockHttpServletRequest);
 
@@ -375,8 +375,7 @@ public class InventoryControllerTest {
         dataTablesResult.setRecordsTotal((int) page.getTotalElements());
 
         mvc.perform(get("/inventory/datatables")
-        )
-                .andExpect(status().isOk());
+        ).andExpect(status().isOk());
     }
 
 }
