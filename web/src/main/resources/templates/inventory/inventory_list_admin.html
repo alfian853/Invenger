@@ -110,9 +110,9 @@
                     <th></th>
                     <th>
                         <select target-col="category">
-                            <th:block th:each="category : ${categories}">
-                                <option th:value="${category.name}" th:text="${category.name}">Option i</option>
-                            </th:block>
+                            <!--<th:block th:each="category : ${categories}">-->
+                                <!--<option th:value="${category.name}" th:text="${category.name}">Option i</option>-->
+                            <!--</th:block>-->
                         </select>
                     </th>
                     <th></th>
@@ -320,6 +320,36 @@
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="_csrf"]').attr('content')
                 }
+            });
+            $('#itemsTable select[target-col=\"category\"]').select2({
+                placeholder : 'Please select item category',
+                ajax : {
+                    url : '/category/search',
+                    params : null,
+                    delay : 350,
+                    data : function (params) {
+                        let query = {
+                            search : (params.term != null)?params.term:"",
+                            page : (params.page)?params.page:0,
+                            length : 10
+                        };
+                        this.params = query;
+                        return query;
+                    },
+                    processResults : function (result) {
+                        let params = this['$element'].params;
+                        result.pagination = {
+                            more : params.length*params.page < result['recordsFiltered']
+                        };
+                        let len = result.results.length;
+                        let tmp = result.results;
+                        for(let i = 0; i<len; i++){
+                            tmp[i].id = tmp[i].text;
+                        }
+                        return result;
+                    }
+                },
+                cache : true
             });
 
             var file_upload = null;
