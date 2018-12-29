@@ -23,10 +23,7 @@ import javax.validation.Valid;
 @Controller
 @RequestMapping("/inventory")
 public class InventoryController {
-
-    @Autowired
-    ItemCategoryService itemCategoryService;
-
+    
     @Autowired
     InventoryService inventoryService;
 
@@ -35,7 +32,6 @@ public class InventoryController {
 
     @GetMapping("/all")
     public String getInventoryTable(Model model){
-        model.addAttribute("categories",itemCategoryService.getAllItemCategory(false));
         model.addAttribute("itemTypes", InventoryType.getAllType());
         model.addAttribute("createItemForm",new InventoryCreateRequest());
 
