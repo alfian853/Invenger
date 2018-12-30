@@ -16,6 +16,7 @@ import com.bliblifuture.invenger.repository.UserRepository;
 import com.bliblifuture.invenger.request.datatables.DataTablesRequest;
 import com.bliblifuture.invenger.request.formRequest.UserCreateRequest;
 import com.bliblifuture.invenger.request.formRequest.UserEditRequest;
+import com.bliblifuture.invenger.request.jsonRequest.ProfileRequest;
 import com.bliblifuture.invenger.request.jsonRequest.UserSearchRequest;
 import com.bliblifuture.invenger.response.jsonResponse.*;
 import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchResponse;
@@ -30,6 +31,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,10 +96,12 @@ public class UserServiceImpl implements UserService {
         UserCreateResponse response = new UserCreateResponse();
         response.setStatusToSuccess();
 
-        String imgName = myUtils.getRandomFileName(request.getProfile_photo());
+        User superior = userRepository.findUserById(request.getSuperior_id());
+        Position position = positionRepository.findPositionById(request.getPosition_id());
 
-        Position newPosition = new Position();
-        newPosition.setId(request.getPosition_id());
+        if(superior.getPosition().getLevel() <= position.getLevel()){
+            throw new InvalidRequestException("can't assign inferior as superior");
+        }
 
         User newUser = new User();
         newUser.setFullName(request.getFullName());
@@ -105,10 +109,12 @@ public class UserServiceImpl implements UserService {
         newUser.setEmail(request.getEmail());
         newUser.setPassword(myUtils.getBcryptHash(request.getPassword()));
         newUser.setTelp(request.getTelp());
-        newUser.setPictureName(imgName);
-        newUser.setPosition(newPosition);
+        newUser.setPosition(position);
         newUser.setRole(RoleType.ROLE_USER.toString());
-        newUser.setSuperior(userRepository.getOne(request.getSuperior_id()));
+        newUser.setSuperior(superior);
+
+        String imgName = myUtils.getRandomFileName(request.getProfile_photo());
+        newUser.setPictureName(imgName);
 
         if(request.getProfile_photo() != null){
             if(!fileStorageService.storeFile(
@@ -305,8 +311,8 @@ public class UserServiceImpl implements UserService {
 
         result.setListOfDataObjects(mapper.toDataTablesDtoList(page.getContent()));
         result.setDraw(Integer.parseInt(request.getDraw()));
-        result.setRecordsFiltered(page.getNumberOfElements());
-        result.setRecordsTotal((int) page.getTotalElements());
+        result.setRecordsFiltered((int) page.getTotalElements());
+        result.setRecordsTotal(result.getRecordsFiltered());
         return result;
     }
 

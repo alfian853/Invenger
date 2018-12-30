@@ -202,6 +202,12 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     public RequestResponse deleteInventory(int id){
         RequestResponse response = new RequestResponse();
+        InventoryDocument doc = inventoryDocRepository.findInventoryDocumentById(id);
+        if(doc != null){
+            fileStorageService.deleteFile(doc.getFileName(), FileStorageService.PathCategory.INVENTORY_PDF);
+            inventoryDocRepository.deleteById(id);
+        }
+
         inventoryRepository.deleteById(id);
         response.setStatusToSuccess();
         response.setMessage("Item Deleted");
@@ -286,8 +292,8 @@ public class InventoryServiceImpl implements InventoryService {
         
         result.setListOfDataObjects(mapper.toDataTablesDtoList(page.getContent()));
         result.setDraw(Integer.parseInt(request.getDraw()));
-        result.setRecordsFiltered(page.getNumberOfElements());
-        result.setRecordsTotal((int) page.getTotalElements());
+        result.setRecordsFiltered((int) page.getTotalElements());
+        result.setRecordsTotal(result.getRecordsFiltered());
 
         return result;
     }

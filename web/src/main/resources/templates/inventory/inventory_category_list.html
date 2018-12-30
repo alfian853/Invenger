@@ -187,7 +187,6 @@
                                         ]
                                     );
                                     toastMessage('success', 'Success', 'New category added');
-                                    listCategory[response['new-category']['id']] = response['new-category']['name'];
                                 }
                                 else{
                                     toastMessage('error', 'Error', response['message']);

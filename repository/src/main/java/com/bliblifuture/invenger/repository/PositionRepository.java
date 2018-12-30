@@ -12,4 +12,5 @@ public interface PositionRepository extends JpaRepository<Position,Integer> {
     @Query("select p from Position p where id = (select u.position.id from User u where u.id = :userid)")
     Position findUserPosition(@Param("userid") Integer userId);
 
+    Position findPositionById(Integer id);
 }

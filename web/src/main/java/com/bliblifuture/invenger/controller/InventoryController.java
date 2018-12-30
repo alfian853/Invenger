@@ -23,10 +23,7 @@ import javax.validation.Valid;
 @Controller
 @RequestMapping("/inventory")
 public class InventoryController {
-
-    @Autowired
-    ItemCategoryService itemCategoryService;
-
+    
     @Autowired
     InventoryService inventoryService;
 
@@ -35,7 +32,6 @@ public class InventoryController {
 
     @GetMapping("/all")
     public String getInventoryTable(Model model){
-        model.addAttribute("categories",itemCategoryService.getAllItemCategory(false));
         model.addAttribute("itemTypes", InventoryType.getAllType());
         model.addAttribute("createItemForm",new InventoryCreateRequest());
 
@@ -68,8 +64,8 @@ public class InventoryController {
     @GetMapping("/detail/{id}")
     public String getInventoryDetail(Model model, @PathVariable("id") Integer id) {
         model.addAttribute("inventory", inventoryService.getById(id));
-        model.addAttribute("itemTypes", InventoryType.getAllType());
-        if(accountService.currentUserIsAdmin()){
+        model.addAttribute("itemTypes", InventoryType.getAllTypeAsString());
+        if(userService.currentUserIsAdmin()){
             return "inventory/inventory_detail_admin";
         }
         else{

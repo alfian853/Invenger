@@ -1,10 +1,7 @@
 package com.bliblifuture.invenger.config;
 
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -26,6 +23,9 @@ public class MvcConfig implements WebMvcConfigurer {
 
         registry.addResourceHandler("/js/*")
                 .addResourceLocations(BASE_PATH+"/static/js/");
+
+        registry.addResourceHandler("/file/*")
+                .addResourceLocations(BASE_PATH+"/static/file/");
 
         registry.addResourceHandler("/inventory/pict/*")
                 .addResourceLocations(BASE_PATH+ "/inventory/pict/");

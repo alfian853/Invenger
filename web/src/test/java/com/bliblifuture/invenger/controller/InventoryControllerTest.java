@@ -8,11 +8,11 @@ import com.bliblifuture.invenger.request.datatables.DataTablesRequest;
 import com.bliblifuture.invenger.request.formRequest.InventoryEditRequest;
 import com.bliblifuture.invenger.response.jsonResponse.*;
 import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchResponse;
-import com.bliblifuture.invenger.response.viewDto.CategoryDTO;
 import com.bliblifuture.invenger.response.viewDto.InventoryDTO;
 import com.bliblifuture.invenger.service.AccountService;
 import com.bliblifuture.invenger.service.InventoryService;
 import com.bliblifuture.invenger.service.ItemCategoryService;
+import com.bliblifuture.invenger.service.UserService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,7 +34,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -51,7 +50,10 @@ public class InventoryControllerTest {
 
     @Mock
     private AccountService accountService;
-
+  
+    @Mock
+    private UserService userService;
+  
     @Mock
     private InventoryService inventoryService;
 
@@ -287,8 +289,6 @@ public class InventoryControllerTest {
 
     @Test
     public void getInventoryTable_userIsAdmin() throws Exception {
-        List<CategoryDTO> categoryDTOS = new ArrayList<>();
-        categoryDTOS.add(CategoryDTO.builder().id(1).name("/all").build());
         List<InventoryDTO> list = new ArrayList<>();
         list.add(InventoryDTO.builder()
                 .id(1)
@@ -307,14 +307,11 @@ public class InventoryControllerTest {
         mvc.perform(get("/inventory/all")
         )
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("categories",categoryDTOS))
                 .andExpect(view().name("inventory/inventory_list_admin"));
     }
 
     @Test
     public void getInventoryTable_userIsNotAdmin() throws Exception {
-        List<CategoryDTO> categoryDTOS = new ArrayList<>();
-        categoryDTOS.add(CategoryDTO.builder().id(1).name("/all").build());
         List<InventoryDTO> list = new ArrayList<>();
         list.add(InventoryDTO.builder()
                 .id(1)
@@ -325,7 +322,6 @@ public class InventoryControllerTest {
                 .category_id(1)
                 .build());
 
-        System.out.println(list);
 
         when(itemCategoryService.getAllItemCategory(anyBoolean())).thenReturn(categoryDTOS);
         when(accountService.currentUserIsAdmin()).thenReturn(false);
@@ -333,7 +329,6 @@ public class InventoryControllerTest {
         mvc.perform(get("/inventory/all")
         )
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("categories",categoryDTOS))
                 .andExpect(view().name("inventory/inventory_list_basic"));
     }
 

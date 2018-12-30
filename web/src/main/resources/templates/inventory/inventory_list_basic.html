@@ -57,7 +57,7 @@
             var searchableList = ['id','name','category'];
 
             for(let i=0;i<searchableList.length;i++){
-                let input = $('#itemsTable input[target-col=\"'+searchableList[i]+'\"]');
+                let input = $('#itemsTable [target-col=\"'+searchableList[i]+'\"]');
                 let target = datatables.column('#itemsTable th[col=\"'+searchableList[i]+'\"]');
                 input.on('keyup change',function () {
                     if(target.search() !== input.val()){
@@ -67,13 +67,6 @@
             }
             tableAccess = new DTAccess(datatables,'row_',7);
         });
-        var listCategory = {};
-
-        /*[# th:each="category : ${categories}"]*/
-
-        listCategory["[(${category.id})]"]=[[${category.name}]];
-
-        /*[/]*/
 
     </script>
     <title>Inventory</title>
@@ -174,8 +167,39 @@
         }
 
         $(document).ready(function() {
+            $('#itemsTable select[target-col=\"category\"]').select2({
+                placeholder : 'Please select item category',
+                ajax : {
+                    url : '/category/search',
+                    params : null,
+                    delay : 350,
+                    data : function (params) {
+                        let query = {
+                            search : (params.term != null)?params.term:"",
+                            page : (params.page)?params.page:0,
+                            length : 10
+                        };
+                        this.params = query;
+                        return query;
+                    },
+                    processResults : function (result) {
+                        let params = this['$element'].params;
+                        result.pagination = {
+                            more : params.length*params.page < result['recordsFiltered']
+                        };
+                        let len = result.results.length;
+                        let tmp = result.results;
+                        for(let i = 0; i<len; i++){
+                            tmp[i].id = tmp[i].text;
+                        }
+                        return result;
+                    }
+                },
+                cache : true
+            });
+
+
             $('#assignItemBtn').click(function () {
-                console.log('clicked');
                 $('#assign-item-modal').iziModal({
                     title : 'Request Items Lendment',
                     width : screen.width*0.6,
