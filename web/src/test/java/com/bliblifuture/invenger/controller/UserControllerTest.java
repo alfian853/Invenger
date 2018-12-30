@@ -452,4 +452,24 @@ public class UserControllerTest {
                 .andExpect(view().name("redirect:/profile"));
     }
 
+    @Test
+    public void getLogin_sessionIsNull() throws Exception {
+
+        when(userService.getSessionUser()).thenReturn(null);
+        User user = new User();
+        user.setUsername("myUserName");
+
+        mvc.perform(get("/login")
+                .sessionAttr("status","failed")
+                .sessionAttr("username","myUserName")
+        ).andExpect(status().isOk())
+        .andExpect(view().name("user/login"))
+        .andExpect(model().attribute("user",user));
+
+
+    }
+
+
+
+
 }
