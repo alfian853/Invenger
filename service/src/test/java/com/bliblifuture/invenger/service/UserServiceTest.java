@@ -16,7 +16,6 @@ import com.bliblifuture.invenger.request.datatables.DataTablesRequest;
 import com.bliblifuture.invenger.request.formRequest.UserCreateRequest;
 import com.bliblifuture.invenger.request.formRequest.UserEditRequest;
 import com.bliblifuture.invenger.request.jsonRequest.UserSearchRequest;
-import com.bliblifuture.invenger.response.jsonResponse.PositionCreateResponse;
 import com.bliblifuture.invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.invenger.response.jsonResponse.UserCreateResponse;
 import com.bliblifuture.invenger.response.viewDto.PositionDTO;
@@ -28,7 +27,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -241,7 +239,10 @@ public class UserServiceTest {
     ///////////////////////////////////////////////////////////////////
 
 
-    private UserCreateRequest mock_userCreateRequest(){
+    private UserCreateRequest mock_userCreateRequest(boolean validRequest){
+
+        when(userRepository.findUserById(10)).thenReturn(USER);
+
         UserCreateRequest request = new UserCreateRequest();
         request.setFullName(FULL_NAME);
         request.setUsername(USERNAME);
@@ -249,18 +250,34 @@ public class UserServiceTest {
         request.setPassword(PASSWORD);
         request.setTelp(TELP);
         request.setProfile_photo(new MockMultipartFile("file", "orig", null, "user".getBytes()));
-        request.setPosition_id(POSITION.getId());
         request.setSuperior_id(10);
+
+        Position lowPosition = Position.builder().id(2).level(1).build();
+        if(validRequest){
+            when(positionRepository.findPositionById(lowPosition.getId()))
+                    .thenReturn(lowPosition);
+            request.setPosition_id(lowPosition.getId());
+        }
+        else{
+            when(positionRepository.findPositionById(POSITION.getId()))
+                    .thenReturn(POSITION);
+            request.setPosition_id(POSITION.getId());
+        }
+
         return request;
+    }
+
+    @Test(expected = InvalidRequestException.class)
+    public void createUser_invalidRequest(){
+        userService.createUser(this.mock_userCreateRequest(false));
     }
 
     @Test(expected = DuplicateEntryException.class)
     public void createUser_duplicateEntry(){
-        DataIntegrityViolationException x = new DataIntegrityViolationException("duplicate username");
-
-        when(userRepository.save(any())).thenThrow(x);
+        when(userRepository.save(any()))
+                .thenThrow(new DataIntegrityViolationException("duplicate username"));
         when(storageService.storeFile(any(), any(), any())).thenReturn(true);
-        userService.createUser(this.mock_userCreateRequest());
+        userService.createUser(this.mock_userCreateRequest(true));
     }
 
     @Test
@@ -271,7 +288,7 @@ public class UserServiceTest {
         UserCreateResponse response = new UserCreateResponse();
         response.setStatusToSuccess();
 
-        Assert.assertEquals(userService.createUser(this.mock_userCreateRequest()), response);
+        Assert.assertEquals(userService.createUser(this.mock_userCreateRequest(true)), response);
 
         verify(storageService, times(1)).storeFile(any(), any(), any());
 
@@ -284,7 +301,10 @@ public class UserServiceTest {
         UserCreateResponse response = new UserCreateResponse();
         response.setStatusToFailed();
 
-        Assert.assertEquals(userService.createUser(this.mock_userCreateRequest()), response);
+        Assert.assertEquals(
+                userService.createUser(this.mock_userCreateRequest(true)),
+                response
+        );
 
         verify(storageService, times(1)).storeFile(any(), any(), any());
 
@@ -362,18 +382,6 @@ public class UserServiceTest {
       /////////////////////////////////////////////////////////////////////////
      //public PositionCreateResponse createPosition(PositionDTO newPosition)//
     /////////////////////////////////////////////////////////////////////////
-
-    @Test
-    public void createPosition_null() {
-        PositionDTO positionDTO = PositionDTO.builder()
-                .name("p")
-                .level(1)
-                .build();
-
-        PositionCreateResponse response = userService.createPosition(positionDTO);
-
-        Assert.assertFalse(response.isSuccess());
-    }
 
     @Test(expected = DuplicateEntryException.class)
     public void createPosition_duplicateEntry() {

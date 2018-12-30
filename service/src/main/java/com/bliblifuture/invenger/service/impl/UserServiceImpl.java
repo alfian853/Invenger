@@ -16,7 +16,6 @@ import com.bliblifuture.invenger.repository.UserRepository;
 import com.bliblifuture.invenger.request.datatables.DataTablesRequest;
 import com.bliblifuture.invenger.request.formRequest.UserCreateRequest;
 import com.bliblifuture.invenger.request.formRequest.UserEditRequest;
-import com.bliblifuture.invenger.request.jsonRequest.ProfileRequest;
 import com.bliblifuture.invenger.request.jsonRequest.UserSearchRequest;
 import com.bliblifuture.invenger.response.jsonResponse.*;
 import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchResponse;
@@ -31,7 +30,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -204,7 +202,6 @@ public class UserServiceImpl implements UserService {
                 return criteriaBuilder.or(predicates.toArray(new Predicate[0]));
             }
         };
-
         Page<User> page = userRepository.findAll(specification,pageRequest);
         SearchResponse response = new SearchResponse();
         response.setResults(mapper.toSearchResultList(page.getContent()));
@@ -213,14 +210,9 @@ public class UserServiceImpl implements UserService {
         return response;
     }
 
-    public List<PositionDTO> getAllPosition(){
-        return mapper.toPositionDtoList(positionRepository.findAll());
-    }
+    public List<PositionDTO> getAllPosition(){ return mapper.toPositionDtoList(positionRepository.findAll()); }
 
-    private void savePositionHandler(Position position) {
-        try{
-            positionRepository.save(position);
-        }
+    private void savePositionHandler(Position position) { try{ positionRepository.save(position); }
         catch (DataIntegrityViolationException e){
             if(e.getLocalizedMessage().contains("duplicate")){
                 if(e.getLocalizedMessage().contains("name")){
@@ -241,18 +233,11 @@ public class UserServiceImpl implements UserService {
 
         PositionCreateResponse response = new PositionCreateResponse();
 
-        if(position != null && position.getId() != null){
-            response.setMessage("New position added to table");
-            response.setStatusToSuccess();
-            response.setPositionId(position.getId());
-        }
-        else{
-            response.setMessage("Unknown error");
-            response.setStatusToFailed();
-        }
+        response.setMessage("New position added to table");
+        response.setStatusToSuccess();
+        response.setPositionId(position.getId());
 
         return response;
-
     }
 
     public RequestResponse editPosition(PositionDTO editedPosition) {
