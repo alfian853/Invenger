@@ -3,7 +3,7 @@ package com.bliblifuture.invenger.service;
 import com.bliblifuture.invenger.entity.user.User;
 import com.bliblifuture.invenger.request.formRequest.UserCreateRequest;
 import com.bliblifuture.invenger.request.formRequest.UserEditRequest;
-import com.bliblifuture.invenger.request.jsonRequest.ProfileRequest;
+import com.bliblifuture.invenger.request.jsonRequest.EditProfileRequest;
 import com.bliblifuture.invenger.request.jsonRequest.UserSearchRequest;
 import com.bliblifuture.invenger.response.jsonResponse.*;
 import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchResponse;
@@ -32,7 +32,7 @@ public interface UserService extends
     User getSessionUser();
     boolean currentUserIsAdmin();
     ProfileDTO getProfile();
-    Map<String,FormFieldResponse> editProfile(ProfileRequest request);
+    Map<String,FormFieldResponse> editProfile(EditProfileRequest request);
     UploadProfilePictResponse changeProfilePict(MultipartFile file);
     List<PositionDTO> getAllPosition();
     PositionCreateResponse createPosition(PositionDTO newPosition);

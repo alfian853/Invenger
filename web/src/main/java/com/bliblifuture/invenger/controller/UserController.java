@@ -7,7 +7,7 @@ import com.bliblifuture.invenger.exception.InvalidRequestException;
 import com.bliblifuture.invenger.request.datatables.DataTablesRequest;
 import com.bliblifuture.invenger.request.formRequest.UserCreateRequest;
 import com.bliblifuture.invenger.request.formRequest.UserEditRequest;
-import com.bliblifuture.invenger.request.jsonRequest.ProfileRequest;
+import com.bliblifuture.invenger.request.jsonRequest.EditProfileRequest;
 import com.bliblifuture.invenger.request.jsonRequest.UserSearchRequest;
 import com.bliblifuture.invenger.response.jsonResponse.*;
 import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchResponse;
@@ -66,7 +66,7 @@ public class UserController {
 
     @PostMapping("/profile")
     @ResponseBody
-    public Map<String,FormFieldResponse> postProfile(@RequestBody ProfileRequest request) {
+    public Map<String,FormFieldResponse> postProfile(@RequestBody EditProfileRequest request) {
         return userService.editProfile(request);
     }
 
