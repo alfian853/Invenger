@@ -9,7 +9,6 @@ import com.bliblifuture.invenger.response.jsonResponse.*;
 import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchResponse;
 import com.bliblifuture.invenger.service.AccountService;
 import com.bliblifuture.invenger.service.InventoryService;
-import com.bliblifuture.invenger.service.ItemCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -65,7 +64,7 @@ public class InventoryController {
     public String getInventoryDetail(Model model, @PathVariable("id") Integer id) {
         model.addAttribute("inventory", inventoryService.getById(id));
         model.addAttribute("itemTypes", InventoryType.getAllTypeAsString());
-        if(userService.currentUserIsAdmin()){
+        if(accountService.currentUserIsAdmin()){
             return "inventory/inventory_detail_admin";
         }
         else{

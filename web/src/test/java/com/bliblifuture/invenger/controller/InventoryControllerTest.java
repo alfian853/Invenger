@@ -301,7 +301,6 @@ public class InventoryControllerTest {
 
         System.out.println(list);
 
-        when(itemCategoryService.getAllItemCategory(anyBoolean())).thenReturn(categoryDTOS);
         when(accountService.currentUserIsAdmin()).thenReturn(true);
 
         mvc.perform(get("/inventory/all")
@@ -322,8 +321,6 @@ public class InventoryControllerTest {
                 .category_id(1)
                 .build());
 
-
-        when(itemCategoryService.getAllItemCategory(anyBoolean())).thenReturn(categoryDTOS);
         when(accountService.currentUserIsAdmin()).thenReturn(false);
 
         mvc.perform(get("/inventory/all")

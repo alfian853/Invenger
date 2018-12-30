@@ -9,6 +9,7 @@ import com.bliblifuture.invenger.response.jsonResponse.*;
 import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchResponse;
 import com.bliblifuture.invenger.response.viewDto.PositionDTO;
 import com.bliblifuture.invenger.response.viewDto.UserDTO;
+import com.bliblifuture.invenger.service.AccountService;
 import com.bliblifuture.invenger.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
@@ -46,6 +47,9 @@ public class UserControllerTest {
     @Mock
     UserService userService;
 
+    @Mock
+    AccountService accountService;
+
     @InjectMocks
     UserController userController;
 
@@ -66,7 +70,6 @@ public class UserControllerTest {
     public void getUserTablePage_test() throws Exception {
         List<UserDTO> users = new ArrayList<>();
         users.add(UserDTO.builder().id(1).build());
-
         when(userService.getAll()).thenReturn(users);
 
         MockHttpServletResponse response = mvc.perform(get("/user/all"))
@@ -373,26 +376,6 @@ public class UserControllerTest {
         )
                 .andExpect(status().isOk());
     }
-
-
-    @Test
-    public void getLogin_sessionIsNull() throws Exception {
-
-        when(userService.getSessionUser()).thenReturn(null);
-        User user = new User();
-        user.setUsername("myUserName");
-
-        mvc.perform(get("/login")
-                .sessionAttr("status","failed")
-                .sessionAttr("username","myUserName")
-        ).andExpect(status().isOk())
-        .andExpect(view().name("user/login"))
-        .andExpect(model().attribute("user",user));
-
-
-    }
-
-
 
 
 }
