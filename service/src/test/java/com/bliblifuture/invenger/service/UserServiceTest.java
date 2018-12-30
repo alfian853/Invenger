@@ -663,6 +663,25 @@ public class UserServiceTest {
      //public boolean currentUserIsAdmin()//
     ///////////////////////////////////////
 
+    @Test
+    public void currentUserIsAdmin_test() {
+        User user = new User();
+        user.setRole(RoleType.ROLE_ADMIN.name());
+        user.setId(ID);
+        user.setEmail(EMAIL);
+        user.setFullName(FULL_NAME);
+        user.setUsername(USERNAME);
+        user.setPassword(PASSWORD);
+        user.setTelp(TELP);
+        user.setPosition(POSITION);
+
+        doReturn(user).when(userService).getSessionUser();
+
+        boolean response = userService.currentUserIsAdmin();
+
+        Assert.assertEquals(response,true);
+    }
+
       ///////////////////////////////////////
      //editProfile(ProfileRequest request)//
     ///////////////////////////////////////
