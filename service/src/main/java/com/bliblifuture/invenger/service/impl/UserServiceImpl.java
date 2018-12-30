@@ -18,8 +18,7 @@ import com.bliblifuture.invenger.repository.UserRepository;
 import com.bliblifuture.invenger.request.datatables.DataTablesRequest;
 import com.bliblifuture.invenger.request.formRequest.UserCreateRequest;
 import com.bliblifuture.invenger.request.formRequest.UserEditRequest;
-import com.bliblifuture.invenger.request.jsonRequest.ProfileRequest;
-import com.bliblifuture.invenger.request.jsonRequest.SearchRequest;
+import com.bliblifuture.invenger.request.jsonRequest.EditProfileRequest;
 import com.bliblifuture.invenger.request.jsonRequest.UserSearchRequest;
 import com.bliblifuture.invenger.response.jsonResponse.*;
 import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchResponse;
@@ -36,7 +35,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -84,13 +82,13 @@ public class UserServiceImpl implements UserService {
     }
 
     private void saveUserHandler(User user) {
+        System.out.println(user);
         try{
             userRepository.save(user);
         }
         catch (DataIntegrityViolationException e){
-            System.out.println(e.getRootCause().getLocalizedMessage());
-            if(e.getRootCause().getLocalizedMessage().contains("duplicate")){
-                if(e.getRootCause().getLocalizedMessage().contains("username")){
+            if(e.getLocalizedMessage().contains("duplicate")){
+                if(e.getLocalizedMessage().contains("username")){
                     throw new DuplicateEntryException("Username already exist");
                 }
                 else{
@@ -232,7 +230,7 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
-    public Map<String,FormFieldResponse> editProfile(ProfileRequest request) {
+    public Map<String,FormFieldResponse> editProfile(EditProfileRequest request) {
         User user = null;
         Map<String,FormFieldResponse> formResponses = new HashMap<>();
         FormFieldResponse formResponse = null;
@@ -266,15 +264,8 @@ public class UserServiceImpl implements UserService {
                 break;
             }
 
-            if(request.getNewPwd1().equals("")){
-                formResponse.setField_name("new-pwd1");
-                formResponse.setStatusToFailed();
-                formResponse.setMessage("password field can't be empty");
-                formResponses.put("password",formResponse);
-                break;
-            }
-            if(request.getNewPwd2().equals("")){
-                formResponse.setField_name("new-pwd2");
+            if(request.getNewPwd1().equals("") || request.getNewPwd2().equals("")){
+                formResponse.setField_name((request.getNewPwd1().equals("")?"new-pwd1":"new-pwd2"));
                 formResponse.setStatusToFailed();
                 formResponse.setMessage("password field can't be empty");
                 formResponses.put("password",formResponse);
@@ -298,8 +289,9 @@ public class UserServiceImpl implements UserService {
             }
 
             if(user == null){
-                user = (User) this.getSessionUser();
+                user = this.getSessionUser();
             }
+
             if(myUtils.matches(request.getOldPwd(),user.getPassword() )){
                 user.setPassword(myUtils.getBcryptHash(newPassword));
                 this.saveUserHandler(user);
@@ -311,13 +303,14 @@ public class UserServiceImpl implements UserService {
             else{
                 formResponse.setField_name("old-pwd");
                 formResponse.setStatusToFailed();
-                formResponse.setMessage("wrong password");
+                formResponse.setMessage("Wrong password");
             }
 
             formResponses.put("password",formResponse);
 
             break;
         }
+
         return formResponses;
     }
 
@@ -400,8 +393,8 @@ public class UserServiceImpl implements UserService {
             positionRepository.save(position);
         }
         catch (DataIntegrityViolationException e){
-            if(e.getRootCause().getLocalizedMessage().contains("duplicate")){
-                if(e.getRootCause().getLocalizedMessage().contains("username")){
+            if(e.getLocalizedMessage().contains("duplicate")){
+                if(e.getLocalizedMessage().contains("name")){
                     throw new DuplicateEntryException("Position already exist!");
                 }
                 throw new DefaultRuntimeException(e.getLocalizedMessage());
