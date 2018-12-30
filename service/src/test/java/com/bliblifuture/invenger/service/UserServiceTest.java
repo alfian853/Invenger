@@ -4,21 +4,22 @@ package com.bliblifuture.invenger.service;
 import com.bliblifuture.invenger.ModelMapper.user.UserMapper;
 import com.bliblifuture.invenger.ModelMapper.user.UserMapperImpl;
 import com.bliblifuture.invenger.Utils.MyUtils;
+import com.bliblifuture.invenger.annotation.imp.PhoneValidator;
 import com.bliblifuture.invenger.entity.user.Position;
+import com.bliblifuture.invenger.entity.user.RoleType;
 import com.bliblifuture.invenger.entity.user.User;
 import com.bliblifuture.invenger.exception.DataNotFoundException;
 import com.bliblifuture.invenger.exception.DefaultRuntimeException;
+import com.bliblifuture.invenger.exception.DuplicateEntryException;
 import com.bliblifuture.invenger.exception.InvalidRequestException;
 import com.bliblifuture.invenger.repository.PositionRepository;
 import com.bliblifuture.invenger.repository.UserRepository;
 import com.bliblifuture.invenger.request.datatables.DataTablesRequest;
 import com.bliblifuture.invenger.request.formRequest.UserCreateRequest;
 import com.bliblifuture.invenger.request.formRequest.UserEditRequest;
+import com.bliblifuture.invenger.request.jsonRequest.EditProfileRequest;
 import com.bliblifuture.invenger.request.jsonRequest.UserSearchRequest;
-import com.bliblifuture.invenger.response.jsonResponse.PositionCreateResponse;
-import com.bliblifuture.invenger.response.jsonResponse.RequestResponse;
-import com.bliblifuture.invenger.response.jsonResponse.UploadProfilePictResponse;
-import com.bliblifuture.invenger.response.jsonResponse.UserCreateResponse;
+import com.bliblifuture.invenger.response.jsonResponse.*;
 import com.bliblifuture.invenger.response.viewDto.PositionDTO;
 import com.bliblifuture.invenger.response.viewDto.ProfileDTO;
 import com.bliblifuture.invenger.response.viewDto.UserDTO;
@@ -31,6 +32,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -46,6 +48,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.mockito.Mockito.*;
@@ -231,7 +234,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getProfile_storeFileSuccess_defaultOldPic(){
+    public void changeProfilePict_storeFileSuccess_defaultOldPic(){
         User user = User.builder().build();
         user.setPictureName("default-pict.png");
         when(storageService.storeFile(any(),anyString(), any()))
@@ -247,7 +250,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getProfile_storeFileSuccess_replaceSuccess(){
+    public void changeProfilePict_storeFileSuccess_replaceSuccess(){
         User user = User.builder().build();
         user.setPictureName("filename.png");
         when(storageService.storeFile(any(),anyString(), any()))
@@ -267,7 +270,7 @@ public class UserServiceTest {
 
 
     @Test
-    public void getProfile_storeFileSuccess_replaceFailed(){
+    public void changeProfilePict_storeFileSuccess_replaceFailed(){
         User user = User.builder().build();
         user.setPictureName("filename.png");
         when(storageService.storeFile(any(),anyString(), any()))
@@ -284,6 +287,8 @@ public class UserServiceTest {
         Assert.assertFalse(response.isSuccess());
         Assert.assertEquals(response.getMessage(), test.getMessage());
     }
+
+
 
       ////////////////////////////////////////////////////////////////////
      //public SearchResponse getSearchResult(UserSearchRequest request)//
@@ -430,8 +435,8 @@ public class UserServiceTest {
      //public UserCreateResponse createUser(UserCreateRequest request)//
     ///////////////////////////////////////////////////////////////////
 
-    @Test
-    public void createUser_fileStored() {
+
+    private UserCreateRequest mock_userCreateRequest(){
         UserCreateRequest request = new UserCreateRequest();
         request.setFullName(FULL_NAME);
         request.setUsername(USERNAME);
@@ -441,13 +446,27 @@ public class UserServiceTest {
         request.setProfile_photo(new MockMultipartFile("file", "orig", null, "user".getBytes()));
         request.setPosition_id(POSITION.getId());
         request.setSuperior_id(10);
+        return request;
+    }
+
+    @Test(expected = DuplicateEntryException.class)
+    public void createUser_duplicateEntry(){
+        DataIntegrityViolationException x = new DataIntegrityViolationException("duplicate username");
+
+        when(userRepository.save(any())).thenThrow(x);
+        when(storageService.storeFile(any(), any(), any())).thenReturn(true);
+        userService.createUser(this.mock_userCreateRequest());
+    }
+
+    @Test
+    public void createUser_fileStored() {
 
         when(storageService.storeFile(any(), any(), any())).thenReturn(true);
 
         UserCreateResponse response = new UserCreateResponse();
         response.setStatusToSuccess();
 
-        Assert.assertEquals(userService.createUser(request), response);
+        Assert.assertEquals(userService.createUser(this.mock_userCreateRequest()), response);
 
         verify(storageService, times(1)).storeFile(any(), any(), any());
 
@@ -455,22 +474,12 @@ public class UserServiceTest {
 
     @Test
     public void createUser_fileNotStored() {
-        UserCreateRequest request = new UserCreateRequest();
-        request.setFullName(FULL_NAME);
-        request.setUsername(USERNAME);
-        request.setEmail(EMAIL);
-        request.setPassword(PASSWORD);
-        request.setTelp(TELP);
-        request.setProfile_photo(new MockMultipartFile("file", "orig", null, "user".getBytes()));
-        request.setPosition_id(POSITION.getId());
-        request.setSuperior_id(10);
-
         when(storageService.storeFile(any(), any(), any())).thenReturn(false);
 
         UserCreateResponse response = new UserCreateResponse();
         response.setStatusToFailed();
 
-        Assert.assertEquals(userService.createUser(request), response);
+        Assert.assertEquals(userService.createUser(this.mock_userCreateRequest()), response);
 
         verify(storageService, times(1)).storeFile(any(), any(), any());
 
@@ -532,25 +541,17 @@ public class UserServiceTest {
 
     @Test
     public void getProfile_test() {
-        User user = new User();
-        user.setId(ID);
-        user.setEmail(EMAIL);
-        user.setFullName(FULL_NAME);
-        user.setUsername(USERNAME);
-        user.setPassword(PASSWORD);
-        user.setTelp(TELP);
-        user.setPosition(POSITION);
 
-        doReturn(user).when(userService).getSessionUser();
+        doReturn(USER).when(userService).getSessionUser();
 
         ProfileDTO profileDTO = ProfileDTO.builder()
-                .id(user.getId())
-                .name(user.getFullName())
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .position(user.getPosition().getName())
-                .pictureName(user.getPictureName())
-                .telp(user.getTelp())
+                .id(USER.getId())
+                .name(USER.getFullName())
+                .username(USER.getUsername())
+                .email(USER.getEmail())
+                .position(USER.getPosition().getName())
+                .pictureName(USER.getPictureName())
+                .telp(USER.getTelp())
                 .build();
 
         Assert.assertEquals(profileDTO,userService.getProfile());
@@ -589,10 +590,18 @@ public class UserServiceTest {
 
         PositionCreateResponse response = userService.createPosition(positionDTO);
 
-        System.out.println(response);
-        System.out.println(positionDTO);
-
         Assert.assertFalse(response.isSuccess());
+    }
+
+    @Test(expected = DuplicateEntryException.class)
+    public void createPosition_duplicateEntry() {
+        PositionDTO positionDTO = PositionDTO.builder()
+                .name("p")
+                .level(1)
+                .build();
+
+        when(positionRepository.save(any())).thenThrow(new DataIntegrityViolationException("duplicate name"));
+        userService.createPosition(positionDTO);
     }
 
       ///////////////////////////////////////////////////////////////////
@@ -665,25 +674,157 @@ public class UserServiceTest {
 
     @Test
     public void currentUserIsAdmin_test() {
-        User user = new User();
-        user.setRole(RoleType.ROLE_ADMIN.name());
-        user.setId(ID);
-        user.setEmail(EMAIL);
-        user.setFullName(FULL_NAME);
-        user.setUsername(USERNAME);
-        user.setPassword(PASSWORD);
-        user.setTelp(TELP);
-        user.setPosition(POSITION);
+        USER.setRole(RoleType.ROLE_ADMIN.name());
 
-        doReturn(user).when(userService).getSessionUser();
+        when(userService.getSessionUser()).thenReturn(USER);
 
-        boolean response = userService.currentUserIsAdmin();
-
-        Assert.assertEquals(response,true);
+        Assert.assertTrue(userService.currentUserIsAdmin());
     }
 
-      ///////////////////////////////////////
-     //editProfile(ProfileRequest request)//
-    ///////////////////////////////////////
+
+      ///////////////////////////////////////////
+     //editProfile(EditProfileRequest request)//
+    ///////////////////////////////////////////
+
+    private EditProfileRequest mock_editProfileRequest(String telp,String pwd,String nPwd1,String nPwd2){
+        EditProfileRequest request = new EditProfileRequest();
+        request.setNewTelp(telp);
+        request.setOldPwd(pwd);
+        request.setNewPwd1(nPwd1);
+        request.setNewPwd2(nPwd2);
+        return request;
+    }
+
+    @Test
+    public void editProfile_changePhone_inValid(){
+
+        EditProfileRequest request = this.mock_editProfileRequest(
+                "+628-199141-1822", "","",""
+        );
+
+        User user = User.builder().telp("081991411822").build();
+        when(userService.getSessionUser()).thenReturn(user);
+
+        Map<String, FormFieldResponse> responseMap =
+                userService.editProfile(request);
+
+        FormFieldResponse formFieldResponse = new FormFieldResponse("new-telp");
+        formFieldResponse.setStatusToFailed();
+        formFieldResponse.setMessage(PhoneValidator.getErrorMessage());
+        Assert.assertEquals(responseMap.get("new-telp"),formFieldResponse);
+    }
+
+    @Test
+    public void editProfile_changePhone_valid(){
+
+        EditProfileRequest request = this.mock_editProfileRequest(
+                "+6281991411822", "","",""
+        );
+
+        User user = User.builder().telp("081991411822").build();
+        doReturn(user).when(userService).getSessionUser();
+
+        Map<String, FormFieldResponse> responseMap =userService.editProfile(request);
+
+        FormFieldResponse formFieldResponse = new FormFieldResponse("new-telp");
+        formFieldResponse.setStatusToSuccess();
+        formFieldResponse.setMessage("Phone number updated successfuly");
+        Assert.assertEquals(responseMap.get("new-telp"),formFieldResponse);
+
+    }
+
+    @Test
+    public void editProfile_editPassword_sameAsOld(){
+        EditProfileRequest request = this.mock_editProfileRequest(
+                "", "oldpwd","oldpwd","oldpwd"
+        );
+
+        Map<String, FormFieldResponse> responseMap = userService.editProfile(request);
+
+        Assert.assertEquals(0,responseMap.size());
+
+        verify(myUtils,times(0)).matches(anyString(),anyString());
+
+    }
+
+    @Test
+    public void editProfile_editPassword_PWdConfirmationEmpty(){
+        EditProfileRequest request = this.mock_editProfileRequest(
+                "", "oldpwd","",""
+        );
+
+        Map<String, FormFieldResponse> responseMap = userService.editProfile(request);
+        System.out.println(responseMap);
+        Assert.assertFalse(responseMap.get("password").getSuccess());
+        Assert.assertEquals(responseMap.get("password").getMessage(),"password field can't be empty");
+        verify(myUtils,times(0)).matches(anyString(),anyString());
+    }
+
+    @Test
+    public void editProfile_editPassword_PWdConfirmationNotMatch(){
+        EditProfileRequest request = this.mock_editProfileRequest(
+                "", "oldpwd","passwordbaru","passwordbaru123"
+        );
+
+        Map<String, FormFieldResponse> responseMap = userService.editProfile(request);
+
+        Assert.assertFalse(responseMap.get("password").getSuccess());
+        Assert.assertEquals(responseMap.get("password").getMessage(),"new password doesn't match");
+        Assert.assertEquals(responseMap.get("password").getField_name(),"new-pwd2");
+        verify(myUtils,times(0)).matches(anyString(),anyString());
+    }
+
+    @Test
+    public void editProfile_weakPassword(){
+        EditProfileRequest request = this.mock_editProfileRequest(
+                "", "oldpwd","passwordbaru","passwordbaru"
+        );
+
+        Map<String, FormFieldResponse> responseMap = userService.editProfile(request);
+
+        Assert.assertFalse(responseMap.get("password").getSuccess());
+        Assert.assertEquals(responseMap.get("password").getMessage(),"Weak password");
+        Assert.assertEquals(responseMap.get("password").getField_name(),"new-pwd1");
+        verify(myUtils,times(0)).matches(anyString(),anyString());
+
+    }
+
+    @Test
+    public void editProfile_wrongPassword(){
+        EditProfileRequest request = this.mock_editProfileRequest(
+                "", "oldpwd","passwordBaru123","passwordBaru123"
+        );
+
+        User user = User.builder().telp("081991411822").password("bcrypted-pwd").build();
+        doReturn(user).when(userService).getSessionUser();
+
+        when(myUtils.matches(anyString(),anyString())).thenReturn(false);
+
+        Map<String, FormFieldResponse> responseMap = userService.editProfile(request);
+        Assert.assertFalse(responseMap.get("password").getSuccess());
+        Assert.assertEquals(responseMap.get("password").getMessage(),"Wrong password");
+        Assert.assertEquals(responseMap.get("password").getField_name(),"old-pwd");
+        verify(myUtils,times(1)).matches(anyString(),anyString());
+    }
+
+    @Test
+    public void editProfile_success(){
+        EditProfileRequest request = this.mock_editProfileRequest(
+                "+6281991411822", "oldpwd","passwordBaru123","passwordBaru123"
+        );
+        User user = User.builder().telp("081991411822").password("bcrypted-pwd").build();
+        doReturn(user).when(userService).getSessionUser();
+
+        when(myUtils.matches(anyString(),anyString())).thenReturn(true);
+
+        Map<String, FormFieldResponse> responseMap = userService.editProfile(request);
+        Assert.assertTrue(responseMap.get("password").getSuccess());
+        Assert.assertTrue(responseMap.get("new-telp").getSuccess());
+        verify(myUtils,times(1)).matches(anyString(),anyString());
+    }
+
+
+
+
 
 }
