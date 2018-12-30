@@ -122,7 +122,7 @@ public class UserController {
         request.setQuery(query);
         request.setPageNum(page);
         request.setLength(length);
-        request.setLength(minLevel);
+        request.setMinLevel(minLevel);
 
         return userService.getSearchResult(request);
     }

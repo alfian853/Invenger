@@ -255,8 +255,8 @@ public class LendmentServiceImpl implements LendmentService {
 
         result.setListOfDataObjects(mapper.toDataTablesDtoList(page.getContent()));
         result.setDraw(Integer.parseInt(request.getDraw()));
-        result.setRecordsFiltered(page.getNumberOfElements());
-        result.setRecordsTotal((int) page.getTotalElements());
+        result.setRecordsFiltered((int) page.getTotalElements());
+        result.setRecordsTotal(result.getRecordsFiltered());
 
         return result;
     }
