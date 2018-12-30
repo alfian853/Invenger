@@ -9,7 +9,9 @@ import com.bliblifuture.invenger.request.formRequest.InventoryEditRequest;
 import com.bliblifuture.invenger.response.jsonResponse.*;
 import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchResponse;
 import com.bliblifuture.invenger.response.viewDto.InventoryDTO;
+import com.bliblifuture.invenger.service.AccountService;
 import com.bliblifuture.invenger.service.InventoryService;
+import com.bliblifuture.invenger.service.ItemCategoryService;
 import com.bliblifuture.invenger.service.UserService;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,8 +46,14 @@ public class InventoryControllerTest {
     private MockMvc mvc;
 
     @Mock
-    private UserService userService;
+    private ItemCategoryService itemCategoryService;
 
+    @Mock
+    private AccountService accountService;
+  
+    @Mock
+    private UserService userService;
+  
     @Mock
     private InventoryService inventoryService;
 
@@ -238,7 +246,7 @@ public class InventoryControllerTest {
         System.out.println(inventory);
 
         when(inventoryService.getById(1)).thenReturn(inventory);
-        when(userService.currentUserIsAdmin()).thenReturn(true);
+        when(accountService.currentUserIsAdmin()).thenReturn(true);
 
         mvc.perform(get("/inventory/detail/{id}", 1)
         )
@@ -264,7 +272,7 @@ public class InventoryControllerTest {
         System.out.println(inventory);
 
         when(inventoryService.getById(1)).thenReturn(inventory);
-        when(userService.currentUserIsAdmin()).thenReturn(false);
+        when(accountService.currentUserIsAdmin()).thenReturn(false);
 
         mvc.perform(get("/inventory/detail/{id}", 1)
         )
@@ -293,7 +301,8 @@ public class InventoryControllerTest {
 
         System.out.println(list);
 
-        when(userService.currentUserIsAdmin()).thenReturn(true);
+        when(itemCategoryService.getAllItemCategory(anyBoolean())).thenReturn(categoryDTOS);
+        when(accountService.currentUserIsAdmin()).thenReturn(true);
 
         mvc.perform(get("/inventory/all")
         )
@@ -313,7 +322,9 @@ public class InventoryControllerTest {
                 .category_id(1)
                 .build());
 
-        when(userService.currentUserIsAdmin()).thenReturn(false);
+
+        when(itemCategoryService.getAllItemCategory(anyBoolean())).thenReturn(categoryDTOS);
+        when(accountService.currentUserIsAdmin()).thenReturn(false);
 
         mvc.perform(get("/inventory/all")
         )

@@ -2,6 +2,7 @@ package com.bliblifuture.invenger.config;
 
 
 import com.bliblifuture.invenger.repository.UserRepository;
+import com.bliblifuture.invenger.service.AccountService;
 import com.bliblifuture.invenger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -26,7 +27,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     UserRepository userRepository;
 
     @Autowired
-    UserService userService;
+    AccountService userService;
 
     @Autowired
     DataSource dataSource;

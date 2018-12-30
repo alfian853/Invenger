@@ -8,9 +8,9 @@ import com.bliblifuture.invenger.response.jsonResponse.DataTablesResult;
 import com.bliblifuture.invenger.response.jsonResponse.LendmentDataTableResponse;
 import com.bliblifuture.invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.invenger.response.viewDto.LendmentDTO;
+import com.bliblifuture.invenger.service.AccountService;
 import com.bliblifuture.invenger.service.impl.InventoryServiceImpl;
 import com.bliblifuture.invenger.service.LendmentService;
-import com.bliblifuture.invenger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,18 +27,18 @@ public class LendmentController {
     LendmentService lendmentService;
 
     @Autowired
-    UserService userService;
+    AccountService accountService;
 
     @Autowired
     InventoryServiceImpl inventoryService;
 
     @GetMapping("/create")
     public String getAssignItemForm(Model model){
-        if(userService.currentUserIsAdmin()){
+        if(accountService.currentUserIsAdmin()){
             return "lendment/lendment_create";
         }
         else{
-            model.addAttribute("user",userService.getProfile());
+            model.addAttribute("user", accountService.getProfile());
             return "lendment/lendment_create_basic";
         }
     }
@@ -52,7 +52,7 @@ public class LendmentController {
     @GetMapping("/all")
     public String getLendmentTable(Model model){
         model.addAttribute("statusList",LendmentStatus.getMap());
-        if(userService.currentUserIsAdmin()){
+        if(accountService.currentUserIsAdmin()){
           model.addAttribute("lendments",lendmentService.getAll());
           return "lendment/lendment_list_admin";
         }
@@ -82,7 +82,7 @@ public class LendmentController {
         LendmentDTO lendment = lendmentService.getLendmentDetailById(id);
         model.addAttribute("lendment", lendment);
         System.out.println(lendment.getStatus());
-        if(userService.currentUserIsAdmin()){
+        if(accountService.currentUserIsAdmin()){
             if(!lendment.getStatus().equals(LendmentStatus.InLending.getDesc())){
                 return "lendment/lendment_detail_basic";
             }

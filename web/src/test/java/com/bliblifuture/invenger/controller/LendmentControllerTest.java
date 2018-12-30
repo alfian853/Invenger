@@ -10,9 +10,8 @@ import com.bliblifuture.invenger.response.jsonResponse.LendmentDataTableResponse
 import com.bliblifuture.invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.invenger.response.viewDto.LendmentDTO;
 import com.bliblifuture.invenger.response.viewDto.ProfileDTO;
+import com.bliblifuture.invenger.service.AccountService;
 import com.bliblifuture.invenger.service.LendmentService;
-import com.bliblifuture.invenger.service.UserService;
-import com.bliblifuture.invenger.service.impl.InventoryServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,7 +29,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -49,10 +48,7 @@ public class LendmentControllerTest {
     LendmentService lendmentService;
 
     @Mock
-    UserService userService;
-
-    @Mock
-    InventoryServiceImpl inventoryService;
+    AccountService userService;
 
     @Before
     public void init() {
@@ -85,14 +81,6 @@ public class LendmentControllerTest {
         ).andExpect(status().isOk())
                 .andExpect(model().attribute("user", user))
                 .andExpect(view().name("lendment/lendment_create_basic"));
-    }
-
-      //////////////////////////////////////////////////////////////////////////////////////////////
-     //public RequestResponse assignItemToUser(@Valid @RequestBody LendmentCreateRequest request)//
-    //////////////////////////////////////////////////////////////////////////////////////////////
-
-    @Test
-    public void assignItemToUser_test() throws Exception {
     }
 
       ///////////////////////////////////////////////
@@ -241,5 +229,67 @@ public class LendmentControllerTest {
 
         mvc.perform(get("/lendment/datatables")
         ).andExpect(status().isOk());
+    }
+
+      /////////////////////////////////////////////////////////////////////////
+     //public String getLendment(@PathVariable("id") Integer id,Model model)//
+    /////////////////////////////////////////////////////////////////////////
+
+    @Test
+    public void getLendment_userIsAdminNotInLending() throws Exception {
+        LendmentDTO lendment = LendmentDTO.builder().id(1).status(LendmentStatus.Finished.getDesc()).build();
+
+        when(lendmentService.getLendmentDetailById(1)).thenReturn(lendment);
+
+        when(userService.currentUserIsAdmin()).thenReturn(true);
+
+        mvc.perform(get("/lendment/detail/{id}",1)
+        ).andExpect(status().isOk())
+                .andExpect(model().attribute("lendment", lendment))
+                .andExpect(view().name("lendment/lendment_detail_basic"));
+    }
+
+    @Test
+    public void getLendment_userIsAdminInLending() throws Exception {
+        LendmentDTO lendment = LendmentDTO.builder().id(1).status(LendmentStatus.InLending.getDesc()).build();
+
+        when(lendmentService.getLendmentDetailById(1)).thenReturn(lendment);
+
+        when(userService.currentUserIsAdmin()).thenReturn(true);
+
+        mvc.perform(get("/lendment/detail/{id}",1)
+        ).andExpect(status().isOk())
+                .andExpect(model().attribute("lendment", lendment))
+                .andExpect(view().name("lendment/lendment_detail_admin"));
+    }
+
+    @Test
+    public void getLendment_userIsNotAdmin() throws Exception {
+        LendmentDTO lendment = LendmentDTO.builder().id(1).build();
+
+        when(lendmentService.getLendmentDetailById(1)).thenReturn(lendment);
+
+        when(userService.currentUserIsAdmin()).thenReturn(false);
+
+        mvc.perform(get("/lendment/detail/{id}",1)
+        ).andExpect(status().isOk())
+                .andExpect(model().attribute("lendment", lendment))
+                .andExpect(view().name("lendment/lendment_detail_basic"));
+    }
+
+      //////////////////////////////////////////////////////////////////////////////////////////////
+     //public RequestResponse assignItemToUser(@Valid @RequestBody LendmentCreateRequest request)//
+    //////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Test
+    public void assignItemToUser_test() throws Exception {
+    }
+
+      /////////////////////////////////////////////////////////////////////////////////////////////
+     //public RequestResponse returnInventory(@Valid @RequestBody LendmentReturnRequest request)//
+    /////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Test
+    public void testReturnInventory_test() throws Exception {
     }
 }

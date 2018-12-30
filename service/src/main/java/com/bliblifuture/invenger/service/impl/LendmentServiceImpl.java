@@ -19,6 +19,7 @@ import com.bliblifuture.invenger.request.jsonRequest.LendmentCreateRequest;
 import com.bliblifuture.invenger.request.jsonRequest.LendmentReturnRequest;
 import com.bliblifuture.invenger.response.jsonResponse.*;
 import com.bliblifuture.invenger.response.viewDto.LendmentDTO;
+import com.bliblifuture.invenger.service.AccountService;
 import com.bliblifuture.invenger.service.LendmentService;
 import com.bliblifuture.invenger.service.UserService;
 import org.mapstruct.factory.Mappers;
@@ -51,8 +52,7 @@ public class LendmentServiceImpl implements LendmentService {
     InventoryRepository inventoryRepository;
 
     @Autowired
-    UserService userService;
-
+    AccountService accountService;
 
     private DataTablesUtils<Lendment> dataTablesUtils;
 
@@ -66,7 +66,7 @@ public class LendmentServiceImpl implements LendmentService {
     public RequestResponse createLendment(LendmentCreateRequest request) {
         RequestResponse response = new RequestResponse();
         Lendment lendment;
-        if(userService.currentUserIsAdmin()){
+        if(accountService.currentUserIsAdmin()){
             lendment = Lendment
                     .builder()
                     .user( userRepository.getOne(request.getUserId()) )
@@ -120,7 +120,7 @@ public class LendmentServiceImpl implements LendmentService {
 
     public List<LendmentDTO> getAllByUser(){
         return mapper.toDtoList(
-                lendmentRepository.findAllByUserId(userService.getSessionUser().getId()),
+                lendmentRepository.findAllByUserId(accountService.getSessionUser().getId()),
                 false
         );
     }
@@ -139,7 +139,7 @@ public class LendmentServiceImpl implements LendmentService {
 
         return mapper.toDtoList(
                 lendmentRepository.findAllBySuperiorIdAndStatus(
-                        userService.getSessionUser().getId(),
+                        accountService.getSessionUser().getId(),
                         LendmentStatus.WaitingForApproval.getDesc()
                 ),false
         );

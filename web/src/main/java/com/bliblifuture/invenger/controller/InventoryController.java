@@ -7,9 +7,9 @@ import com.bliblifuture.invenger.request.formRequest.InventoryEditRequest;
 import com.bliblifuture.invenger.request.jsonRequest.SearchRequest;
 import com.bliblifuture.invenger.response.jsonResponse.*;
 import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchResponse;
+import com.bliblifuture.invenger.service.AccountService;
 import com.bliblifuture.invenger.service.InventoryService;
 import com.bliblifuture.invenger.service.ItemCategoryService;
-import com.bliblifuture.invenger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,14 +28,14 @@ public class InventoryController {
     InventoryService inventoryService;
 
     @Autowired
-    UserService userService;
+    AccountService accountService;
 
     @GetMapping("/all")
     public String getInventoryTable(Model model){
         model.addAttribute("itemTypes", InventoryType.getAllType());
         model.addAttribute("createItemForm",new InventoryCreateRequest());
 
-        if(userService.currentUserIsAdmin()){
+        if(accountService.currentUserIsAdmin()){
             return "inventory/inventory_list_admin";
         }
         else{

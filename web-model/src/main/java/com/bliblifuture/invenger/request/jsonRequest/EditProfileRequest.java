@@ -4,17 +4,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class ProfileRequest {
+public class EditProfileRequest {
 
     @JsonProperty("new-telp")
-    String newTelp;
+    String newTelp="";
 
     @JsonProperty("old-pwd")
-    String oldPwd;
+    String oldPwd="";
 
     @JsonProperty("new-pwd1")
-    String newPwd1;
+    String newPwd1="";
 
     @JsonProperty("new-pwd2")
-    String newPwd2;
+    String newPwd2="";
 }

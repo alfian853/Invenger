@@ -7,11 +7,12 @@ import com.bliblifuture.invenger.exception.InvalidRequestException;
 import com.bliblifuture.invenger.request.datatables.DataTablesRequest;
 import com.bliblifuture.invenger.request.formRequest.UserCreateRequest;
 import com.bliblifuture.invenger.request.formRequest.UserEditRequest;
-import com.bliblifuture.invenger.request.jsonRequest.ProfileRequest;
+import com.bliblifuture.invenger.request.jsonRequest.EditProfileRequest;
 import com.bliblifuture.invenger.request.jsonRequest.UserSearchRequest;
 import com.bliblifuture.invenger.response.jsonResponse.*;
 import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchResponse;
 import com.bliblifuture.invenger.response.viewDto.PositionDTO;
+import com.bliblifuture.invenger.service.AccountService;
 import com.bliblifuture.invenger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -33,54 +34,13 @@ public class UserController {
     @Autowired
     MyUtils myUtils;
 
-    @GetMapping("/login")
-    public String getLogin(Model model, HttpServletRequest request){
-        if(userService.getSessionUser() != null){
-            return "redirect:/profile";
-        }
-        User user = new User();
-        String requestStatus = (String) request.getSession().getAttribute("status");
-        if(requestStatus != null
-                && requestStatus.equals("failed") ){
-            AlertResponse alert = new AlertResponse(
-                    "Failed",
-                    "error",
-                    "Wrong username/email or password"
-            );
-            model.addAttribute("alert",alert);
-            // persistent login form value
-            user.setUsername(request.getSession().getAttribute("username").toString());
-            request.removeAttribute("status");
-            request.removeAttribute("username");
-        }
-        model.addAttribute("user",user);
-
-        return "user/login";
-    }
-
-    @GetMapping("/profile")
-    public String getProfile(Model model){
-        model.addAttribute("user",userService.getProfile());
-        return "user/profile";
-    }
-
-    @PostMapping("/profile")
-    @ResponseBody
-    public Map<String,FormFieldResponse> postProfile(@RequestBody ProfileRequest request) {
-        return userService.editProfile(request);
-    }
-
-    @PostMapping("/profile/upload-pict")
-    @ResponseBody
-    public UploadProfilePictResponse uploadProfilePict
-            (@RequestParam("file") MultipartFile file){
-        return userService.changeProfilePict(file);
-    }
+    @Autowired
+    AccountService accountService;
 
     @GetMapping("/user/all")
     public String getUserTablePage(Model model){
         model.addAttribute("users", userService.getAll());
-        model.addAttribute("user",userService.getProfile());
+        model.addAttribute("user",accountService.getProfile());
         model.addAttribute("roles", RoleType.values());
         model.addAttribute("positions", userService.getAllPosition());
         model.addAttribute("createUserForm", new UserCreateRequest());
