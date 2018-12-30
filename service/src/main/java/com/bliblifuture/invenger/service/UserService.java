@@ -17,23 +17,14 @@ import java.util.List;
 import java.util.Map;
 
 public interface UserService extends
-        UserDetailsService,
         DatatablesService <DataTablesResult<UserDataTableResponse> >,
         SearchService<SearchResponse, UserSearchRequest> {
-
-    @Override
-    User loadUserByUsername(String s);
 
     List<UserDTO> getAll();
     UserDTO getById(Integer id);
     UserCreateResponse createUser(UserCreateRequest request);
     RequestResponse updateUser(UserEditRequest request);
     RequestResponse deleteUser(Integer id);
-    User getSessionUser();
-    boolean currentUserIsAdmin();
-    ProfileDTO getProfile();
-    Map<String,FormFieldResponse> editProfile(EditProfileRequest request);
-    UploadProfilePictResponse changeProfilePict(MultipartFile file);
     List<PositionDTO> getAllPosition();
     PositionCreateResponse createPosition(PositionDTO newPosition);
     RequestResponse editPosition(PositionDTO editedPosition);

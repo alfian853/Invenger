@@ -61,7 +61,7 @@ public class LendmentServiceTest {
     InventoryRepository inventoryRepository;
 
     @Mock
-    UserService userService;
+    AccountService accountService;
 
     private final LendmentMapper mapper = Mappers.getMapper(LendmentMapper.class);
 
@@ -125,7 +125,7 @@ public class LendmentServiceTest {
 
     @Test
     public void createLendment_adminRequest(){
-        when(userService.currentUserIsAdmin()).thenReturn(true);
+        when(accountService.currentUserIsAdmin()).thenReturn(true);
 
         when(inventoryRepository.findInventoryById(1)).thenReturn(Inventory.builder().id(1).quantity(5).build());
         when(inventoryRepository.findInventoryById(2)).thenReturn(Inventory.builder().id(2).quantity(10).build());
@@ -142,7 +142,7 @@ public class LendmentServiceTest {
 
     @Test
     public void createLendment_userRequest(){
-        when(userService.currentUserIsAdmin()).thenReturn(false);
+        when(accountService.currentUserIsAdmin()).thenReturn(false);
 
         when(inventoryRepository.findInventoryById(1)).thenReturn(Inventory.builder().id(1).quantity(5).build());
         when(inventoryRepository.findInventoryById(2)).thenReturn(Inventory.builder().id(2).quantity(10).build());
@@ -159,7 +159,7 @@ public class LendmentServiceTest {
 
     @Test(expected = InvalidRequestException.class)
     public void createLendment_invalidRequest(){
-        when(userService.currentUserIsAdmin()).thenReturn(true);
+        when(accountService.currentUserIsAdmin()).thenReturn(true);
 
         when(inventoryRepository.findInventoryById(1)).thenReturn(Inventory.builder().id(1).quantity(0).build());
 
@@ -190,7 +190,7 @@ public class LendmentServiceTest {
 
     @Test
     public void getAllByUser_test(){
-        when(userService.getSessionUser()).thenReturn(USER);
+        when(accountService.getSessionUser()).thenReturn(USER);
         when(lendmentRepository.findAllByUserId(any())).thenReturn(LENDMENTS);
 
         Assert.assertEquals(lendmentService.getAllByUser(),LENDMENTS_DTO_WITHOUT_DETAIL);
@@ -224,7 +224,7 @@ public class LendmentServiceTest {
 
     @Test
     public void getAllLendmentRequestOfSuperior_test(){
-        when(userService.getSessionUser()).thenReturn(USER);
+        when(accountService.getSessionUser()).thenReturn(USER);
         when(lendmentRepository.findAllBySuperiorIdAndStatus(any(),any())).thenReturn(LENDMENTS);
 
         Assert.assertEquals(

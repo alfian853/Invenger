@@ -10,9 +10,9 @@ import com.bliblifuture.invenger.response.jsonResponse.*;
 import com.bliblifuture.invenger.response.jsonResponse.search_response.SearchResponse;
 import com.bliblifuture.invenger.response.viewDto.CategoryDTO;
 import com.bliblifuture.invenger.response.viewDto.InventoryDTO;
+import com.bliblifuture.invenger.service.AccountService;
 import com.bliblifuture.invenger.service.InventoryService;
 import com.bliblifuture.invenger.service.ItemCategoryService;
-import com.bliblifuture.invenger.service.UserService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,16 +29,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -50,7 +50,7 @@ public class InventoryControllerTest {
     private ItemCategoryService itemCategoryService;
 
     @Mock
-    private UserService userService;
+    private AccountService accountService;
 
     @Mock
     private InventoryService inventoryService;
@@ -244,7 +244,7 @@ public class InventoryControllerTest {
         System.out.println(inventory);
 
         when(inventoryService.getById(1)).thenReturn(inventory);
-        when(userService.currentUserIsAdmin()).thenReturn(true);
+        when(accountService.currentUserIsAdmin()).thenReturn(true);
 
         mvc.perform(get("/inventory/detail/{id}", 1)
         )
@@ -270,7 +270,7 @@ public class InventoryControllerTest {
         System.out.println(inventory);
 
         when(inventoryService.getById(1)).thenReturn(inventory);
-        when(userService.currentUserIsAdmin()).thenReturn(false);
+        when(accountService.currentUserIsAdmin()).thenReturn(false);
 
         mvc.perform(get("/inventory/detail/{id}", 1)
         )
@@ -302,7 +302,7 @@ public class InventoryControllerTest {
         System.out.println(list);
 
         when(itemCategoryService.getAllItemCategory(anyBoolean())).thenReturn(categoryDTOS);
-        when(userService.currentUserIsAdmin()).thenReturn(true);
+        when(accountService.currentUserIsAdmin()).thenReturn(true);
 
         mvc.perform(get("/inventory/all")
         )
@@ -328,7 +328,7 @@ public class InventoryControllerTest {
         System.out.println(list);
 
         when(itemCategoryService.getAllItemCategory(anyBoolean())).thenReturn(categoryDTOS);
-        when(userService.currentUserIsAdmin()).thenReturn(false);
+        when(accountService.currentUserIsAdmin()).thenReturn(false);
 
         mvc.perform(get("/inventory/all")
         )

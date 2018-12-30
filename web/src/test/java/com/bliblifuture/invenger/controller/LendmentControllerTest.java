@@ -10,8 +10,8 @@ import com.bliblifuture.invenger.response.jsonResponse.LendmentDataTableResponse
 import com.bliblifuture.invenger.response.jsonResponse.RequestResponse;
 import com.bliblifuture.invenger.response.viewDto.LendmentDTO;
 import com.bliblifuture.invenger.response.viewDto.ProfileDTO;
+import com.bliblifuture.invenger.service.AccountService;
 import com.bliblifuture.invenger.service.LendmentService;
-import com.bliblifuture.invenger.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +29,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -48,7 +48,7 @@ public class LendmentControllerTest {
     LendmentService lendmentService;
 
     @Mock
-    UserService userService;
+    AccountService userService;
 
     @Before
     public void init() {
