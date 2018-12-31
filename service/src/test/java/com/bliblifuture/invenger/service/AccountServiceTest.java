@@ -77,7 +77,7 @@ public class AccountServiceTest {
 
     @Before
     public void init(){
-        when(myUtils.getRandomFileName(any())).thenReturn("abcdefg");
+        when(myUtils.getRandomFileName(any(MultipartFile.class))).thenReturn("abcdefg");
     }
 
 

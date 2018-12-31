@@ -275,7 +275,7 @@ public class InventoryServiceTest {
     public void downloadItemDetail_documentDoesNotCreatedYet() {
         when(inventoryRepository.findInventoryById(any())).thenReturn(INVENTORY);
         when(inventoryDocRepository.findInventoryDocumentById(INVENTORY.getId())).thenReturn(null);
-        when(fileStorageService.createPdfFromTemplate(any(), any(), any())).thenReturn("filename.pdf");
+        when(fileStorageService.createPdfFromTemplate(any(),any(), any(), any())).thenReturn("filename.pdf");
 
         InventoryDocDownloadResponse response = inventoryService.downloadItemDetail(INVENTORY.getId());
 
@@ -313,13 +313,13 @@ public class InventoryServiceTest {
                 .build();
 
         when(inventoryDocRepository.findInventoryDocumentById(INVENTORY.getId())).thenReturn(document);
-        when(fileStorageService.createPdfFromTemplate(any(), any(), any())).thenReturn("filename_baru.pdf");
+        when(fileStorageService.createPdfFromTemplate(any(), any(), any(), any())).thenReturn("filename_baru.pdf");
 
         InventoryDocDownloadResponse response = inventoryService.downloadItemDetail(INVENTORY.getId());
 
         Assert.assertTrue(response.isSuccess());
         Assert.assertEquals(response.getInventoryDocUrl(), "/inventory/document/" + "filename_baru.pdf");
-        verify(fileStorageService,times(1)).createPdfFromTemplate(any(), any(), any());
+        verify(fileStorageService,times(1)).createPdfFromTemplate(any(), any(), any(), any());
         verify(inventoryDocRepository, times(1)).save(any());
     }
 
@@ -332,21 +332,21 @@ public class InventoryServiceTest {
                 .build();
 
         when(inventoryDocRepository.findInventoryDocumentById(INVENTORY.getId())).thenReturn(document);
-        when(fileStorageService.createPdfFromTemplate(any(), any(), any())).thenReturn(null);
+        when(fileStorageService.createPdfFromTemplate(any(), any(), any(), any())).thenReturn(null);
 
         InventoryDocDownloadResponse response = inventoryService.downloadItemDetail(INVENTORY.getId());
 
         Assert.assertFalse(response.isSuccess());
         Assert.assertNull(response.getInventoryDocUrl());
 
-        verify(fileStorageService,times(1)).createPdfFromTemplate(any(), any(), any());
+        verify(fileStorageService,times(1)).createPdfFromTemplate(any(), any(), any(), any());
     }
 
 
 
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      ////////////////////////////////////////////////////////////////////////////////////////////////////
      //public DataTablesResult<InventoryDataTableResponse> getDatatablesData(DataTablesRequest request)//
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private MockHttpServletRequest mock_datatableServletRequest(boolean hasSearchValue) {
         MockHttpServletRequest servletRequest = new MockHttpServletRequest();

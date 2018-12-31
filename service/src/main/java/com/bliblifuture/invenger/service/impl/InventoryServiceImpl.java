@@ -233,6 +233,7 @@ public class InventoryServiceImpl implements InventoryService {
             Map templateMap = oMapper.convertValue(inventoryDTO, Map.class);
 
             String filename = fileStorageService.createPdfFromTemplate(
+                    myUtils.getRandomFileName("pdf"),
                     PDF_TEMPLATE_PATH,
                     templateMap,
                     FileStorageService.PathCategory.INVENTORY_PDF

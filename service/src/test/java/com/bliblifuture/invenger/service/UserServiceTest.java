@@ -37,6 +37,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -88,7 +89,7 @@ public class UserServiceTest {
 
     @Before
     public void init(){
-        when(myUtils.getRandomFileName(any())).thenReturn("abcdefg");
+        when(myUtils.getRandomFileName(any(MultipartFile.class))).thenReturn("abcdefg");
     }
 
 
