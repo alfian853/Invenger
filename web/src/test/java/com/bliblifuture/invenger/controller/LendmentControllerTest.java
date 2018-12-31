@@ -4,6 +4,7 @@ import com.bliblifuture.invenger.ModelMapper.lendment.LendmentMapper;
 import com.bliblifuture.invenger.entity.lendment.Lendment;
 import com.bliblifuture.invenger.entity.lendment.LendmentStatus;
 import com.bliblifuture.invenger.request.datatables.DataTablesRequest;
+import com.bliblifuture.invenger.request.jsonRequest.LendmentCreateRequest;
 import com.bliblifuture.invenger.response.jsonResponse.DataTablesResult;
 import com.bliblifuture.invenger.response.jsonResponse.HandOverResponse;
 import com.bliblifuture.invenger.response.jsonResponse.LendmentDataTableResponse;
@@ -22,13 +23,14 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -82,6 +84,7 @@ public class LendmentControllerTest {
                 .andExpect(model().attribute("user", user))
                 .andExpect(view().name("lendment/lendment_create_basic"));
     }
+
 
       ///////////////////////////////////////////////
      //public String getLendmentTable(Model model)//
@@ -283,6 +286,18 @@ public class LendmentControllerTest {
 
     @Test
     public void assignItemToUser_test() throws Exception {
+
+        HashMap<String,Object> content = new HashMap<>();
+        content.put("user_id",1);
+
+        content.put("items",Arrays.asList(
+                LendmentCreateRequest.Item.builder().id(1).quantity(2).build(),
+                LendmentCreateRequest.Item.builder().id(2).quantity(2).build()
+        ));
+
+        mvc.perform(post("/lendment/create").contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(objectMapper.writeValueAsBytes(content))).andExpect(status().isOk());
+
     }
 
       /////////////////////////////////////////////////////////////////////////////////////////////
@@ -291,5 +306,16 @@ public class LendmentControllerTest {
 
     @Test
     public void testReturnInventory_test() throws Exception {
+        HashMap<String,Object> content = new HashMap<>();
+        content.put("lendment_id","1");
+        content.put("inventories_id",Arrays.asList(1,2,3));
+        RequestResponse response = new RequestResponse();
+        response.setStatusToSuccess();
+        when(lendmentService.returnInventory(any())).thenReturn(response);
+
+        mvc.perform(post("/lendment/return").contentType(MediaType.APPLICATION_JSON_UTF8)
+        .content(objectMapper.writeValueAsBytes(content))).andExpect(status().isOk());
     }
+
+
 }
