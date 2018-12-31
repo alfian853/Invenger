@@ -29,6 +29,10 @@ public class MyUtils {
         return UUID.randomUUID().toString().replace("-","")+
                 "."+ FilenameUtils.getExtension(file.getOriginalFilename());
     }
+    public String getRandomFileName(String extension){
+        return UUID.randomUUID().toString().replace("-","")+
+                "."+ extension;
+    }
 
 
 
