@@ -19,7 +19,8 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.bliblifuture.invenger"))
-                .paths(regex("/(inventory|category|user|lendment).*"))
+                .paths(regex("/(inventory|category" +
+                        "|user|lendment|profile|login).*"))
                 .build();
     }
 
