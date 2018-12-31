@@ -75,7 +75,7 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
         }
     }
 
-
+    @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public CategoryEditResponse updateCategory(CategoryEditRequest request){
 
@@ -161,6 +161,7 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
 
     }
 
+    @Override
     public CategoryCreateResponse createCategory(CategoryCreateRequest request){
         CategoryCreateResponse response = new CategoryCreateResponse();
         if(request.getName().contains("/") || request.getName().length() == 0){
@@ -179,6 +180,7 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
         return response;
     }
 
+    @Override
     @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     public RequestResponse deleteCategory(int id) {
         RequestResponse response = new RequestResponse();
@@ -203,6 +205,7 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
         return response;
     }
 
+    @Override
     public List<CategoryDTO> getAllItemCategory(boolean fetchParent){
         if(fetchParent){
             return mapper.toDtoList(categoryRepository.findAllFetchParent());
@@ -212,6 +215,7 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
         }
     }
 
+    @Override
     public SearchResponse getSearchResult(SearchRequest request){
         PageRequest pageRequest = PageRequest.of(request.getPageNum(), request.getLength());
         Specification<Category> specification = (root, criteriaQuery, criteriaBuilder) -> {

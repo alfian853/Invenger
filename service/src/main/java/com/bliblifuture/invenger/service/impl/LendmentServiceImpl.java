@@ -21,7 +21,6 @@ import com.bliblifuture.invenger.response.jsonResponse.*;
 import com.bliblifuture.invenger.response.viewDto.LendmentDTO;
 import com.bliblifuture.invenger.service.AccountService;
 import com.bliblifuture.invenger.service.LendmentService;
-import com.bliblifuture.invenger.service.UserService;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -62,6 +61,7 @@ public class LendmentServiceImpl implements LendmentService {
         dataTablesUtils = new DataTablesUtils<>(mapper);
     }
 
+    @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public RequestResponse createLendment(LendmentCreateRequest request) {
         RequestResponse response = new RequestResponse();
@@ -114,10 +114,12 @@ public class LendmentServiceImpl implements LendmentService {
 
     }
 
+    @Override
     public List<LendmentDTO> getAll(){
         return mapper.toDtoList(lendmentRepository.findAll(),false);
     }
 
+    @Override
     public List<LendmentDTO> getAllByUser(){
         return mapper.toDtoList(
                 lendmentRepository.findAllByUserId(accountService.getSessionUser().getId()),
@@ -125,6 +127,7 @@ public class LendmentServiceImpl implements LendmentService {
         );
     }
 
+    @Override
     public LendmentDTO getLendmentDetailById(Integer id) {
         Lendment lendment = lendmentRepository.findLendmentById(id);
 
@@ -135,6 +138,7 @@ public class LendmentServiceImpl implements LendmentService {
         return mapper.toLendmentWithDetailDTO(lendment);
     }
 
+    @Override
     public List<LendmentDTO> getAllLendmentRequestOfSuperior(){
 
         return mapper.toDtoList(
@@ -146,6 +150,7 @@ public class LendmentServiceImpl implements LendmentService {
 
     }
 
+    @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public RequestResponse returnInventory(LendmentReturnRequest request) {
 
@@ -189,6 +194,7 @@ public class LendmentServiceImpl implements LendmentService {
         return response;
     }
 
+    @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public RequestResponse approveLendmentRequest(Integer id) {
         Lendment lendment = lendmentRepository.findLendmentById(id);
@@ -210,6 +216,7 @@ public class LendmentServiceImpl implements LendmentService {
         return response;
     }
 
+    @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public HandOverResponse handOverOrderItems(Integer id) {
         Lendment lendment = lendmentRepository.findLendmentById(id);
@@ -232,6 +239,8 @@ public class LendmentServiceImpl implements LendmentService {
         return response;
 
     }
+
+    @Override
     public List<LendmentDTO> getInventoryLendment(Integer id){
         return mapper.toDtoList(
                 lendmentRepository.findLendmentContainInventory(id),true

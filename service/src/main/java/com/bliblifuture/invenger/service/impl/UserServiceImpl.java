@@ -61,10 +61,12 @@ public class UserServiceImpl implements UserService {
 
     private final UserMapper mapper = Mappers.getMapper(UserMapper.class);
 
+    @Override
     public List<UserDTO> getAll(){
         return mapper.toDtoList(userRepository.findAllFetched());
     }
 
+    @Override
     public UserDTO getById(Integer id) {
         User user = userRepository.findUserById(id);
         if(user == null){
@@ -90,6 +92,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
     public UserCreateResponse createUser(UserCreateRequest request) {
         UserCreateResponse response = new UserCreateResponse();
         response.setStatusToSuccess();
@@ -132,6 +135,7 @@ public class UserServiceImpl implements UserService {
         return response;
     }
 
+    @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public RequestResponse updateUser(UserEditRequest request) {
 
@@ -161,6 +165,7 @@ public class UserServiceImpl implements UserService {
         return response;
     }
 
+    @Override
     public RequestResponse deleteUser(Integer id) {
         RequestResponse response = new RequestResponse();
         try{
@@ -179,6 +184,7 @@ public class UserServiceImpl implements UserService {
         return response;
     }
 
+    @Override
     public SearchResponse getSearchResult(UserSearchRequest request) {
 
         PageRequest pageRequest = PageRequest.of(request.getPageNum(), request.getLength());
@@ -210,6 +216,7 @@ public class UserServiceImpl implements UserService {
         return response;
     }
 
+    @Override
     public List<PositionDTO> getAllPosition(){ return mapper.toPositionDtoList(positionRepository.findAll()); }
 
     private void savePositionHandler(Position position) { try{ positionRepository.save(position); }
@@ -223,6 +230,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
     public PositionCreateResponse createPosition(PositionDTO newPosition) {
         Position position = Position.builder()
                 .name(newPosition.getName())
@@ -240,6 +248,7 @@ public class UserServiceImpl implements UserService {
         return response;
     }
 
+    @Override
     public RequestResponse editPosition(PositionDTO editedPosition) {
 
         Position position = positionRepository.getOne(editedPosition.getId());
@@ -259,6 +268,7 @@ public class UserServiceImpl implements UserService {
         return response;
     }
 
+    @Override
     public RequestResponse deletePosition(Integer id) {
         try{
             positionRepository.deleteById(id);
@@ -278,6 +288,7 @@ public class UserServiceImpl implements UserService {
         return response;
     }
 
+    @Override
     public DataTablesResult<UserDataTableResponse> getDatatablesData(DataTablesRequest request){
         QuerySpec<User> spec = dataTablesUtils.getQuerySpec(request);
 
