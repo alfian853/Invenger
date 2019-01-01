@@ -395,6 +395,18 @@ public class UserServiceTest {
         userService.createPosition(positionDTO);
     }
 
+    @Test
+    public void createPosition_success() {
+        PositionDTO positionDTO = PositionDTO.builder()
+                .name("p")
+                .level(1)
+                .build();
+
+        Assert.assertTrue(userService.createPosition(positionDTO).isSuccess());
+    }
+
+
+
       ///////////////////////////////////////////////////////////////////
      //public RequestResponse editPosition(PositionDTO editedPosition)//
     ///////////////////////////////////////////////////////////////////
