@@ -7,8 +7,8 @@
     <div style="text-align: center; margin-bottom: 20px;">Inventory's Report</div>
 </div>
 <div>
-    <img id="img-dropzone-temp" class="d-block img-fluid mx-auto rounded"
-         th:src="@{http://localhost:8080/inventory/pict/{link}(link=${image})}" style="height: 350px;width:350px;"/>
+    <img th:src="@{http://localhost:8080/inventory/pict/{link}(link=${image})}"
+         style="max-height: 400px;max-width:400px; display: block; margin-left: auto; margin-right: auto; width: 50%; padding-bottom: 30px;"/>
     <div style="font-size: 16px; clear: left;">
         <div style="width: 150px; float: left;">Inventory Id</div>
         <div style="float: left;" th:text="': ' + ${id}"></div>
