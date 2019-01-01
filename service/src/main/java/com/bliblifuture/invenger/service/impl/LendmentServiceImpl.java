@@ -1,6 +1,7 @@
 package com.bliblifuture.invenger.service.impl;
 
 import com.bliblifuture.invenger.ModelMapper.lendment.LendmentMapper;
+import com.bliblifuture.invenger.Utils.CustomPredicate;
 import com.bliblifuture.invenger.Utils.DataTablesUtils;
 import com.bliblifuture.invenger.Utils.QuerySpec;
 import com.bliblifuture.invenger.entity.inventory.Inventory;
@@ -52,6 +53,9 @@ public class LendmentServiceImpl implements LendmentService {
 
     @Autowired
     AccountService accountService;
+
+    private CustomPredicate customPredicate = (root, criteriaQuery, criteriaBuilder)
+            -> criteriaBuilder.equal(root.get("user").get("id"), accountService.getSessionUser().getId());
 
     private DataTablesUtils<Lendment> dataTablesUtils;
 
@@ -249,7 +253,15 @@ public class LendmentServiceImpl implements LendmentService {
 
     @Override
     public DataTablesResult<LendmentDataTableResponse> getDatatablesData(DataTablesRequest request) {
-        QuerySpec<Lendment> spec = dataTablesUtils.getQuerySpec(request);
+
+        QuerySpec<Lendment> spec;
+
+        if(accountService.currentUserIsAdmin()){
+            spec = dataTablesUtils.getQuerySpec(request);
+        }
+        else{
+            spec = dataTablesUtils.getQuerySpec(request,customPredicate);
+        }
 
         Page<Lendment> page;
 

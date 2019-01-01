@@ -21,7 +21,7 @@ public class DataTablesUtils<T> {
         this.criteriaPathMapper = criteriaPathMapper;
     }
 
-    public QuerySpec<T> getQuerySpec(DataTablesRequest request){
+    public QuerySpec<T> getQuerySpec(DataTablesRequest request, CustomPredicate...customPredicates){
 
         QuerySpec<T> querySpec = new QuerySpec<>();
 
@@ -59,11 +59,25 @@ public class DataTablesUtils<T> {
                         );
                     }
                 }
+
+                for(int i=0;i<customPredicates.length;i++){
+                    predicates.add(customPredicates[i].getPredicate(root,criteriaQuery,criteriaBuilder));
+                }
+
                 return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
             };
             querySpec.setSpecification(specification);
         }
-
+        else if(customPredicates.length > 0){
+            Specification<T> specification = (root, criteriaQuery, criteriaBuilder) -> {
+                List<Predicate> predicates = new ArrayList<>();
+                for(int i=0;i<customPredicates.length;i++){
+                    predicates.add(customPredicates[i].getPredicate(root,criteriaQuery,criteriaBuilder));
+                }
+                return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+            };
+            querySpec.setSpecification(specification);
+        }
 
         return querySpec;
     }
