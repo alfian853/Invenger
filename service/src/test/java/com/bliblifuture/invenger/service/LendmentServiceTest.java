@@ -390,21 +390,21 @@ public class LendmentServiceTest {
     }
 
     @Test
-    public void getPaginatedDatatablesLendmentList_onlySortByColumn() {
+    public void getDatatablesData_onlySortByColumn() {
 
         DataTablesRequest request = new DataTablesRequest(this.mock_datatableServletRequest(false));
         Page<Lendment> page = new PageImpl<>(new ArrayList<>());
 
         when(lendmentRepository.findAll(any(PageRequest.class))).thenReturn(page);
 
+        when(accountService.currentUserIsAdmin()).thenReturn(true);
         lendmentService.getDatatablesData(request);
 
         verify(lendmentRepository, times(1)).findAll(any(PageRequest.class));
-
     }
 
     @Test
-    public void getPaginatedDatatablesLendmentList_sortAndSearchByColumn() {
+    public void getDatatablesData_sortAndSearchByColumn() {
 
         MockHttpServletRequest servletRequest = this.mock_datatableServletRequest(true);
         DataTablesRequest request = new DataTablesRequest(servletRequest);
