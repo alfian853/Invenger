@@ -15,8 +15,8 @@ public class QuerySpec<T> {
         this.specification = specification;
     }
 
-    Specification<T> specification;
-    PageRequest pageRequest;
+    private Specification<T> specification;
+    private PageRequest pageRequest;
 
 
 }
