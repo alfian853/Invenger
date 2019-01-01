@@ -1,14 +1,14 @@
 <div id="sidebar" th:fragment="left_sidebar" xmlns:th="http://www.w3.org/1999/xhtml"
 	 xmlns:sec="http://www.w3.org/1999/xhtml">
-	<div id="top">
-		<div id="invenger-text">INVENGER</div><i onclick="myFunction()" id="bars" class="fa fa-bars"></i>
+	<div id="top" style="padding: 20px 32px;">
+		<div id="invenger-text" style="line-height: 1;">INVENGER</div><i onclick="myFunction()" id="bars" class="fa fa-bars"></i>
 	</div>
 	<div id="element">MENUS</div>
 	<a class="icon sidebar-selected" href="/inventory/all">
 		<i class="fas fa-drafting-compass"></i><div class="text">Inventories</div>
 	</a>
 	<a class="icon" href="/category/all" sec:authorize="hasRole('ADMIN')">
-		<i class="fas fa-sitemap"></i><div class="text">Item Categories</div>
+		<i class="fas fa-tags"></i><div class="text">Item Categories</div>
 	</a>
 	<a class="icon" href="/lendment/all">
 		<i class="fab fa-stack-overflow"></i><div class="text">Lendments</div>
@@ -20,7 +20,7 @@
 		<i class="fas fa-users"></i><div class="text">Users</div>
 	</a>
 	<a class="icon" href="/user/positions" sec:authorize="hasRole('ADMIN')">
-		<i class="fas fa-users"></i><div class="text">User Positions</div>
+		<i class="fas fa-sitemap"></i><div class="text">User Positions</div>
 	</a>
 	<script>
         function myFunction(){
