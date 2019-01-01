@@ -211,6 +211,7 @@
                             data: form,
                             success: function(response){
                                 if(response['success']){
+                                    tableAccess.datatables.ajax.reload(null, false);
                                     toastMessage('success','Success',response['message']);
                                 }
                                 else{
