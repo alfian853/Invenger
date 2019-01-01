@@ -104,12 +104,12 @@
             <table id="itemsTable" class="display" style="width:100%;">
                 <thead>
                 <tr>
-                    <th><input type="text" style="width: 60px" placeholder="Id" target-col="id"/></th>
-                    <th><input type="text" placeholder="Name" target-col="name"/></th>
+                    <th><input type="text" style="width: 60px" placeholder="Id.." target-col="id"/></th>
+                    <th><input type="text" placeholder="Name.." target-col="name"/></th>
                     <th></th>
                     <th></th>
                     <th>
-                        <select target-col="category">
+                        <select target-col="category" style="width: 200px;">
                             <!--<th:block th:each="category : ${categories}">-->
                                 <!--<option th:value="${category.name}" th:text="${category.name}">Option i</option>-->
                             <!--</th:block>-->
@@ -166,20 +166,20 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label">Item Quantity *</label><br>
-                    <input class="form-input" type="number" min="0" th:field="*{quantity}">
+                    <input class="form-input" type="number" min="0" th:field="*{quantity}" style="width: 95.5%;">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Item Price</label><br>
-                    <input class="form-input" type="number" min="0" th:field="*{price}">
+                    <input class="form-input" type="number" min="0" th:field="*{price}" style="width: 95.5%;">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Item Category</label><br>
-                    <select class="form-input" style="width: 100%;" name="category_id">
+                    <select class="form-input" style="width: 95.5%;" name="category_id">
                     </select>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Item type</label>
-                    <select class="form-input" style="width: 100%;" name="type">
+                    <select class="form-input" style="width: 95.5%; padding-right: 25px;" name="type">
                         <th:block th:each="type : ${itemTypes}">
                             <option th:value="${type}" th:text="${type}">Option i</option>
                         </th:block>
@@ -210,7 +210,7 @@
     </div>
 
     <div id="import-modal" style="display: none">
-        <a href="/file/inventory_upload_format.csv" target="_blank">click to download upload format example</a>
+        <p style="text-align: center; margin-top: 20px;"><a href="/file/inventory_upload_format.csv" target="_blank" style="text-align: center;">Click to download upload format example.</a></p>
         <form class="dropzone needsclick mx-4" id="importFile" action="/inventory/upload" style="margin-top:20px;">
             <div class="modal-body">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
@@ -322,7 +322,7 @@
                 }
             });
             $('#itemsTable select[target-col=\"category\"]').select2({
-                placeholder : 'Please select item category',
+                placeholder : 'Please select category..',
                 ajax : {
                     url : '/category/search',
                     params : null,
@@ -364,7 +364,7 @@
                 history: false,
                 onOpening : function(){
                     $('select[name=\"category_id\"]').select2({
-                        placeholder : 'Please select item category',
+                        placeholder : 'Please select category...',
                         ajax : {
                             url : '/category/search',
                             params : null,

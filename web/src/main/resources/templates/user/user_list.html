@@ -97,11 +97,11 @@
             <table id="usersTable" class="display" style="width:100%;">
                 <thead>
                 <tr>
-                    <th><input type="text" style="width: 60px" placeholder="name" target-col="fullName"/></th>
-                    <th><input type="text" placeholder="email" target-col="email"/></th>
+                    <th><input type="text" style="width: 60px" placeholder="Name.." target-col="fullName"/></th>
+                    <th><input type="text" placeholder="Email.." target-col="email"/></th>
                     <th>
                         <select target-col="position">
-                            <option selected value="">&lt;Filter by position&gt;</option>
+                            <option selected value="">&lt;Filter by Position&gt;</option>
                             <th:block th:each="position : ${positions}">
                                 <option th:value="${position.name}" th:text="${position.name}">Option i</option>
                             </th:block>
@@ -148,13 +148,13 @@
                         <label class="form-label">Telp *</label>
                         <input class="form-input" th:field="*{telp}">
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" style="width: 95.5%;">
                         <label class="form-label">Password *</label>
                         <input class="form-input" type="password" th:field="*{password}">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Superior *</label>
-                        <select class="form-input" style="width: 100%;" name="superior_id">
+                        <select class="form-input" style="width: 95.5%; padding-right: 25px;" name="superior_id">
                             <th:block th:each="user2 : ${users}">
                                 <option th:value="${user2.id}" th:text="${user2.username}">Option i</option>
                             </th:block>
@@ -162,7 +162,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Position *</label>
-                        <select class="form-input" style="width: 100%;" name="position_id">
+                        <select class="form-input" style="width: 95.5%;padding-right: 25px;" name="position_id">
                             <th:block th:each="position : ${positions}">
                                 <option th:value="${position.id}" th:text="${position.name}">Option i</option>
                             </th:block>

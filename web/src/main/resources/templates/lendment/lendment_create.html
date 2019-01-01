@@ -1,19 +1,19 @@
-<div style="margin-top :40px;padding:20px;" xmlns:th="http://www.w3.org/1999/xhtml">
-    <div class="row">
+<div style="margin-top :10px;padding:10px;" xmlns:th="http://www.w3.org/1999/xhtml">
+    <div class="row" style="padding: 0px 20px 10px 20px;">
         <div class="col-5">
-            <label>Employee name : </label>
+            <label>Employee's Name : </label>
         </div>
         <div class="col-7">
-            <select id="AI-users-select" style="width: 70%">
+            <select id="AI-users-select" style="width: 300px;">
             </select>
         </div>
     </div>
-    <div class="row">
+    <div class="row" style="padding: 0px 20px 10px 20px;">
         <div class="col-md-5">
-            <label>Select items : </label>
+            <label>Selected Items : </label>
         </div>
         <div class="col-md-5">
-            <select id="AI-item-select" style="width: 70%">
+            <select id="AI-item-select" style="width: 300px;">
                 <!--<option></option>-->
             </select>
         </div>
@@ -23,7 +23,7 @@
             </button>
         </div>
     </div>
-    <div class="row">
+    <div class="row" style="padding: 0px 20px;">
         <div class="col-4">
             <label>Category</label>
         </div>
@@ -34,7 +34,7 @@
             <label>Quantity</label>
         </div>
     </div>
-    <div class="row" id="selected-items">
+    <div class="row" id="selected-items" style="padding: 10px 35px;">
     </div>
     <div class="modal-footer">
         <button id="item-assign-submit" class="btn btn-primary">Assign</button>
@@ -72,7 +72,7 @@ Documentation
         // console.log(maks);
         console.log(parseInt($(input).val()));
         if(maks < parseInt($(input).val()) ){
-            $(input).notify('quantity can\'t be greater than '+maks,{
+            $(input).notify('Quantity can\'t be greater than '+maks,{
                 position : 'left',
                 autoHide : true,
                 clickToHide: true,
@@ -84,7 +84,7 @@ Documentation
     }
 
     $('#AI-users-select').select2({
-        placeholder : 'please select user',
+        placeholder : 'Please select user...',
         ajax : {
             url : '/user/search',
             params : null,
@@ -114,7 +114,7 @@ Documentation
 
     var item_select = $('#AI-item-select');
     item_select.select2({
-        placeholder : 'please select item',
+        placeholder : 'Please select item...',
         ajax : {
             url : '/inventory/search',
             params : null,
@@ -145,7 +145,7 @@ Documentation
     });
 
     $('#AI-users-select').select2({
-        placeholder : 'please select user',
+        placeholder : 'Please select user...',
         ajax : {
             url : '/user/search',
             delay : 350,
