@@ -2,11 +2,13 @@
     <div class="navbar">
         <div id="dropdown" onclick="dropDown()">
             <div style="padding-left: 32px; padding-right: 8px; border-left: 1px solid rgba(24, 28, 33, 0.04);" th:object="${#authentication.getPrincipal()}" th:text="*{username}"></div>
-            <div class="circle"></div>
+            <div class="circle">
+                <img style="width: 28px;height: 28px; margin: 0;" src="https://image.flaticon.com/icons/svg/60/60473.svg"/>
+            </div>
             <i style="padding-left: 8px; padding-right: 8px;" class="fa fa-angle-down"></i>
         </div>
     </div>
-    <div id="link">
+    <div id="link" style="display: none;">
         <a th:href="@{/profile}" style="border-bottom: 1px solid rgba(24,28,33,0.04);">
             <i style="padding-right: 8px;" class="fa fa-user"></i>
             <div>My Profile</div>
