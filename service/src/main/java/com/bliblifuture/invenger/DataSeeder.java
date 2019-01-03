@@ -29,8 +29,6 @@ public class DataSeeder {
     public void initSeeder(ContextRefreshedEvent event){
         postionSeeder();
         adminSeeder();
-        userSeeder();
-
         categorySeeder();
 
     }
@@ -58,16 +56,7 @@ public class DataSeeder {
             position.setName("inventory system admin");
             positionRepository.save(position);
         }
-
-        position = positionRepository.findByName("junior software engineer");
-
-        if(position == null){
-            position = new Position();
-            position.setLevel(2);
-            position.setName("junior software engineer");
-            positionRepository.save(position);
-        }
-
+        
     }
 
     void adminSeeder(){
@@ -82,21 +71,6 @@ public class DataSeeder {
             admin.setPassword(new BCryptPasswordEncoder().encode("root"));
             admin.setPosition(positionRepository.findByName("inventory system admin"));
             userRepository.save(admin);
-        }
-    }
-
-    void userSeeder(){
-        User user = userRepository.findByUsername("basic");
-        if(user == null){
-            user = new User();
-            user.setUsername("basic");
-            user.setFullName("biasa saja");
-            user.setEmail("basics@future.com");
-            user.setTelp("+1111111111");
-            user.setRole(RoleType.ROLE_USER.toString());
-            user.setPassword(new BCryptPasswordEncoder().encode("basic"));
-            user.setPosition(positionRepository.findByName("junior software engineer"));
-            userRepository.save(user);
         }
     }
 
