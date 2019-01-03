@@ -230,6 +230,21 @@
                     $('#edit-close-btn').click(function () {
                         $('.iziModal-button-close').click();
                     });
+                    let parId = tableAccess.getRowById(id).attr('parent_id');
+                    let name = tableAccess.getColByRowId(id,'name').text();
+                    let parName;
+                    let len = name.length;
+                    for(let i = len-1; i > -1; i--){
+                        if(name[i] == '/'){
+                            parName = name.substr(0,i);
+                            break;
+                        }
+                    }
+
+                    $('#editModal select[name=\"parent_id\"]').append(
+                        '<option value=\"'+parId+'\">'+parName+'</option>'
+                    );
+
 
                     $('#submit-edit').click(function () {
                         let source = $('#editModal');
@@ -253,6 +268,7 @@
                                         tableAccess.setColValueByRowId(categories[i]['id'],'name',categories[i]['name']);
                                         tableAccess.getRowById(categories[i]['id']).attr('parent_id',categories[i]['parent_id']);
                                     }
+                                    toastMessage('success','Success','');
                                 }
                                 else{
                                     toastMessage('error','Error',response['message']);
