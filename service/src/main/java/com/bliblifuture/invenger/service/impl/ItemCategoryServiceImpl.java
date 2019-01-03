@@ -92,6 +92,12 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
         categories = categoryRepository.getCategoryParentWithChildIdOrderById();
         int currentIndex = getCategoryIndex(request.getId());
         CategoryWithChildId current = categories.get(currentIndex);
+
+        //if edit base category
+        if(current.getName().equals("/all")){
+            throw new InvalidRequestException("Can't edit /all category");
+        }
+
         int oldNameLength = current.getName().length();
 
         boolean nameChanged = !current.getName().substring(current.getName().length()-request.getNewName().length())

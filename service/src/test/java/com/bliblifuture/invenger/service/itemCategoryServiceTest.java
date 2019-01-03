@@ -66,22 +66,22 @@ public class itemCategoryServiceTest {
 
         List<CategoryWithChildId> categories = new LinkedList<>();
         categories.add(CategoryWithChildId.builder()
-                .id(1).name("one")
+                .id(1).name("/all")
                 .childsId(Arrays.asList(2,3))
                 .parentId(null).build()
         );
         categories.add(CategoryWithChildId.builder()
-                .id(2).name("one/two")
+                .id(2).name("/all/two")
                 .childsId(Arrays.asList(4))
                 .parentId(1).build()
         );
         categories.add(CategoryWithChildId.builder()
-                .id(3).name("one/three")
+                .id(3).name("/all/three")
                 .childsId(Arrays.asList())
                 .parentId(1).build()
         );
         categories.add(CategoryWithChildId.builder()
-                .id(4).name("one/two/four")
+                .id(4).name("/all/two/four")
                 .childsId(Arrays.asList())
                 .parentId(2).build());
 
@@ -91,10 +91,10 @@ public class itemCategoryServiceTest {
     private CategoryEditResponse mock_updateCategory_parentNotChanged_result(){
 
         CategoryEditResponse response = new CategoryEditResponse();
-        response.addCategoryData(1,"one",null);
-        response.addCategoryData(2,"one/"+CATEGORY_NEWNAME,1);
-        response.addCategoryData(3,"one/three",1);
-        response.addCategoryData(4,"one/"+CATEGORY_NEWNAME+"/four",2);
+        response.addCategoryData(1,"/all",null);
+        response.addCategoryData(2,"/all/"+CATEGORY_NEWNAME,1);
+        response.addCategoryData(3,"/all/three",1);
+        response.addCategoryData(4,"/all/"+CATEGORY_NEWNAME+"/four",2);
         response.setStatusToSuccess();
         return response;
     }
@@ -102,19 +102,33 @@ public class itemCategoryServiceTest {
     private CategoryEditResponse mock_updateCategory_parentChanged_result(){
 
         CategoryEditResponse response = new CategoryEditResponse();
-        response.addCategoryData(1,"one",null);
-        response.addCategoryData(2,"one/three/"+CATEGORY_NEWNAME,3);
-        response.addCategoryData(3,"one/three",1);
-        response.addCategoryData(4,"one/three/"+CATEGORY_NEWNAME+"/four",2);
+        response.addCategoryData(1,"/all",null);
+        response.addCategoryData(2,"/all/three/"+CATEGORY_NEWNAME,3);
+        response.addCategoryData(3,"/all/three",1);
+        response.addCategoryData(4,"/all/three/"+CATEGORY_NEWNAME+"/four",2);
         response.setStatusToSuccess();
         return response;
     }
 
     @Test(expected = InvalidRequestException.class)
-    public void updateCategory_invalidRequest(){
+    public void updateCategory_invalidNewName(){
         CategoryEditRequest request = new CategoryEditRequest();
         request.setId(CATEGORY_ID);
         request.setNewName("tidak/valid");
+        request.setNewParentId(100);
+        categoryService.updateCategory(request);
+    }
+
+    @Test(expected = InvalidRequestException.class)
+    public void updateCategory_updateRoot(){
+        CategoryEditRequest request = new CategoryEditRequest();
+        request.setId(1);
+        request.setNewParentId(2);
+        request.setNewName("yeah");
+
+        when(categoryRepository.getCategoryParentWithChildIdOrderById())
+                .thenReturn(mock_getCategoryParentWithChildOrderById());
+
         categoryService.updateCategory(request);
     }
 
@@ -136,6 +150,7 @@ public class itemCategoryServiceTest {
         CategoryEditRequest request = new CategoryEditRequest();
         request.setId(-1);
         request.setNewName(CATEGORY_NEWNAME);
+        request.setNewParentId(2);
         categoryService.updateCategory(request);
     }
 
