@@ -87,11 +87,11 @@
             <table id="lendmentsTable" class="display" style="width:100%;">
                 <thead>
                 <tr>
-                    <th><input type="text" style="width: 60px" placeholder="name" target-col="id"/></th>
+                    <th><input type="text" style="width: 60px" placeholder="Id.." target-col="id"/></th>
                     <th></th>
                     <th>
                         <select target-col="status">
-                            <option selected value="">&lt;Filter by status&gt;</option>
+                            <option selected value="">&lt;Filter by Status&gt;</option>
                             <th:block th:each="status : ${statusList}">
                                 <option th:value="${status.value}" th:text="${status.value}">Option i</option>
                             </th:block>

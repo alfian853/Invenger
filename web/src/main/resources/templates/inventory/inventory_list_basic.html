@@ -92,12 +92,12 @@
             <table id="itemsTable" class="display" style="width:100%;">
                 <thead>
                 <tr>
-                    <th><input type="text" style="width: 60px" placeholder="Id" target-col="id"/></th>
-                    <th><input type="text" placeholder="Name" target-col="name"/></th>
+                    <th><input type="text" style="width: 60px" placeholder="Id.." target-col="id"/></th>
+                    <th><input type="text" placeholder="Name.." target-col="name"/></th>
                     <th></th>
                     <th></th>
                     <th>
-                        <select target-col="category">
+                        <select target-col="category" style="width: 200px;">
                             <th:block th:each="category : ${categories}">
                                 <option th:value="${category.name}" th:text="${category.name}">Option i</option>
                             </th:block>
@@ -168,7 +168,7 @@
 
         $(document).ready(function() {
             $('#itemsTable select[target-col=\"category\"]').select2({
-                placeholder : 'Please select item category',
+                placeholder : 'Please select category..',
                 ajax : {
                     url : '/category/search',
                     params : null,

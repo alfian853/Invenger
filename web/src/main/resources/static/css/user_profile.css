@@ -172,9 +172,9 @@ body{
 .circle{
     width: 30px;
     height: 30px;
-    border-radius: 50%;
+    /*border-radius: 50%;
     border: 1px solid rgba(24,28,33,0.06);
-    background-color: rgba(24,28,33,0.06);
+    background-color: rgba(24,28,33,0.06);*/
 }
 #link{
     display: none;

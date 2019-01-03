@@ -36,7 +36,7 @@ a:hover{
 .field{
 	/*1 rem = 16px*/
 	padding: 3rem;
-	border-bottom: 1px solid rgba(24, 28, 33, 0.06);
+	/*border-bottom: 1px solid rgba(24, 28, 33, 0.06);*/
 	/*width: 378px;*/
 	height: calc(398px - 6rem);
 }
