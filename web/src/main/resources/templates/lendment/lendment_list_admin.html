@@ -23,6 +23,10 @@
 
         <script th:src="@{/js/DataTablesAccess.js}"></script>
 
+        <style>
+            .dataTables_filter, .dataTables_info { display: none; }
+        </style>
+
         <script th:inline = "javascript">
             var tableAccess = null;
             let preparedCol = DTAccess.generateColumnSpec([
