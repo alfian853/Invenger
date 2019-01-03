@@ -90,11 +90,13 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
         CategoryWithChildId current = categories.get(currentIndex);
         int oldNameLength = current.getName().length();
 
+        boolean nameChanged = !current.getName().substring(current.getName().length()-request.getNewName().length())
+                .equals(request.getNewName());
+
+        boolean parentChanged = !current.getParentId().equals(request.getNewParentId());
 
         // check is value changed?
-        if(current.getName().substring(current.getName().length()-request.getNewName().length())
-                .equals(request.getNewName()) &&
-                current.getParentId().equals(request.getNewParentId()) ){
+        if( !nameChanged && !parentChanged){
             response.setStatusToSuccess();
             response.setMessage("no data changed");
             return response;
@@ -133,21 +135,28 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
         }
 
 
-        //parent id changed
-        if( request.getNewParentId() != null && !current.getParentId().equals(request.getNewParentId()) ){
-            current.setParentId(parent.getId());
-            current.setName(parent.getName()+"/"+request.getNewName());
-        }
-        else{//parent id not changed
+        Category currentCtg = categoryRepository.getOne(current.getId());
+
+        if(nameChanged){//parent id not changed
             for(int i = oldNameLength-1; i >= 0; --i){
                 if( current.getName().charAt(i) == '/' ){
                     current.setName( current.getName().substring(0,i+1) + request.getNewName() );
-                    categoryRepository.updateNameById(current.getId(),current.getName());
+                    currentCtg.setName(current.getName());
+//                    categoryRepository.updateNameById(current.getId(),current.getName());
                     break;
                 }
             }
         }
 
+        //parent id changed
+        if(parentChanged){
+            current.setParentId(parent.getId());
+            current.setName(parent.getName()+"/"+request.getNewName());
+            currentCtg.setName(current.getName());
+            currentCtg.setParent(categoryRepository.getOne(current.getParentId()));
+        }
+
+        categoryRepository.save(currentCtg);
 
         for(Integer childId: current.getChildsId()){
             updateCategoryUtil(childId,current.getName(),oldNameLength);
