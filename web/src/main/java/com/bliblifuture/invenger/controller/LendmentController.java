@@ -72,8 +72,9 @@ public class LendmentController {
 
     @PostMapping("/approve/{id}")
     @ResponseBody
-    public RequestResponse doApprovement(@PathVariable("id") Integer lendmentId) {
-        return lendmentService.approveLendmentRequest(lendmentId);
+    public RequestResponse doApprovement(@PathVariable("id") Integer lendmentId,
+                                         @RequestParam(value = "approve")boolean isApprove) {
+        return lendmentService.assignLendmentRequest(lendmentId,isApprove);
     }
 
     @GetMapping("/detail/{id}")

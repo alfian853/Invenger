@@ -20,7 +20,7 @@ public interface LendmentService extends
     LendmentDTO getLendmentDetailById(Integer id);
     List<LendmentDTO> getAllLendmentRequestOfSuperior();
     RequestResponse returnInventory(LendmentReturnRequest request);
-    RequestResponse approveLendmentRequest(Integer id);
+    RequestResponse assignLendmentRequest(Integer id, boolean isApprove);
     HandOverResponse handOverOrderItems(Integer id);
     List<LendmentDTO> getInventoryLendment(Integer id);
 }

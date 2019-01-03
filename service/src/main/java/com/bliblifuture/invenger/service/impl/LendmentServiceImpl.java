@@ -200,22 +200,29 @@ public class LendmentServiceImpl implements LendmentService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public RequestResponse approveLendmentRequest(Integer id) {
+    public RequestResponse assignLendmentRequest(Integer id,boolean isApprove) {
         Lendment lendment = lendmentRepository.findLendmentById(id);
 
         if(lendment == null){
             throw new DataNotFoundException("Lendment Not Found");
         }
 
-        if(!lendment.getStatus().equals(LendmentStatus.WaitingForApproval.getDesc())){
-            throw new InvalidRequestException("Lendment had been approved");
-        }
-
-        lendment.setStatus(LendmentStatus.WaitingForPickUp.getDesc());
-        lendmentRepository.save(lendment);
-
         RequestResponse response = new RequestResponse();
-        response.setStatusToSuccess();
+        if (isApprove) {
+            if(!lendment.getStatus().equals(LendmentStatus.WaitingForApproval.getDesc())){
+                throw new InvalidRequestException("Lendment had been approved");
+            }
+
+            lendment.setStatus(LendmentStatus.WaitingForPickUp.getDesc());
+            lendmentRepository.save(lendment);
+            response.setStatusToSuccess();
+            response.setMessage("Request has been approved");
+        }
+        else{
+            lendmentRepository.deleteById(id);
+            response.setStatusToSuccess();
+            response.setMessage("Request has been disapproved");
+        }
 
         return response;
     }
