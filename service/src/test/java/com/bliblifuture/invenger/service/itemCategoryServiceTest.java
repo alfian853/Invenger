@@ -59,6 +59,7 @@ public class itemCategoryServiceTest {
     ///////////////////////////////////////////////////////////////////////////
 
     private String CATEGORY_NEWNAME = "dua";
+    private int CATEGORY_ID = 2;
 
 
     private List<CategoryWithChildId> mock_getCategoryParentWithChildOrderById(){
@@ -112,7 +113,7 @@ public class itemCategoryServiceTest {
     @Test(expected = InvalidRequestException.class)
     public void updateCategory_invalidRequest(){
         CategoryEditRequest request = new CategoryEditRequest();
-        request.setId(1);
+        request.setId(CATEGORY_ID);
         request.setNewName("tidak/valid");
         categoryService.updateCategory(request);
     }
@@ -152,8 +153,10 @@ public class itemCategoryServiceTest {
         when(categoryRepository.getCategoryParentWithChildIdOrderById())
                 .thenReturn(mock_getCategoryParentWithChildOrderById());
 
+        when(categoryRepository.getOne(2)).thenReturn(new Category());
+
         CategoryEditRequest request = new CategoryEditRequest();
-        request.setId(2);
+        request.setId(CATEGORY_ID);
         request.setNewName(CATEGORY_NEWNAME);
         request.setNewParentId(1);
         CategoryEditResponse response = categoryService.updateCategory(request);
@@ -162,12 +165,13 @@ public class itemCategoryServiceTest {
 
     @Test
     public void updateCategory_parentChanged(){
+        when(categoryRepository.getOne(2)).thenReturn(new Category());
 
         when(categoryRepository.getCategoryParentWithChildIdOrderById())
                 .thenReturn(mock_getCategoryParentWithChildOrderById());
 
         CategoryEditRequest request = new CategoryEditRequest();
-        request.setId(2);
+        request.setId(CATEGORY_ID);
         request.setNewName(CATEGORY_NEWNAME);
         request.setNewParentId(3);
         CategoryEditResponse response = categoryService.updateCategory(request);
@@ -178,11 +182,13 @@ public class itemCategoryServiceTest {
     @Test
     public void updateCategory_validParentChanged(){
 
+        when(categoryRepository.getOne(2)).thenReturn(new Category());
+
         when(categoryRepository.getCategoryParentWithChildIdOrderById())
                 .thenReturn(mock_getCategoryParentWithChildOrderById());
 
         CategoryEditRequest request = new CategoryEditRequest();
-        request.setId(2);
+        request.setId(CATEGORY_ID);
         request.setNewName("two");
         request.setNewParentId(3);
         CategoryEditResponse response = categoryService.updateCategory(request);
@@ -196,7 +202,7 @@ public class itemCategoryServiceTest {
                 .thenReturn(mock_getCategoryParentWithChildOrderById());
 
         CategoryEditRequest request = new CategoryEditRequest();
-        request.setId(2);
+        request.setId(CATEGORY_ID);
         request.setNewName("two");
         request.setNewParentId(4);
         CategoryEditResponse response = categoryService.updateCategory(request);
