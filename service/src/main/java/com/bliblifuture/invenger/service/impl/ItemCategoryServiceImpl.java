@@ -81,6 +81,10 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
 
         CategoryEditResponse response = new CategoryEditResponse();
 
+        if(request.getNewParentId().equals(request.getId())){
+            throw new InvalidRequestException("Can't assign it self as parent");
+        }
+
         if(request.getNewName().contains("/")){
             throw new InvalidRequestException("category name can't be contain '/' character");
         }

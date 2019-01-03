@@ -118,6 +118,15 @@ public class itemCategoryServiceTest {
         categoryService.updateCategory(request);
     }
 
+    @Test(expected = InvalidRequestException.class)
+    public void updateCategory_assignSelfAsParent(){
+        CategoryEditRequest request = new CategoryEditRequest();
+        request.setId(1);
+        request.setNewParentId(1);
+        categoryService.updateCategory(request);
+    }
+
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void updateCategory_idNotFound(){
 
