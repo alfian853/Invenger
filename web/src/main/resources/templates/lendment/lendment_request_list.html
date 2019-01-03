@@ -65,7 +65,7 @@
                         <td>
                             <button class="submit" type="submit" th:onclick="|loadLendmentDetail(${lendment.id})|">Detail</button>
                             <button class="submit" type="submit" th:onclick="|approve(${lendment.id},true)|">Approve</button>
-                            <button class="submit" type="submit" th:onclick="|approve(${lendment.id},false)|">Disapprove</button>
+                            <button class="submit" style="background-color: #BB281A;" type="submit" th:onclick="|approve(${lendment.id},false)|">Disapprove</button>
                         </td>
                     </tr>
                 </th:block>
@@ -114,6 +114,7 @@
 
         function approve(id,isApprove) {
 
+
             iziToast.question({
                 timeout: 20000,
                 close: true,
@@ -122,7 +123,7 @@
                 id: 'question',
                 zindex: 99999,
                 title: 'Hey',
-                message: 'Are you sure to approve this lendment request?',
+                message: (isApprove)?'Are you sure to approve this lendment request?':'Are you sure to disapprove this lendment request?',
                 position: 'center',
                 buttons: [
                     ['<button><b>YES</b></button>', function (instance, toast) {
