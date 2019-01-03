@@ -148,9 +148,10 @@ public class LendmentControllerTest {
         RequestResponse response = new RequestResponse();
         response.setStatusToSuccess();
 
-        when(lendmentService.approveLendmentRequest(1)).thenReturn(response);
+        when(lendmentService.assignLendmentRequest(1,true)).thenReturn(response);
 
         mvc.perform(post("/lendment/approve/{id}", 1)
+                .param("approve","true")
         ).andExpect(status().isOk());
     }
 

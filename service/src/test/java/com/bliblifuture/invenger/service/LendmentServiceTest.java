@@ -305,28 +305,37 @@ public class LendmentServiceTest {
 
 
       /////////////////////////////////////////////////////////////
-     //public RequestResponse approveLendmentRequest(Integer id)//
+     //public RequestResponse assignLendmentRequest(Integer id)//
     /////////////////////////////////////////////////////////////
 
     @Test(expected = DataNotFoundException.class)
     public void approveLendmentRequest_notFound(){
         when(lendmentRepository.findLendmentById(1)).thenReturn(null);
-        lendmentService.approveLendmentRequest(1);
+        lendmentService.assignLendmentRequest(1,true);
     }
 
     @Test(expected = InvalidRequestException.class)
-    public void approveLendmentRequest_invalidRequest(){
+    public void assignLendmentRequest_approve_InvalidRequest(){
         LENDMENT.setStatus(LendmentStatus.InLending.getDesc());
         when(lendmentRepository.findLendmentById(LENDMENT.getId())).thenReturn(LENDMENT);
-        lendmentService.approveLendmentRequest(LENDMENT.getId());
+        lendmentService.assignLendmentRequest(LENDMENT.getId(),true);
     }
 
     @Test
-    public void approveLendmentRequest_success(){
+    public void assignLendmentRequest_approve_Success(){
         LENDMENT.setStatus(LendmentStatus.WaitingForApproval.getDesc());
         when(lendmentRepository.findLendmentById(LENDMENT.getId())).thenReturn(LENDMENT);
         Assert.assertTrue(
-                lendmentService.approveLendmentRequest(LENDMENT.getId()).isSuccess()
+                lendmentService.assignLendmentRequest(LENDMENT.getId(),true).isSuccess()
+        );
+    }
+
+    @Test
+    public void assignLendmentRequest_disapprove_Success(){
+        LENDMENT.setStatus(LendmentStatus.WaitingForApproval.getDesc());
+        when(lendmentRepository.findLendmentById(LENDMENT.getId())).thenReturn(LENDMENT);
+        Assert.assertTrue(
+                lendmentService.assignLendmentRequest(LENDMENT.getId(),false).isSuccess()
         );
     }
 
