@@ -93,7 +93,6 @@ public class LendmentServiceImpl implements LendmentService {
         int itemSize = request.getItems().size();
         for(int i = 0;i < itemSize; ++i){
             Inventory inventory = inventoryRepository.findInventoryById( request.getChildIdAt(i) );
-
             if(request.getChildQuantityAt(i) > inventory.getQuantity()){
                 throw new InvalidRequestException(inventory.getName()+" is not Available");
             }
@@ -238,6 +237,10 @@ public class LendmentServiceImpl implements LendmentService {
 
         if(!lendment.getStatus().equals(LendmentStatus.WaitingForPickUp.getDesc())){
             throw new InvalidRequestException("Invalid Request!");
+        }
+
+        if(!lendment.getUser().getSuperior().getId().equals(accountService.getSessionUser().getId())){
+            throw new InvalidRequestException("You are not authorized to do this action");
         }
 
         lendment.setStatus(LendmentStatus.InLending.getDesc());
