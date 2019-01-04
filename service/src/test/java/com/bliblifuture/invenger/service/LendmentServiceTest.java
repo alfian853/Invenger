@@ -354,10 +354,21 @@ public class LendmentServiceTest {
     @Test
     public void handOverOrderItems_success(){
         LENDMENT.setStatus(LendmentStatus.WaitingForPickUp.getDesc());
+        USER.setSuperior(User.builder().id(40).build());
         when(lendmentRepository.findLendmentById(LENDMENT.getId())).thenReturn(LENDMENT);
+        when(accountService.getSessionUser()).thenReturn(User.builder().id(40).build());
         Assert.assertTrue(
                 lendmentService.handOverOrderItems(LENDMENT.getId()).isSuccess()
         );
+    }
+
+    @Test(expected = InvalidRequestException.class)
+    public void handOverOrderItems_assignOtherInferiorRequest(){
+        LENDMENT.setStatus(LendmentStatus.WaitingForPickUp.getDesc());
+        USER.setSuperior(User.builder().id(2).build());
+        when(lendmentRepository.findLendmentById(LENDMENT.getId())).thenReturn(LENDMENT);
+        when(accountService.getSessionUser()).thenReturn(User.builder().superior(USER).build());
+        lendmentService.handOverOrderItems(LENDMENT.getId());
     }
 
 
