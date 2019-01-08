@@ -206,6 +206,11 @@ public class LendmentServiceImpl implements LendmentService {
             throw new DataNotFoundException("Lendment Not Found");
         }
 
+        if(!lendment.getUser().getSuperior().getId().equals(accountService.getSessionUser().getId())){
+            throw new InvalidRequestException("You are not authorized to do this action");
+        }
+
+
         RequestResponse response = new RequestResponse();
         if (isApprove) {
             if(!lendment.getStatus().equals(LendmentStatus.WaitingForApproval.getDesc())){
@@ -237,10 +242,6 @@ public class LendmentServiceImpl implements LendmentService {
 
         if(!lendment.getStatus().equals(LendmentStatus.WaitingForPickUp.getDesc())){
             throw new InvalidRequestException("Invalid Request!");
-        }
-
-        if(!lendment.getUser().getSuperior().getId().equals(accountService.getSessionUser().getId())){
-            throw new InvalidRequestException("You are not authorized to do this action");
         }
 
         lendment.setStatus(LendmentStatus.InLending.getDesc());
